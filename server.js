@@ -2,11 +2,11 @@ const express = require('express');
 const app = express();
 
 // Serve static files from the "dist" directory
-app.use(express.static('dist/hexadash'));
+app.use(express.static('dist/medisupply'));
 
 // Redirect all requests to the "index.html" file
 app.get('*', (req, res) => {
-  res.sendFile(__dirname + '/dist/hexadash/index.html');
+  res.sendFile(__dirname + '/dist/medisupply/index.html');
 });
 
 // Start the server

@@ -1,5 +1,5 @@
 {
-  "name": "hexadash",
+  "name": "medisupply",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -12,7 +12,7 @@
     "e2e": "ng e2e",
     "build-prod": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng build --configuration production",
     "build-prod-state": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng build --configuration production --stats-json",
-    "bundle-report": "webpack-bundle-analyzer dist/hexadash/stats.json"
+    "bundle-report": "webpack-bundle-analyzer dist/medisupply/stats.json"
   },
   "private": true,
   "dependencies": {
