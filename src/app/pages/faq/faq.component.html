@@ -1,0 +1,156 @@
+<div nz-row nzGutter="25">
+  <!-- skeleton -->
+  <ng-template #loadingSkeleton>
+    <nz-skeleton class="bg-white dark:bg-white/10 rounded-6 p-[30px] pt-[15px]" [nzShape]="circle" [nzActive]="true"
+      [nzParagraph]="{ rows: 12 }"></nz-skeleton>
+  </ng-template>
+  <!-- skeleton -->
+
+  <div nz-col nzXXl="6" nzLg="8" nzMd="10" nzSm="11" nzXs="24" class="mb-[25px] max-sm:flex max-sm:flex-col-reverse">
+    <ng-container *ngIf="showContent; else loadingSkeleton">
+      <div class="bg-white dark:bg-white/10 p-[25px] rounded-[10px] sm:mb-[25px]">
+        <span class="px-5 py-1 bg-regularBG dark:bg-white/10 text-light dark:text-white/60 text-13 rounded-2xl" type="light">Browse by Topic</span>
+        <ul class="mt-8 mb-0">
+          <li class="{{ listItemClass }} text-primary" nz-tab nzTitle="Using Applications" (click)="selectTab('usingApplication', 'Using Applications')" [class.active]="selectedTab === 'usingApplication'">
+
+            <span class="text-dark dark:text-white/[.87]">Using Applications</span>
+          </li>
+          <li class="{{ listItemClass }} text-secondary" nz-tab nzTitle="Ul Elements" (click)="selectTab('uiElement', 'Ul Elements')" [class.active]="selectedTab === 'uiElement'">
+
+            <span class="text-dark dark:text-white/[.87]">Ul Elements</span>
+          </li>
+          <li class="{{ listItemClass }} text-success" nz-tab nzTitle="Components" (click)="selectTab('components', 'Components')" [class.active]="selectedTab === 'components'">
+
+            <span class="text-dark dark:text-white/[.87]">Components</span>
+          </li>
+          <li class="{{ listItemClass }} text-info" nz-tab nzTitle="Build Process" (click)="selectTab('buildProcess','Build Process')" [class.active]="selectedTab === 'buildProcess'">
+
+            <span class="text-dark dark:text-white/[.87]">Build Process</span>
+          </li>
+          <li class="{{ listItemClass }} text-warning" nz-tab nzTitle="Support Policy" (click)="selectTab('supportPolicy','Support Policy')" [class.active]="selectedTab === 'supportPolicy'">
+
+            <span class="text-dark dark:text-white/[.87]">Support Policy</span>
+          </li>
+          <li class="{{ listItemClass }} text-danger" nz-tab nzTitle="Accounts & Billing" (click)="selectTab('accountsBilling','Accounts & Billing')" [class.active]="selectedTab === 'accountsBilling'">
+
+            <span class="text-dark dark:text-white/[.87]">Accounts & Billing</span>
+          </li>
+        </ul>
+      </div>
+      <div class="bg-white dark:bg-white/10 px-[25px] py-[30px] mb-[25px] rounded-[10px] max-sm:order-1 ">
+        <figure class="mx-auto mb-7">
+          <svg-icon class="flex justify-center w-full h-full" src="assets/images/svg/profiles.svg"></svg-icon>
+        </figure>
+        <figcaption class="text-center">
+          <h1 class="mb-4 text-lg font-medium text-dark dark:text-white/[.87]">Not finding the help you need?</h1>
+          <button nz-button class="text-sm font-semibold text-white bg-primary border-primary hover:bg-primary-hbr h-11 px-7 rounded-6">
+            <span>Contact Support</span>
+          </button>
+        </figcaption>
+      </div>
+    </ng-container>
+  </div>
+  <div nz-col nzXXl="18" nzLg="16" nzMd="14" nzSm="13" nzXs="24" class="mb-[25px]">
+    <ng-container *ngIf="showContent; else loadingSkeleton">
+      <div class="tab-content">
+        <div class="bg-white dark:bg-white/10 m-0 p-0 mb-[25px] rounded-10 relative">
+          <div class="py-[18px] px-[25px] text-dark dark:text-white/[.87] font-medium text-[17px]">
+            <h1 class="mb-0 text-[20px] font-medium text-dark dark:text-white/[.87]">{{ tabTitle }}</h1>
+          </div>
+          <div *ngIf="selectedTab === 'usingApplication'">
+            <div class="px-[25px] pb-[50px] pt-[5px]">
+                <!-- Add your content for the Edit Profile tab -->
+                <nz-collapse class="bg-transparent" *ngIf="usingApplicationsData" [nzBordered]="false" nzAccordion>
+                  <nz-collapse-panel
+                    class="{{collapsePanelClass}}"
+                    *ngFor="let panel of usingApplicationsData.Panel"
+                    [nzHeader]="panel.header"
+                    [nzActive]="usingApplicationsData.defaultActiveKey.includes(panel.key)"
+                    [nzDisabled]="false"
+                    [nzShowArrow]="true"
+                    [nzBordered]="usingApplicationsData.bordered"
+                    [nzExpandIcon]="expandIcon"
+                  >
+                    <p class="font-normal mb-9 text-body dark:text-white/60 text-15">{{ panel.content }}</p>
+                    <p><strong class="mb-3 text-sm font-medium text-dark dark:text-white/[.87]">Was this article helpful?</strong></p>
+                    <div class="flex items-center gap-[10px] mt-[10px]">
+                      <button nz-button class="inline-flex items-center justify-center px-4 capitalize bg-transparent border rounded-4 h-9 text-success border-success">
+                        <span class="text-[12px]" nz-icon nzType="smile" nzTheme="outline"></span>
+                        Yes
+                      </button>
+                      <button nz-button class="inline-flex items-center justify-center px-4 capitalize bg-transparent border rounded-4 h-9 text-warning border-warning">
+                        <span class="text-[12px]" nz-icon nzType="frown" nzTheme="outline"></span>
+                        No
+                      </button>
+                    </div>
+                  </nz-collapse-panel>
+                </nz-collapse>
+            </div>
+          </div>
+          <div *ngIf="selectedTab === 'uiElement'">
+            <div class="px-[25px] pb-[50px] pt-[5px]">
+                <!-- Add your content for the Account Settings tab -->
+                <nz-collapse class="bg-transparent" *ngIf="uiElementsData" [nzBordered]="false" nzAccordion>
+                  <nz-collapse-panel
+                    class="{{collapsePanelClass}}"
+                    *ngFor="let panel of uiElementsData.Panel"
+                    [nzHeader]="panel.header"
+                    [nzActive]="uiElementsData.defaultActiveKey.includes(panel.key)"
+                    [nzDisabled]="false"
+                    [nzShowArrow]="true"
+                    [nzBordered]="uiElementsData.bordered"
+                    [nzExpandedIcon]="!isFirst ? uiElementsData.icon || expandedIcon : undefined"
+                  >
+                    <p class="font-normal mb-9 text-body dark:text-white/60 text-15">{{ panel.content }}</p>
+                    <p><strong class="mb-3 text-sm font-medium text-dark dark:text-white/[.87]">Was this article helpful?</strong></p>
+                    <div class="flex items-center gap-[10px] mt-[10px]">
+                      <button nz-button class="inline-flex items-center justify-center px-4 capitalize bg-transparent border rounded-4 h-9 text-success border-success">
+                        <span class="text-[12px]" nz-icon nzType="smile" nzTheme="outline"></span>
+                        Yes
+                      </button>
+                      <button nz-button class="inline-flex items-center justify-center px-4 capitalize bg-transparent border rounded-4 h-9 text-warning border-warning">
+                        <span class="text-[12px]" nz-icon nzType="frown" nzTheme="outline"></span>
+                        No
+                      </button>
+                    </div>
+                    <ng-template #expandedIcon let-active>
+                      {{ active }}
+                      <span nz-icon nzType="caret-right" class="ant-collapse-arrow" [nzRotate]="p.nzActive ? 90 : -90"></span>
+                    </ng-template>
+                  </nz-collapse-panel>
+                </nz-collapse>
+                <!-- Display warning message when no data available -->
+                <div class="text-warning" *ngIf="!uiElementsData">
+                  No data available. Please check back later or contact support.
+                </div>
+            </div>
+          </div>
+          <div *ngIf="selectedTab === 'components'">
+            <!-- ... 'Components' content ... -->
+            <div class="px-[25px] pb-[50px] pt-[40px] text-warning text-[16px]">
+              No data available for 'Components'. Please check back later or contact support.
+            </div>
+          </div>
+          <div *ngIf="selectedTab === 'buildProcess'">
+            <!-- ... 'Build Process' content ... -->
+            <div class="px-[25px] pb-[50px] pt-[40px] text-warning text-[16px]">
+              No data available for 'Build Process'. Please check back later or contact support.
+            </div>
+          </div>
+          <div *ngIf="selectedTab === 'supportPolicy'">
+            <!-- ... 'Support Policy' content ... -->
+            <div class="px-[25px] pb-[50px] pt-[40px] text-warning text-[16px]">
+              No data available for 'Support Policy'. Please check back later or contact support.
+            </div>
+          </div>
+          <div *ngIf="selectedTab === 'accountsBilling'">
+            <!-- ... 'Accounts & Billing' content ... -->
+            <div class="px-[25px] pb-[50px] pt-[40px] text-warning text-[16px]">
+              No data available for 'Accounts & Billing'. Please check back later or contact support.
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>
