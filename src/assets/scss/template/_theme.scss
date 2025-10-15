@@ -332,7 +332,7 @@
 }
 
 .apexcharts-tooltip-marker {
-  @apply w-[8px] h-[8px] ltr:mr-[5px] rtl:ml-[5px] #{!important};
+  @apply w-[8px] h-[8px] me-[5px] #{!important};
 }
 
 .apexcharts-xaxistooltip, .apexcharts-yaxistooltip{
@@ -354,7 +354,7 @@
   @apply dark:bg-[#32333f] dark:border-white/10;
 }
 .ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow{
-  @apply ltr:mr-[12px] rtl:ml-[12px] rtl:rotate-[178deg];
+  @apply me-[12px] rtl:rotate-[178deg];
 }
 
 .ant-collapse-content{
@@ -600,7 +600,7 @@
 }
 
 .ant-modal-close-x{
-  @apply w-[34px] h-[34px] bg-normalBG text-dark border-1 border-regular rounded-full flex items-center justify-center mt-[12px] ltr:mr-[25px] rtl:ml-[25px] hover:bg-primary hover:text-white hover:border-primary duration-200 ease-in-out text-[15px] dark:bg-white/10 dark:text-white/[.87] dark:border-white/10 dark:hover:bg-primary dark:hover:text-white dark:hover:border-primary;
+  @apply w-[34px] h-[34px] bg-normalBG text-dark border-1 border-regular rounded-full flex items-center justify-center mt-[12px] me-[25px] hover:bg-primary hover:text-white hover:border-primary duration-200 ease-in-out text-[15px] dark:bg-white/10 dark:text-white/[.87] dark:border-white/10 dark:hover:bg-primary dark:hover:text-white dark:hover:border-primary;
 }
 
 /*------ Select -------*/
