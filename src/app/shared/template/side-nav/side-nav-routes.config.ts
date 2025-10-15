@@ -36,7 +36,7 @@ export const ROUTES: SideNavInterface[] = [
     submenu: []
   },
   {
-    path: '/warehouses',
+    path: '/dashboard/warehouses',
     title: 'Bodegas',
     iconType: 'nzIcon',
     icon: 'home',
@@ -58,7 +58,7 @@ export const ROUTES: SideNavInterface[] = [
     iconTheme: 'outline',
     icon: 'appstore-add',
     submenu: [{
-      path: '/pages/blank-page',
+      path: '/dashboard/blank-page',
       title: 'Blank Page',
       iconType: '',
       icon: '',

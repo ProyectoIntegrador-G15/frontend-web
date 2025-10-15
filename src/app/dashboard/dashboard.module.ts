@@ -44,7 +44,8 @@ import { PerfectScrollbarConfigInterface } from 'ngx-om-perfect-scrollbar';
 import { FullCalendarModule } from '@fullcalendar/angular';
 
 import { BlankPageComponent } from './blank-page/blank-page.component';
-
+import { WarehousesComponent } from './warehouse/warehouses.component';
+import { ProductsWarehouseComponent } from './products-warehouse/products-warehouse.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -85,7 +86,7 @@ const antdModule = [
     PerfectScrollbarModule,
     FullCalendarModule,
     NzMessageModule
-]
+];
 
 @NgModule({
     imports: [
@@ -97,7 +98,9 @@ const antdModule = [
     exports: [
     ],
     declarations: [
-      BlankPageComponent
+      BlankPageComponent,
+      WarehousesComponent,
+      ProductsWarehouseComponent,
     ],
     providers: [
         ThemeConstantService,
