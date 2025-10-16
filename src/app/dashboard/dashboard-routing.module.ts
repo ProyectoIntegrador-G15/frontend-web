@@ -3,7 +3,9 @@ import {Routes, RouterModule} from '@angular/router';
 
 import {BlankPageComponent} from './blank-page/blank-page.component';
 import {WarehousesComponent} from './warehouse/warehouses.component';
-import {ProductsWarehouseComponent} from './products-warehouse/products-warehouse.component';
+import {WarehouseInventoryComponent} from './warehouse-inventory/warehouse-inventory.component';
+import {ProductsComponent} from './products/products.component';
+import {ProductInventoryComponent} from './product-inventory/product-inventory.component';
 
 
 const routes: Routes = [
@@ -15,20 +17,32 @@ const routes: Routes = [
     },
   },
   {
+    path: 'products',
+    component: ProductsComponent,
+    data: {
+      title: 'Productos',
+    },
+  },
+  {
+    path: 'products/:id/warehouses',
+    component: ProductInventoryComponent,
+    data: {
+      title: 'Disponibilidad de producto',
+    },
+  },
+  {
     path: 'warehouses',
     component: WarehousesComponent,
     data: {
       title: 'Bodegas',
     },
-    children: [
-      {
-        path: ':id/products',
-        component: ProductsWarehouseComponent,
-        data: {
-          title: 'Productos por bodega',
-        },
-      }
-    ],
+  },
+  {
+    path: 'warehouses/:id/products',
+    component: WarehouseInventoryComponent,
+    data: {
+      title: 'Productos por bodega',
+    },
   },
 ];
 

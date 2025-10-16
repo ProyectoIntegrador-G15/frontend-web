@@ -1,10 +1,13 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-warehouses',
   templateUrl: 'warehouses.component.html',
 })
-export class WarehousesComponent {
+export class WarehousesComponent implements OnInit {
+  constructor(private router: Router) {}
+
   listOfData: any[] = [
     {
       id: '1',
@@ -36,16 +39,20 @@ export class WarehousesComponent {
   showContent = false;
 
 
-  ngOnInit() {
+  ngOnInit(): void {
     // Simulate loading time
     this.loadData();
   }
 
-  loadData() {
+  loadData(): void {
     // Simulate an asynchronous data loading operation
     setTimeout(() => {
       this.isLoading = false;
       this.showContent = true;
     }, 500);
+  }
+
+  navigateToProducts(warehouseId: string): void {
+    this.router.navigate(['/dashboard/warehouses', warehouseId, 'products']);
   }
 }

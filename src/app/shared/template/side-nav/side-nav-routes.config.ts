@@ -12,7 +12,7 @@ export const ROUTES: SideNavInterface[] = [
     submenu: []
   },
   {
-    path: '/products',
+    path: '/dashboard/products',
     title: 'Productos',
     iconType: 'nzIcon',
     icon: 'shop',
@@ -20,7 +20,7 @@ export const ROUTES: SideNavInterface[] = [
     submenu: []
   },
   {
-    path: '/sellers',
+    path: '/dashboard/sellers',
     title: 'Vendedores',
     iconType: 'nzIcon',
     icon: 'dollar',
@@ -28,7 +28,7 @@ export const ROUTES: SideNavInterface[] = [
     submenu: []
   },
   {
-    path: '/reports',
+    path: '/dashboard/reports',
     title: 'Reportes',
     iconType: 'nzIcon',
     icon: 'bar-chart',
@@ -44,7 +44,7 @@ export const ROUTES: SideNavInterface[] = [
     submenu: []
   },
   {
-    path: '/routes',
+    path: '/dashboard/routes',
     title: 'Rutas de Entrega',
     iconType: 'nzIcon',
     icon: 'environment',
