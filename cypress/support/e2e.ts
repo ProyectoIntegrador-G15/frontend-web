@@ -15,3 +15,27 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
+
+// Alternatively you can use CommonJS syntax:
+// require('./commands')
+
+// Hide fetch/XHR requests from command log
+Cypress.on('window:before:load', (win) => {
+  // Hide fetch/XHR requests
+  const originalFetch = win.fetch
+  win.fetch = (...args) => {
+    return originalFetch(...args)
+  }
+})
+
+// Global configuration for Angular testing
+Cypress.on('uncaught:exception', (err, runnable) => {
+  // Don't fail tests on uncaught exceptions from Angular
+  if (err.message.includes('ResizeObserver loop limit exceeded')) {
+    return false
+  }
+  if (err.message.includes('Non-Error promise rejection')) {
+    return false
+  }
+  return true
+})
