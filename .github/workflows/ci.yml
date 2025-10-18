@@ -125,7 +125,7 @@ jobs:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
           
       - name: Comment production URL
-        if: success()
+        if: success() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
@@ -169,7 +169,7 @@ jobs:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
           
       - name: Comment preview URL
-        if: success()
+        if: success() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
