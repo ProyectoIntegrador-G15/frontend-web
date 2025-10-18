@@ -124,17 +124,36 @@ jobs:
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
           
-      - name: Comment production URL
-        if: success() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+      - name: Display Production URL
+        run: |
+          echo "🚀 Deploy a Producción completado!"
+          echo "🌐 URL de Producción: https://${{ secrets.FIREBASE_PROJECT_ID }}.web.app"
+          echo "✅ Build: Exitoso"
+          echo "✅ Tests: Pasaron" 
+          echo "✅ E2E: Completados"
+          echo "🎯 Canal: live"
+          
+      - name: Create Deployment Info
+        run: |
+          cat > deployment-info.json << EOF
+          {
+            "environment": "production",
+            "url": "https://${{ secrets.FIREBASE_PROJECT_ID }}.web.app",
+            "channel": "live",
+            "status": "deployed",
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "commit": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}"
+          }
+          EOF
+          
+      - name: Upload Deployment Info
+        uses: actions/upload-artifact@v4
         with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '🚀 **Deploy a Producción completado!**\n\n🌐 **URL de Producción**: https://${{ secrets.FIREBASE_PROJECT_ID }}.web.app\n\n✅ Build: Exitoso\n✅ Tests: Pasaron\n✅ E2E: Completados\n🎯 Canal: live'
-            })
+          name: deployment-info-production
+          path: deployment-info.json
+          retention-days: 30
+          
 
   deploy-preview:
     name: Deploy to Preview (Develop)
@@ -168,14 +187,33 @@ jobs:
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
           
-      - name: Comment preview URL
-        if: success() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+      - name: Display Preview URL
+        run: |
+          echo "🔧 Deploy a Preview completado!"
+          echo "🌐 URL de Preview: https://${{ secrets.FIREBASE_PROJECT_ID }}--develop.web.app"
+          echo "✅ Build: Exitoso"
+          echo "✅ Tests: Pasaron"
+          echo "✅ E2E: Completados"
+          echo "🎯 Canal: develop"
+          
+      - name: Create Preview Deployment Info
+        run: |
+          cat > preview-deployment-info.json << EOF
+          {
+            "environment": "preview",
+            "url": "https://${{ secrets.FIREBASE_PROJECT_ID }}--develop.web.app",
+            "channel": "develop",
+            "status": "deployed",
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "commit": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}"
+          }
+          EOF
+          
+      - name: Upload Preview Deployment Info
+        uses: actions/upload-artifact@v4
         with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '🔧 **Deploy a Preview completado!**\n\n🌐 **URL de Preview**: https://${{ secrets.FIREBASE_PROJECT_ID }}--develop.web.app\n\n✅ Build: Exitoso\n✅ Tests: Pasaron\n✅ E2E: Completados\n🎯 Canal: develop'
-            })
+          name: deployment-info-preview
+          path: preview-deployment-info.json
+          retention-days: 30
+          
