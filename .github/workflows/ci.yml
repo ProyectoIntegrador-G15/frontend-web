@@ -127,32 +127,11 @@ jobs:
       - name: Display Production URL
         run: |
           echo "🚀 Deploy a Producción completado!"
-          echo "🌐 URL de Producción: https://${{ secrets.FIREBASE_PROJECT_ID }}.web.app"
+          echo "🌐 URL de Producción: https://misw4502-g15.web.app"
           echo "✅ Build: Exitoso"
           echo "✅ Tests: Pasaron" 
           echo "✅ E2E: Completados"
           echo "🎯 Canal: live"
-          
-      - name: Create Deployment Info
-        run: |
-          cat > deployment-info.json << EOF
-          {
-            "environment": "production",
-            "url": "https://${{ secrets.FIREBASE_PROJECT_ID }}.web.app",
-            "channel": "live",
-            "status": "deployed",
-            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "commit": "${{ github.sha }}",
-            "branch": "${{ github.ref_name }}"
-          }
-          EOF
-          
-      - name: Upload Deployment Info
-        uses: actions/upload-artifact@v4
-        with:
-          name: deployment-info-production
-          path: deployment-info.json
-          retention-days: 30
           
 
   deploy-preview:
@@ -190,30 +169,9 @@ jobs:
       - name: Display Preview URL
         run: |
           echo "🔧 Deploy a Preview completado!"
-          echo "🌐 URL de Preview: https://${{ secrets.FIREBASE_PROJECT_ID }}--develop.web.app"
+          echo "🌐 URL de Preview: https://misw4502-g15--develop.web.app"
           echo "✅ Build: Exitoso"
           echo "✅ Tests: Pasaron"
           echo "✅ E2E: Completados"
           echo "🎯 Canal: develop"
-          
-      - name: Create Preview Deployment Info
-        run: |
-          cat > preview-deployment-info.json << EOF
-          {
-            "environment": "preview",
-            "url": "https://${{ secrets.FIREBASE_PROJECT_ID }}--develop.web.app",
-            "channel": "develop",
-            "status": "deployed",
-            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "commit": "${{ github.sha }}",
-            "branch": "${{ github.ref_name }}"
-          }
-          EOF
-          
-      - name: Upload Preview Deployment Info
-        uses: actions/upload-artifact@v4
-        with:
-          name: deployment-info-preview
-          path: preview-deployment-info.json
-          retention-days: 30
           
