@@ -128,6 +128,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   // Método para validar el rango de temperatura en tiempo real
   validateTemperatureRange(): void {
+    // Verificar que el formulario esté inicializado
+    if (!this.validateForm) {
+      return;
+    }
+
     const tempMin = this.validateForm.get('tempMin')?.value;
     const tempMax = this.validateForm.get('tempMax')?.value;
 
@@ -140,13 +145,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
       const tempMinField = this.validateForm.get('tempMin');
       const tempMaxField = this.validateForm.get('tempMax');
 
-      if (tempMinField?.errors.temperatureRange) {
+      if (tempMinField?.errors?.temperatureRange) {
         const errors = { ...tempMinField.errors };
         delete errors.temperatureRange;
         tempMinField.setErrors(Object.keys(errors).length > 0 ? errors : null);
       }
 
-      if (tempMaxField?.errors.temperatureRange) {
+      if (tempMaxField?.errors?.temperatureRange) {
         const errors = { ...tempMaxField.errors };
         delete errors.temperatureRange;
         tempMaxField.setErrors(Object.keys(errors).length > 0 ? errors : null);
