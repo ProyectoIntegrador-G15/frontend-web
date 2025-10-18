@@ -1,3 +1,133 @@
+<!-- Modal de crear producto -->
+<nz-modal
+  [(nzVisible)]="isProductModalVisible"
+  [nzTitle]="productModalTitle"
+  [nzContent]="productModalContent"
+  [nzFooter]="productModalFooter"
+  (nzOnCancel)="handleProductModalCancel()"
+  nzWidth="75%"
+>
+  <ng-template #productModalTitle>Información del Producto</ng-template>
+
+  <ng-template #productModalContent>
+    <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="handleProductModalOk()">
+      <nz-form-item>
+        <nz-form-control [nzValidateStatus]="getFieldStatus('name')" [nzErrorTip]="getFieldError('name')">
+          <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">Nombre
+            del producto: <span class="text-red-500">*</span></nz-form-label>
+          <input class="{{inputClass}}" type="text" nz-input placeholder="Nombre del producto" formControlName="name">
+        </nz-form-control>
+      </nz-form-item>
+
+      <div nz-row nzGutter="16">
+        <div nz-col nzXs="24" nzSm="12">
+          <nz-form-item>
+            <nz-form-control [nzValidateStatus]="getFieldStatus('price')" [nzErrorTip]="getFieldError('price')">
+              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+                Precio por unidad: <span class="text-red-500">*</span></nz-form-label>
+              <input class="{{inputClass}}" type="number" nz-input placeholder="$##.### COP" formControlName="price">
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzXs="24" nzSm="12">
+          <nz-form-item>
+            <nz-form-control [nzValidateStatus]="getFieldStatus('provider')" [nzErrorTip]="getFieldError('provider')">
+              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+                Proveedor: <span class="text-red-500">*</span></nz-form-label>
+              <nz-select
+                class="min-w-[260px] capitalize [&>nz-select-top-control]:border-normal dark:[&>nz-select-top-control]:border-white/10 [&>nz-select-top-control]:bg-white [&>nz-select-top-control]:dark:bg-white/10 [&>nz-select-top-control]:shadow-none [&>nz-select-top-control]:text-dark [&>nz-select-top-control]:dark:text-white/60 [&>nz-select-top-control]:h-[50px] [&>nz-select-top-control]:flex [&>nz-select-top-control]:items-center [&>nz-select-top-control]:rounded-[5px] [&>nz-select-top-control]:px-[20px] [&>.ant-select-arrow]:text-theme-gray dark:[&>.ant-select-arrow]:text-white/60"
+                nzPlaceHolder="Seleccionar proveedor" nzAllowClear formControlName="provider">
+                <nz-option nzValue="proveedor1" nzLabel="Proveedor 1"></nz-option>
+                <nz-option nzValue="proveedor2" nzLabel="Proveedor 2"></nz-option>
+                <nz-option nzValue="proveedor3" nzLabel="Proveedor 3"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <div nz-row nzGutter="16">
+        <div nz-col nzXs="24" nzSm="12">
+          <nz-form-item>
+            <nz-form-control [nzValidateStatus]="getFieldStatus('requiresColdChain')"
+                             [nzErrorTip]="getFieldError('requiresColdChain')">
+              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+                Requiere cadena de frío: <span class="text-red-500">*</span></nz-form-label>
+              <nz-select
+                class="min-w-[260px] capitalize [&>nz-select-top-control]:border-normal dark:[&>nz-select-top-control]:border-white/10 [&>nz-select-top-control]:bg-white [&>nz-select-top-control]:dark:bg-white/10 [&>nz-select-top-control]:shadow-none [&>nz-select-top-control]:text-dark [&>nz-select-top-control]:dark:text-white/60 [&>nz-select-top-control]:h-[50px] [&>nz-select-top-control]:flex [&>nz-select-top-control]:items-center [&>nz-select-top-control]:rounded-[5px] [&>nz-select-top-control]:px-[20px] [&>.ant-select-arrow]:text-theme-gray dark:[&>.ant-select-arrow]:text-white/60"
+                nzPlaceHolder="Seleccionar opción" nzAllowClear formControlName="requiresColdChain">
+                <nz-option nzValue="si" nzLabel="Sí"></nz-option>
+                <nz-option nzValue="no" nzLabel="No"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzXs="24" nzSm="12">
+          <nz-form-item>
+            <nz-form-control [nzValidateStatus]="getFieldStatus('tempMin')" [nzErrorTip]="getFieldError('tempMin')">
+              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+                Rango de temperatura: <span class="text-red-500">*</span></nz-form-label>
+              <div class="flex items-center gap-2">
+                <input class="{{inputClass}} flex-1" type="number" nz-input placeholder="##°F"
+                       formControlName="tempMin">
+                <span class="text-dark dark:text-white/[.87]">-</span>
+                <input class="{{inputClass}} flex-1" type="number" nz-input placeholder="##°F"
+                       formControlName="tempMax">
+              </div>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <nz-form-item>
+        <nz-form-control [nzValidateStatus]="getFieldStatus('description')" [nzErrorTip]="getFieldError('description')">
+          <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+            Descripción: <span class="text-red-500">*</span></nz-form-label>
+          <textarea
+            class="min-h-[100px] border-normal dark:border-white/10 px-[20px] py-[15px] placeholder-shown:text-light-extra dark:placeholder-shown:text-white/60 rounded-[5px] dark:bg-white/10"
+            nz-input placeholder="Descripción" formControlName="description"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item class="mb-0">
+        <nz-form-control [nzValidateStatus]="getFieldStatus('storageInstructions')"
+                         [nzErrorTip]="getFieldError('storageInstructions')">
+          <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+            Instrucciones de almacenamiento: <span class="text-red-500">*</span></nz-form-label>
+          <textarea
+            class="min-h-[100px] border-normal dark:border-white/10 px-[20px] py-[15px] placeholder-shown:text-light-extra dark:placeholder-shown:text-white/60 rounded-[5px] dark:bg-white/10"
+            nz-input placeholder="Instrucciones de almacenamiento" formControlName="storageInstructions"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </ng-template>
+
+  <ng-template #productModalFooter>
+    <div class="flex justify-center gap-3 w-full">
+      <button
+        class="hover:bg-gray-hbr border-solid border-1 dark:bg-transparent border-normal dark:border-white/10 text-light dark:text-white/60 dark:focus:text-white/60 hover:text-white text-[14px] font-semibold leading-[22px] inline-flex items-center justify-center rounded-[4px] px-[20px] h-[44px]"
+        nz-button nzType="default" (click)="handleProductModalCancel()">Cancelar
+      </button>
+      <button
+        class="bg-primary hover:bg-primary-hbr hover:border-primary-hbr border-solid border-1 border-primary text-white dark:text-white/[.87] text-[14px] font-semibold leading-[22px] inline-flex items-center justify-center rounded-[4px] px-[20px] h-[44px]"
+        nz-button nzType="primary" (click)="handleProductModalOk()" [nzLoading]="isProductModalLoading">
+        <i class="text-[12px] mr-2" nz-icon nzType="plus"></i>Crear Producto
+      </button>
+    </div>
+  </ng-template>
+</nz-modal>
+
+<div class="flex justify-end mb-[25px] mt-[4px]">
+  <!-- New Product -->
+  <button
+    class="flex items-center px-[14px] text-sm text-white rounded-md font-semibold bg-primary border-primary h-10 gap-[6px]"
+    nz-button
+    (click)="showProductModal()">
+    <i class="text-[12px]" nz-icon nzType="plus"></i>
+    <span class="m-0">Crear producto</span>
+  </button>
+  <!-- end: New Product -->
+</div>
 <div
   class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
   <div class="p-[25px]">

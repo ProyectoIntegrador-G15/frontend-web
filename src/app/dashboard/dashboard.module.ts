@@ -2,7 +2,7 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {SharedModule} from '../shared/shared.module';
 import {DashboardRoutingModule} from "./dashboard-routing.module";
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DatePipe} from '@angular/common'; // Import DatePipe
 import {DecimalPipe} from '@angular/common';
 
@@ -46,6 +46,8 @@ import {FullCalendarModule} from '@fullcalendar/angular';
 import {BlankPageComponent} from './blank-page/blank-page.component';
 import {WarehousesComponent} from './warehouse/warehouses.component';
 import {WarehouseInventoryComponent} from './warehouse-inventory/warehouse-inventory.component';
+
+// Products
 import {ProductsComponent} from './products/products.component';
 import {ProductInventoryComponent} from './product-inventory/product-inventory.component';
 
@@ -78,6 +80,7 @@ const antdModule = [
   NzSpaceModule,
   NzFormModule,
   FormsModule,
+  ReactiveFormsModule,
   NzSelectModule,
   NzDatePickerModule,
   NzModalModule,
