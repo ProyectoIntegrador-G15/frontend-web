@@ -2,7 +2,7 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {SharedModule} from '../shared/shared.module';
 import {DashboardRoutingModule} from "./dashboard-routing.module";
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DatePipe} from '@angular/common'; // Import DatePipe
 import {DecimalPipe} from '@angular/common';
 
@@ -34,9 +34,8 @@ import {NzDatePickerModule} from 'ng-zorro-antd/date-picker';
 import {NzModalModule} from 'ng-zorro-antd/modal';
 import {NzInputModule} from 'ng-zorro-antd/input';
 import {NzMessageModule} from 'ng-zorro-antd/message';
-import {NzSpinModule} from 'ng-zorro-antd/spin';
-import {NzIconModule} from 'ng-zorro-antd/icon';
 import {NzPaginationModule} from 'ng-zorro-antd/pagination';
+import {NzSpinModule} from 'ng-zorro-antd/spin';
 
 import {AngularSvgIconModule} from 'angular-svg-icon';
 import {BaseChartDirective} from 'ng2-charts';
@@ -49,6 +48,8 @@ import {FullCalendarModule} from '@fullcalendar/angular';
 import {BlankPageComponent} from './blank-page/blank-page.component';
 import {WarehousesComponent} from './warehouse/warehouses.component';
 import {WarehouseInventoryComponent} from './warehouse-inventory/warehouse-inventory.component';
+
+// Products
 import {ProductsComponent} from './products/products.component';
 import {ProductInventoryComponent} from './product-inventory/product-inventory.component';
 import {RoutesListComponent} from './routes-list/routes-list.component';
@@ -83,6 +84,7 @@ const antdModule = [
   NzSpaceModule,
   NzFormModule,
   FormsModule,
+  ReactiveFormsModule,
   NzSelectModule,
   NzDatePickerModule,
   NzModalModule,
@@ -93,9 +95,8 @@ const antdModule = [
   PerfectScrollbarModule,
   FullCalendarModule,
   NzMessageModule,
-  NzSpinModule,
-  NzIconModule,
-  NzPaginationModule
+  NzPaginationModule,
+  NzSpinModule
 ];
 
 @NgModule({

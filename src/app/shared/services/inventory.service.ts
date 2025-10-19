@@ -7,7 +7,7 @@ import { ProductInventory } from '../interfaces/inventory.type';
   providedIn: 'root'
 })
 export class InventoryService {
-  private baseUrl = 'http://localhost:8003/inventory';
+  private baseUrl = 'http://localhost:3002/inventory';
 
   constructor(private http: HttpClient) { }
 
