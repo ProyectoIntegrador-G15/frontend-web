@@ -1,0 +1,97 @@
+// Estilos para botones principales
+.btn-primary {
+  display: flex;
+  padding: 12px 50px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 100px;
+  background: var(--blue-violet-a11y, #5F6AB0);
+  color: var(--white, #FFF);
+  font-family: 'Nunito', sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 24px; /* 120% */
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: var(--blue-violet-dark, #3749B3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(95, 106, 176, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(95, 106, 176, 0.2);
+  }
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(95, 106, 176, 0.2);
+  }
+  
+  &:disabled {
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+// Variante más pequeña
+.btn-primary-sm {
+  @extend .btn-primary;
+  padding: 12px 32px;
+  font-size: 16px;
+  line-height: 20px;
+}
+
+// Variante más grande
+.btn-primary-lg {
+  @extend .btn-primary;
+  padding: 20px 64px;
+  font-size: 24px;
+  line-height: 28px;
+}
+
+// Botón secundario
+.btn-secondary {
+  display: flex;
+  padding: 16px 51px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 100px;
+  background: transparent;
+  color: var(--blue-violet-a11y, #5F6AB0);
+  font-family: 'Nunito', sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: 0.15px;
+  border: 2px solid var(--blue-violet-a11y, #5F6AB0);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: var(--blue-violet-a11y, #5F6AB0);
+    color: var(--white, #FFF);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(95, 106, 176, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(95, 106, 176, 0.2);
+  }
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(95, 106, 176, 0.2);
+  }
+}

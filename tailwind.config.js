@@ -86,7 +86,7 @@ module.exports = {
         10: '10px',
       },
       fontFamily: {
-        jost: ['Jost', 'sans-serif'],
+        nunito: ['Nunito', 'sans-serif'],
       },
       fontSize: {
         10: ['10px', '14px'],

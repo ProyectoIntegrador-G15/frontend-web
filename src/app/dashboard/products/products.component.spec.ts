@@ -727,8 +727,9 @@ describe('ProductsComponent - Comprehensive Tests', () => {
   describe('Input Class Property', () => {
     it('should have correct input class', () => {
       expect(component.inputClass).toContain('w-full');
-      expect(component.inputClass).toContain('rounded-4');
-      expect(component.inputClass).toContain('border-normal');
+      expect(component.inputClass).toContain('rounded-[6px]');
+      expect(component.inputClass).toContain('text-[16px]');
+      expect(component.inputClass).toContain('min-h-[50px]');
     });
   });
 });

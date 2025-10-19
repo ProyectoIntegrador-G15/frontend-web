@@ -1,0 +1,14 @@
+.routes-list-container {
+  padding: 20px;
+}
+
+.table-link {
+  color: #1890ff;
+  cursor: pointer;
+  
+  &:hover {
+    color: #40a9ff;
+    text-decoration: underline;
+  }
+}
+

@@ -4,9 +4,10 @@ import {Routes, RouterModule} from '@angular/router';
 import {BlankPageComponent} from './blank-page/blank-page.component';
 import {WarehousesComponent} from './warehouse/warehouses.component';
 import {WarehouseInventoryComponent} from './warehouse-inventory/warehouse-inventory.component';
-
 import {ProductsComponent} from './products/products.component';
 import {ProductInventoryComponent} from './product-inventory/product-inventory.component';
+import {RoutesListComponent} from './routes-list/routes-list.component';
+import {CreateRouteComponent} from './create-route/create-route.component';
 
 
 const routes: Routes = [
@@ -43,6 +44,20 @@ const routes: Routes = [
     component: WarehouseInventoryComponent,
     data: {
       title: 'Productos por bodega',
+    },
+  },
+  {
+    path: 'routes',
+    component: RoutesListComponent,
+    data: {
+      title: 'Rutas de Entrega',
+    },
+  },
+  {
+    path: 'routes/create-route',
+    component: CreateRouteComponent,
+    data: {
+      title: 'Generar ruta de entrega',
     },
   },
 ];
