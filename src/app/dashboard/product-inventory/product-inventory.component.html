@@ -1,6 +1,6 @@
 <!-- Botón de regreso -->
 <div class="mb-6">
-  <button 
+  <button
     (click)="goBack()"
     class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -26,7 +26,7 @@
         <p class="text-sm text-blue-700 dark:text-blue-200 mb-1">ID: {{ inventoryData?.product_id || 'N/A' }}</p>
         <p class="text-lg font-bold text-blue-900 dark:text-blue-100">{{ inventoryData?.product_name || 'N/A' }}</p>
       </div>
-      
+
       <div class="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg">
         <div class="flex items-center mb-3">
           <div class="w-10 h-10 bg-green-100 dark:bg-green-800 rounded-lg flex items-center justify-center mr-3">
@@ -39,7 +39,7 @@
         <p class="text-3xl font-bold text-green-900 dark:text-green-100">{{ inventoryData?.total_warehouses || 0 }}</p>
         <p class="text-sm text-green-700 dark:text-green-200">con inventario</p>
       </div>
-      
+
       <div class="bg-purple-50 dark:bg-purple-900/20 p-6 rounded-lg">
         <div class="flex items-center mb-3">
           <div class="w-10 h-10 bg-purple-100 dark:bg-purple-800 rounded-lg flex items-center justify-center mr-3">
@@ -57,7 +57,7 @@
 </div>
 
 <!-- Tabla de inventario por bodega -->
-<div *ngIf="!isLoading && !errorMessage" class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
+<div *ngIf="!isLoading && warehousesData.length > 0 && !errorMessage" class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
   <div class="p-[25px]">
     <div class="w-full overflow-x-auto">
       <nz-table #warehousesTable [nzData]="warehousesData" [nzFrontPagination]="false" [nzShowPagination]="false">
@@ -77,7 +77,7 @@
           </th>
           <th
             class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
-            Ubicación
+            Sector
           </th>
           <th
             class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">

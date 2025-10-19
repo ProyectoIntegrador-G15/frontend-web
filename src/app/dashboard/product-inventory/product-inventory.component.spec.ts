@@ -63,6 +63,9 @@ describe('ProductInventoryComponent', () => {
     component = fixture.componentInstance;
     mockInventoryService = TestBed.inject(InventoryService) as jasmine.SpyObj<InventoryService>;
     mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+
+    // Setup default mock returns
+    mockInventoryService.getProductInventory.and.returnValue(of(mockProductInventory));
   });
 
   it('should create', () => {

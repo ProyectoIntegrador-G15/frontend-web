@@ -6,7 +6,7 @@ import {throwError} from 'rxjs';
 
 import {Product} from '../interfaces/product.type';
 
-const PRODUCTS_API_URL = 'http://localhost:8003';
+const PRODUCTS_API_URL = 'http://localhost:3002';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +23,29 @@ export class ProductsService {
       .pipe(
         catchError(this.handleError)
       );
+  }
+
+  createProduct(productData: any): Observable<any> {
+    return this.http.post<any>(`${PRODUCTS_API_URL}/products`, productData)
+      .pipe(
+        map(response => {
+          // Actualizar la lista de productos después de crear uno nuevo
+          this.refreshProducts();
+          return response;
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  private refreshProducts(): void {
+    this.getProducts().subscribe({
+      next: (products) => {
+        this.productsSubject.next(products);
+      },
+      error: (error) => {
+        console.error('Error al actualizar la lista de productos:', error);
+      }
+    });
   }
 
   /**
