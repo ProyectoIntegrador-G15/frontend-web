@@ -1,5 +1,56 @@
 @import '../variables';
 
+// Estilos para inputs de texto (sobrescribir Ant Design)
+.ant-input,
+input[nz-input],
+textarea[nz-input] {
+  border-color: var(--gray-main, #6F6F70) !important;
+  border-width: 1px !important;
+  border-radius: 6px !important;
+  font-size: 16px !important;
+  padding: 12px 16px !important;
+  min-height: 50px !important;
+  background-color: white !important;
+  color: var(--gray-dark, #1E1E1F) !important;
+  
+  &::placeholder {
+    color: var(--gray-main, #6F6F70) !important;
+    font-size: 16px !important;
+  }
+  
+  &:hover {
+    border-color: var(--blue-violet-dark, #3749B3) !important;
+  }
+  
+  &:focus,
+  &.ant-input-focused {
+    border-color: var(--blue-violet-dark, #3749B3) !important;
+    box-shadow: 0 0 0 2px rgba(55, 73, 179, 0.1) !important;
+  }
+}
+
+// Textarea específico
+textarea.ant-input,
+textarea[nz-input] {
+  resize: vertical;
+  min-height: 100px !important;
+}
+
+// Modo oscuro para inputs
+.dark {
+  .ant-input,
+  input[nz-input],
+  textarea[nz-input] {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: var(--gray-main, #6F6F70) !important;
+    color: rgba(255, 255, 255, 0.87) !important;
+    
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+  }
+}
+
 // Estilos para Labels
 label {
   font-size: 16px !important;

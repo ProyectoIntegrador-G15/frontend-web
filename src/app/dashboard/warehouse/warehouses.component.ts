@@ -55,4 +55,32 @@ export class WarehousesComponent implements OnInit {
   navigateToProducts(warehouseId: string): void {
     this.router.navigate(['/dashboard/warehouses', warehouseId, 'products']);
   }
+
+  // Método para obtener el color del tag según el estado
+  getStatusColor(status: string): string {
+    switch (status.toLowerCase()) {
+      case 'operativa':
+        return 'green';
+      case 'mantenimiento':
+        return 'orange';
+      case 'cerrada':
+        return 'default';
+      default:
+        return 'default';
+    }
+  }
+
+  // Método para obtener el texto del estado
+  getStatusText(status: string): string {
+    switch (status.toLowerCase()) {
+      case 'operativa':
+        return 'Operativa';
+      case 'mantenimiento':
+        return 'Mantenimiento';
+      case 'cerrada':
+        return 'Cerrada';
+      default:
+        return status;
+    }
+  }
 }

@@ -51,7 +51,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   // Formulario reactivo para validaciones
   validateForm: FormGroup;
-  inputClass = 'w-full rounded-4 border-normal border-1 text-[15px] dark:bg-white/10 dark:border-white/10 px-[20px] py-[12px] min-h-[50px] outline-none placeholder:text-[#A0A0A0] text-theme-gray dark:text-white/60';
+  inputClass = 'w-full rounded-[6px] text-[16px] dark:bg-white/10 px-[16px] py-[12px] min-h-[50px] outline-none';
 
   private subscription: Subscription = new Subscription();
 

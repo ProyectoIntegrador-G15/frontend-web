@@ -35,7 +35,7 @@
               <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 Proveedor: <span class="text-red-500">*</span></nz-form-label>
               <nz-select
-                class="min-w-[260px] capitalize [&>nz-select-top-control]:border-normal dark:[&>nz-select-top-control]:border-white/10 [&>nz-select-top-control]:bg-white [&>nz-select-top-control]:dark:bg-white/10 [&>nz-select-top-control]:shadow-none [&>nz-select-top-control]:text-dark [&>nz-select-top-control]:dark:text-white/60 [&>nz-select-top-control]:h-[50px] [&>nz-select-top-control]:flex [&>nz-select-top-control]:items-center [&>nz-select-top-control]:rounded-[5px] [&>nz-select-top-control]:px-[20px] [&>.ant-select-arrow]:text-theme-gray dark:[&>.ant-select-arrow]:text-white/60"
+                class="w-full"
                 nzPlaceHolder="Seleccionar proveedor" nzAllowClear formControlName="supplier">
                 <nz-option nzValue="proveedor1" nzLabel="Proveedor 1"></nz-option>
                 <nz-option nzValue="proveedor2" nzLabel="Proveedor 2"></nz-option>
@@ -54,7 +54,7 @@
               <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 Requiere cadena de frío: <span class="text-red-500">*</span></nz-form-label>
               <nz-select
-                class="min-w-[260px] capitalize [&>nz-select-top-control]:border-normal dark:[&>nz-select-top-control]:border-white/10 [&>nz-select-top-control]:bg-white [&>nz-select-top-control]:dark:bg-white/10 [&>nz-select-top-control]:shadow-none [&>nz-select-top-control]:text-dark [&>nz-select-top-control]:dark:text-white/60 [&>nz-select-top-control]:h-[50px] [&>nz-select-top-control]:flex [&>nz-select-top-control]:items-center [&>nz-select-top-control]:rounded-[5px] [&>nz-select-top-control]:px-[20px] [&>.ant-select-arrow]:text-theme-gray dark:[&>.ant-select-arrow]:text-white/60"
+                class="w-full"
                 nzPlaceHolder="Seleccionar opción" nzAllowClear formControlName="requiresColdChain">
                 <nz-option nzValue="si" nzLabel="Sí"></nz-option>
                 <nz-option nzValue="no" nzLabel="No"></nz-option>
@@ -84,7 +84,7 @@
           <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
             Descripción: <span class="text-red-500">*</span></nz-form-label>
           <textarea
-            class="min-h-[100px] border-normal dark:border-white/10 px-[20px] py-[15px] placeholder-shown:text-light-extra dark:placeholder-shown:text-white/60 rounded-[5px] dark:bg-white/10"
+            class="w-full min-h-[100px] rounded-[6px] text-[16px] dark:bg-white/10 px-[16px] py-[12px] outline-none"
             nz-input placeholder="Descripción" formControlName="description"></textarea>
         </nz-form-control>
       </nz-form-item>
@@ -95,7 +95,7 @@
           <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
             Instrucciones de almacenamiento: <span class="text-red-500">*</span></nz-form-label>
           <textarea
-            class="min-h-[100px] border-normal dark:border-white/10 px-[20px] py-[15px] placeholder-shown:text-light-extra dark:placeholder-shown:text-white/60 rounded-[5px] dark:bg-white/10"
+            class="w-full min-h-[100px] rounded-[6px] text-[16px] dark:bg-white/10 px-[16px] py-[12px] outline-none"
             nz-input placeholder="Instrucciones de almacenamiento" formControlName="storageInstructions"></textarea>
         </nz-form-control>
       </nz-form-item>
@@ -107,7 +107,7 @@
               <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 Bodega: <span class="text-red-500">*</span></nz-form-label>
               <nz-select
-                class="min-w-[260px] capitalize [&>nz-select-top-control]:border-normal dark:[&>nz-select-top-control]:border-white/10 [&>nz-select-top-control]:bg-white [&>nz-select-top-control]:dark:bg-white/10 [&>nz-select-top-control]:shadow-none [&>nz-select-top-control]:text-dark [&>nz-select-top-control]:dark:text-white/60 [&>nz-select-top-control]:h-[50px] [&>nz-select-top-control]:flex [&>nz-select-top-control]:items-center [&>nz-select-top-control]:rounded-[5px] [&>nz-select-top-control]:px-[20px] [&>.ant-select-arrow]:text-theme-gray dark:[&>.ant-select-arrow]:text-white/60"
+                class="w-full"
                 nzPlaceHolder="Seleccionar bodega" nzAllowClear formControlName="warehouse" [nzLoading]="isLoadingWarehouses">
                 <nz-option *ngFor="let warehouse of warehouses" [nzValue]="warehouse.id" [nzLabel]="warehouse.name"></nz-option>
               </nz-select>
@@ -137,14 +137,12 @@
 
   <ng-template #productModalFooter>
     <div class="flex justify-center gap-3 w-full">
-      <button
-        class="hover:bg-gray-hbr border-solid border-1 dark:bg-transparent border-normal dark:border-white/10 text-light dark:text-white/60 dark:focus:text-white/60 hover:text-white text-[14px] font-semibold leading-[22px] inline-flex items-center justify-center rounded-[4px] px-[20px] h-[44px]"
-        nz-button nzType="default" (click)="handleProductModalCancel()">Cancelar
+      <button class="btn-secondary" (click)="handleProductModalCancel()">
+        Cancelar
       </button>
-      <button
-        class="bg-primary hover:bg-primary-hbr hover:border-primary-hbr border-solid border-1 border-primary text-white dark:text-white/[.87] text-[14px] font-semibold leading-[22px] inline-flex items-center justify-center rounded-[4px] px-[20px] h-[44px]"
-        nz-button nzType="primary" (click)="handleProductModalOk()" [nzLoading]="isProductModalLoading">
-        <i class="text-[12px] mr-2" nz-icon nzType="plus"></i>Crear Producto
+      <button class="btn-primary" (click)="handleProductModalOk()" [nzLoading]="isProductModalLoading">
+        <span nz-icon nzType="plus" nzTheme="outline"></span>
+        Crear Producto
       </button>
     </div>
   </ng-template>
@@ -152,12 +150,9 @@
 
 <div class="flex justify-end mb-[25px] mt-[4px]">
   <!-- New Product -->
-  <button
-    class="flex items-center px-[14px] text-sm text-white rounded-md font-semibold bg-primary border-primary h-10 gap-[6px]"
-    nz-button
-    (click)="showProductModal()">
-    <i class="text-[12px]" nz-icon nzType="plus"></i>
-    <span class="m-0">Crear producto</span>
+  <button class="btn-primary" (click)="showProductModal()">
+    <span nz-icon nzType="plus" nzTheme="outline"></span>
+    Crear producto
   </button>
   <!-- end: New Product -->
 </div>
@@ -218,10 +213,13 @@
           </td>
           <td
             class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-            <button nz-button
-                    (click)="navigateToInventory(data.id)"
-                    class="bg-primary/10 hover:bg-primary-hbr border-none text-primary hover:text-white text-[14px] font-semibold leading-[22px] inline-flex items-center justify-center rounded-[4px] px-[20px] h-[44px] [&>span]:inline-flex">
-              <span class="text-[14px]" nz-icon nzType="home" nzTheme="outline"></span>
+            <button
+              (click)="navigateToInventory(data.id)"
+              class="inline-flex items-center justify-center w-[44px] h-[44px] rounded-[6px] border-none cursor-pointer transition-all duration-200"
+              style="background-color: var(--blue-violet-extralight, #E8ECFF); color: var(--blue-violet-dark, #3749B3);"
+              onmouseover="this.style.backgroundColor='var(--blue-violet-dark, #3749B3)'; this.style.color='white';"
+              onmouseout="this.style.backgroundColor='var(--blue-violet-extralight, #E8ECFF)'; this.style.color='var(--blue-violet-dark, #3749B3)';">
+              <span class="text-[18px]" nz-icon nzType="home" nzTheme="outline"></span>
             </button>
           </td>
         </tr>
