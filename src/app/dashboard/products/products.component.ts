@@ -5,6 +5,7 @@ import {ProductsService} from '../../shared/services/products.service';
 import {Subscription} from 'rxjs';
 import {Router} from '@angular/router';
 import {NzModalService} from 'ng-zorro-antd/modal';
+import {NzNotificationService} from 'ng-zorro-antd/notification';
 
 @Component({
   selector: 'app-products',
@@ -53,7 +54,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private router: Router,
     private productsService: ProductsService,
     private modalService: NzModalService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private notification: NzNotificationService
   ) {
   }
 
@@ -109,13 +111,16 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.validateForm = this.fb.group({
       name: [null, [Validators.required]],
       price: [null, [Validators.required, Validators.min(0.01)]],
-      provider: [null, [Validators.required]],
+      supplier: [null, [Validators.required]],
       requiresColdChain: [null, [Validators.required]],
       tempMin: [null, [Validators.required]],
       tempMax: [null, [Validators.required]],
-      description: [null, [Validators.required]],
-      storageInstructions: [null, [Validators.required]]
-    }, { validators: this.temperatureRangeValidator });
+      description: [null, [Validators.required, Validators.minLength(10)]],
+      storageInstructions: [null, [Validators.required, Validators.minLength(10)]],
+      warehouse: [null, [Validators.required]],
+      quantity: [null, [Validators.required, Validators.min(1)]],
+      location: [null, [Validators.required]]
+    }, {validators: this.temperatureRangeValidator});
 
     // Suscribirse a cambios en los campos de temperatura para validar en tiempo real
     this.validateForm.get('tempMin')?.valueChanges.subscribe(() => {
@@ -138,21 +143,21 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
     if (tempMin && tempMax && tempMin >= tempMax) {
       // Marcar ambos campos como inválidos
-      this.validateForm.get('tempMin')?.setErrors({ temperatureRange: true });
-      this.validateForm.get('tempMax')?.setErrors({ temperatureRange: true });
+      this.validateForm.get('tempMin')?.setErrors({temperatureRange: true});
+      this.validateForm.get('tempMax')?.setErrors({temperatureRange: true});
     } else {
       // Limpiar errores si la validación pasa
       const tempMinField = this.validateForm.get('tempMin');
       const tempMaxField = this.validateForm.get('tempMax');
 
       if (tempMinField?.errors?.temperatureRange) {
-        const errors = { ...tempMinField.errors };
+        const errors = {...tempMinField.errors};
         delete errors.temperatureRange;
         tempMinField.setErrors(Object.keys(errors).length > 0 ? errors : null);
       }
 
       if (tempMaxField?.errors?.temperatureRange) {
-        const errors = { ...tempMaxField.errors };
+        const errors = {...tempMaxField.errors};
         delete errors.temperatureRange;
         tempMaxField.setErrors(Object.keys(errors).length > 0 ? errors : null);
       }
@@ -165,7 +170,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     const tempMax = control.get('tempMax')?.value;
 
     if (tempMin && tempMax && tempMin >= tempMax) {
-      return { temperatureRange: true };
+      return {temperatureRange: true};
     }
     return {};
   }
@@ -188,6 +193,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
       }
       if (field.errors.min) {
         return 'El precio debe ser mayor a 0';
+      }
+      if (field.errors.minlength) {
+        return 'Este campo debe tener al menos 10 caracteres';
       }
       if (field.errors.temperatureRange) {
         return 'La temperatura mínima debe ser menor a la máxima';
@@ -214,18 +222,54 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
     this.isProductModalLoading = true;
 
-    // Capturar y mostrar los datos del formulario por consola
-    console.log('=== DATOS DEL FORMULARIO DE PRODUCTO ===');
-    console.log(this.validateForm.value);
+    // Generar el objeto con la estructura correcta
+    const formData = this.validateForm.value;
+    const productData = {
+      name: formData.name,
+      price: formData.price,
+      supplier: formData.supplier,
+      requiresColdChain: formData.requiresColdChain === 'si',
+      temperatureRange: `${formData.tempMin}°F - ${formData.tempMax}°F`,
+      description: formData.description,
+      storageInstructions: formData.storageInstructions,
+      warehouse: formData.warehouse,
+      quantity: formData.quantity,
+      location: formData.location
+    };
 
-    // Simular proceso de creación
-    setTimeout(() => {
-      this.isProductModalVisible = false;
-      this.isProductModalLoading = false;
-      // Limpiar el formulario después de crear
-      this.resetProductForm();
-      console.log('Producto creado exitosamente');
-    }, 1000);
+    // Enviar datos al servicio
+    this.productsService.createProduct(productData).subscribe({
+      next: (response) => {
+        console.log('=== PRODUCTO CREADO EXITOSAMENTE ===');
+        console.log('Respuesta del servidor:', response);
+
+        // Cerrar modal y limpiar formulario
+        this.isProductModalVisible = false;
+        this.isProductModalLoading = false;
+        this.resetProductForm();
+
+        // Mostrar notificación de éxito
+        this.notification.create(
+          'success',
+          '¡Producto creado exitosamente!',
+          `El producto "${productData.name}" ha sido agregado correctamente al inventario.`
+        );
+      },
+      error: (error) => {
+        console.error('=== ERROR AL CREAR PRODUCTO ===');
+        console.error('Error:', error);
+
+        this.isProductModalLoading = false;
+        this.errorMessage = 'Error al crear el producto. Por favor, inténtalo de nuevo.';
+
+        // Mostrar notificación de error
+        this.notification.create(
+          'error',
+          'Error al crear producto',
+          'No se pudo crear el producto. Por favor, verifica los datos e inténtalo de nuevo.'
+        );
+      }
+    });
   }
 
   resetProductForm(): void {

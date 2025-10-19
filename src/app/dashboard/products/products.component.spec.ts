@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NzModalService } from 'ng-zorro-antd/modal';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { of, throwError } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
@@ -14,6 +15,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
   let mockProductsService: jasmine.SpyObj<ProductsService>;
   let mockRouter: jasmine.SpyObj<Router>;
   let mockModalService: jasmine.SpyObj<NzModalService>;
+  let mockNotificationService: jasmine.SpyObj<NzNotificationService>;
 
   const mockProducts = [
     {
@@ -39,23 +41,29 @@ describe('ProductsComponent - Comprehensive Tests', () => {
     createValidFormData: () => ({
       name: 'Producto de Prueba',
       price: 15.50,
-      provider: 'proveedor1',
+      supplier: 'proveedor1',
       requiresColdChain: 'si',
       tempMin: 20,
       tempMax: 30,
       description: 'Descripción del producto de prueba',
-      storageInstructions: 'Instrucciones de almacenamiento del producto'
+      storageInstructions: 'Instrucciones de almacenamiento del producto',
+      warehouse: 'bodega1',
+      quantity: 100,
+      location: 'Estante A-1'
     }),
 
     createInvalidFormData: () => ({
       name: '',
       price: 0,
-      provider: null,
+      supplier: null,
       requiresColdChain: null,
       tempMin: 30,
       tempMax: 20,
-      description: '',
-      storageInstructions: ''
+      description: 'Corto',
+      storageInstructions: 'Corto',
+      warehouse: null,
+      quantity: 0,
+      location: ''
     }),
 
     fillFormWithValidData: () => {
@@ -84,9 +92,10 @@ describe('ProductsComponent - Comprehensive Tests', () => {
   };
 
   beforeEach(async () => {
-    const productsServiceSpy = jasmine.createSpyObj('ProductsService', ['getProducts', 'products$']);
+    const productsServiceSpy = jasmine.createSpyObj('ProductsService', ['getProducts', 'createProduct', 'products$']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     const modalServiceSpy = jasmine.createSpyObj('NzModalService', ['create', 'closeAll', 'confirm']);
+    const notificationServiceSpy = jasmine.createSpyObj('NzNotificationService', ['create']);
 
     await TestBed.configureTestingModule({
       declarations: [ProductsComponent],
@@ -95,7 +104,8 @@ describe('ProductsComponent - Comprehensive Tests', () => {
         FormBuilder,
         { provide: ProductsService, useValue: productsServiceSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: NzModalService, useValue: modalServiceSpy }
+        { provide: NzModalService, useValue: modalServiceSpy },
+        { provide: NzNotificationService, useValue: notificationServiceSpy }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -105,6 +115,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
     mockProductsService = TestBed.inject(ProductsService) as jasmine.SpyObj<ProductsService>;
     mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     mockModalService = TestBed.inject(NzModalService) as jasmine.SpyObj<NzModalService>;
+    mockNotificationService = TestBed.inject(NzNotificationService) as jasmine.SpyObj<NzNotificationService>;
 
     // Setup default mock returns
     mockProductsService.getProducts.and.returnValue(of(mockProducts));
@@ -144,15 +155,18 @@ describe('ProductsComponent - Comprehensive Tests', () => {
   describe('Form Initialization', () => {
     it('should initialize form with all required fields', () => {
       component.initForm();
-
+      
       expect(component.validateForm.get('name')).toBeTruthy();
       expect(component.validateForm.get('price')).toBeTruthy();
-      expect(component.validateForm.get('provider')).toBeTruthy();
+      expect(component.validateForm.get('supplier')).toBeTruthy();
       expect(component.validateForm.get('requiresColdChain')).toBeTruthy();
       expect(component.validateForm.get('tempMin')).toBeTruthy();
       expect(component.validateForm.get('tempMax')).toBeTruthy();
       expect(component.validateForm.get('description')).toBeTruthy();
       expect(component.validateForm.get('storageInstructions')).toBeTruthy();
+      expect(component.validateForm.get('warehouse')).toBeTruthy();
+      expect(component.validateForm.get('quantity')).toBeTruthy();
+      expect(component.validateForm.get('location')).toBeTruthy();
     });
 
     it('should set up value changes subscriptions for temperature fields', () => {
@@ -304,14 +318,66 @@ describe('ProductsComponent - Comprehensive Tests', () => {
       expect(component.isProductModalLoading).toBe(true);
     });
 
-    it('should log form data on submission', () => {
-      spyOn(console, 'log');
+    it('should call createProduct service on submission', () => {
       spyOn(component, 'validateFormFields').and.returnValue(true);
-
+      mockProductsService.createProduct.and.returnValue(of({ success: true }));
+      
       TestUtils.fillFormWithValidData();
       component.handleProductModalOk();
+      
+      expect(mockProductsService.createProduct).toHaveBeenCalled();
+    });
 
-      expect(console.log).toHaveBeenCalledWith(component.validateForm.value);
+    it('should handle successful product creation', () => {
+      spyOn(component, 'validateFormFields').and.returnValue(true);
+      spyOn(component, 'resetProductForm');
+      mockProductsService.createProduct.and.returnValue(of({ success: true }));
+      
+      TestUtils.fillFormWithValidData();
+      component.handleProductModalOk();
+      
+      expect(component.isProductModalVisible).toBe(false);
+      expect(component.isProductModalLoading).toBe(false);
+      expect(component.resetProductForm).toHaveBeenCalled();
+    });
+
+    it('should handle product creation error', () => {
+      spyOn(component, 'validateFormFields').and.returnValue(true);
+      mockProductsService.createProduct.and.returnValue(throwError('Error creating product'));
+      
+      TestUtils.fillFormWithValidData();
+      component.handleProductModalOk();
+      
+      expect(component.isProductModalLoading).toBe(false);
+      expect(component.errorMessage).toBe('Error al crear el producto. Por favor, inténtalo de nuevo.');
+    });
+
+    it('should show success notification on successful creation', () => {
+      spyOn(component, 'validateFormFields').and.returnValue(true);
+      mockProductsService.createProduct.and.returnValue(of({ success: true }));
+      
+      TestUtils.fillFormWithValidData();
+      component.handleProductModalOk();
+      
+      expect(mockNotificationService.create).toHaveBeenCalledWith(
+        'success',
+        '¡Producto creado exitosamente!',
+        jasmine.stringMatching(/El producto ".*" ha sido agregado correctamente al inventario\./)
+      );
+    });
+
+    it('should show error notification on creation failure', () => {
+      spyOn(component, 'validateFormFields').and.returnValue(true);
+      mockProductsService.createProduct.and.returnValue(throwError('Error creating product'));
+      
+      TestUtils.fillFormWithValidData();
+      component.handleProductModalOk();
+      
+      expect(mockNotificationService.create).toHaveBeenCalledWith(
+        'error',
+        'Error al crear producto',
+        'No se pudo crear el producto. Por favor, verifica los datos e inténtalo de nuevo.'
+      );
     });
 
     it('should close modal after successful submission', (done) => {
@@ -430,6 +496,41 @@ describe('ProductsComponent - Comprehensive Tests', () => {
 
       expect(() => component.validateTemperatureRange()).not.toThrow();
     });
+  });
+
+  // ========================================
+  // MINIMUM LENGTH VALIDATION TESTS
+  // ========================================
+
+  describe('Minimum Length Validation', () => {
+    beforeEach(() => {
+      component.initForm();
+    });
+
+    it('should validate description minimum length', () => {
+      component.validateForm.get('description')?.setValue('Corto');
+      component.validateForm.get('description')?.markAsTouched();
+
+      expect(component.validateForm.get('description')?.hasError('minlength')).toBeTruthy();
+      expect(component.getFieldError('description')).toBe('La descripción debe tener al menos 10 caracteres');
+    });
+
+    it('should validate storage instructions minimum length', () => {
+      component.validateForm.get('storageInstructions')?.setValue('Corto');
+      component.validateForm.get('storageInstructions')?.markAsTouched();
+
+      expect(component.validateForm.get('storageInstructions')?.hasError('minlength')).toBeTruthy();
+      expect(component.getFieldError('storageInstructions')).toBe('Las instrucciones de almacenamiento deben tener al menos 10 caracteres');
+    });
+
+    it('should pass validation with sufficient length', () => {
+      component.validateForm.get('description')?.setValue('Esta es una descripción suficientemente larga');
+      component.validateForm.get('storageInstructions')?.setValue('Estas son instrucciones suficientemente largas');
+
+      expect(component.validateForm.get('description')?.hasError('minlength')).toBeFalsy();
+      expect(component.validateForm.get('storageInstructions')?.hasError('minlength')).toBeFalsy();
+    });
+
   });
 
   // ========================================
@@ -556,12 +657,15 @@ describe('ProductsComponent - Comprehensive Tests', () => {
       expect(component.validateForm.value).toEqual({
         name: null,
         price: null,
-        provider: null,
+        supplier: null,
         requiresColdChain: null,
         tempMin: null,
         tempMax: null,
         description: null,
-        storageInstructions: null
+        storageInstructions: null,
+        warehouse: null,
+        quantity: null,
+        location: null
       });
     });
 

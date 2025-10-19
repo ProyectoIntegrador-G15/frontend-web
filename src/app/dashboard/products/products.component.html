@@ -31,12 +31,12 @@
         </div>
         <div nz-col nzXs="24" nzSm="12">
           <nz-form-item>
-            <nz-form-control [nzValidateStatus]="getFieldStatus('provider')" [nzErrorTip]="getFieldError('provider')">
+            <nz-form-control [nzValidateStatus]="getFieldStatus('supplier')" [nzErrorTip]="getFieldError('supplier')">
               <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 Proveedor: <span class="text-red-500">*</span></nz-form-label>
               <nz-select
                 class="min-w-[260px] capitalize [&>nz-select-top-control]:border-normal dark:[&>nz-select-top-control]:border-white/10 [&>nz-select-top-control]:bg-white [&>nz-select-top-control]:dark:bg-white/10 [&>nz-select-top-control]:shadow-none [&>nz-select-top-control]:text-dark [&>nz-select-top-control]:dark:text-white/60 [&>nz-select-top-control]:h-[50px] [&>nz-select-top-control]:flex [&>nz-select-top-control]:items-center [&>nz-select-top-control]:rounded-[5px] [&>nz-select-top-control]:px-[20px] [&>.ant-select-arrow]:text-theme-gray dark:[&>.ant-select-arrow]:text-white/60"
-                nzPlaceHolder="Seleccionar proveedor" nzAllowClear formControlName="provider">
+                nzPlaceHolder="Seleccionar proveedor" nzAllowClear formControlName="supplier">
                 <nz-option nzValue="proveedor1" nzLabel="Proveedor 1"></nz-option>
                 <nz-option nzValue="proveedor2" nzLabel="Proveedor 2"></nz-option>
                 <nz-option nzValue="proveedor3" nzLabel="Proveedor 3"></nz-option>
@@ -89,7 +89,7 @@
         </nz-form-control>
       </nz-form-item>
 
-      <nz-form-item class="mb-0">
+      <nz-form-item>
         <nz-form-control [nzValidateStatus]="getFieldStatus('storageInstructions')"
                          [nzErrorTip]="getFieldError('storageInstructions')">
           <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
@@ -97,6 +97,41 @@
           <textarea
             class="min-h-[100px] border-normal dark:border-white/10 px-[20px] py-[15px] placeholder-shown:text-light-extra dark:placeholder-shown:text-white/60 rounded-[5px] dark:bg-white/10"
             nz-input placeholder="Instrucciones de almacenamiento" formControlName="storageInstructions"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+
+      <div nz-row nzGutter="16">
+        <div nz-col nzXs="24" nzSm="12">
+          <nz-form-item>
+            <nz-form-control [nzValidateStatus]="getFieldStatus('warehouse')" [nzErrorTip]="getFieldError('warehouse')">
+              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+                Bodega: <span class="text-red-500">*</span></nz-form-label>
+              <nz-select
+                class="min-w-[260px] capitalize [&>nz-select-top-control]:border-normal dark:[&>nz-select-top-control]:border-white/10 [&>nz-select-top-control]:bg-white [&>nz-select-top-control]:dark:bg-white/10 [&>nz-select-top-control]:shadow-none [&>nz-select-top-control]:text-dark [&>nz-select-top-control]:dark:text-white/60 [&>nz-select-top-control]:h-[50px] [&>nz-select-top-control]:flex [&>nz-select-top-control]:items-center [&>nz-select-top-control]:rounded-[5px] [&>nz-select-top-control]:px-[20px] [&>.ant-select-arrow]:text-theme-gray dark:[&>.ant-select-arrow]:text-white/60"
+                nzPlaceHolder="Seleccionar bodega" nzAllowClear formControlName="warehouse">
+                <nz-option nzValue="bodega1" nzLabel="Bodega Central"></nz-option>
+                <nz-option nzValue="bodega2" nzLabel="Bodega Sur"></nz-option>
+                <nz-option nzValue="bodega3" nzLabel="Bodega Este"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzXs="24" nzSm="12">
+          <nz-form-item>
+            <nz-form-control [nzValidateStatus]="getFieldStatus('quantity')" [nzErrorTip]="getFieldError('quantity')">
+              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+                Cantidad: <span class="text-red-500">*</span></nz-form-label>
+              <input class="{{inputClass}}" type="number" nz-input placeholder="Cantidad" formControlName="quantity">
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <nz-form-item class="mb-0">
+        <nz-form-control [nzValidateStatus]="getFieldStatus('location')" [nzErrorTip]="getFieldError('location')">
+          <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+            Ubicación del producto: <span class="text-red-500">*</span></nz-form-label>
+          <input class="{{inputClass}}" type="text" nz-input placeholder="Ubicación del producto" formControlName="location">
         </nz-form-control>
       </nz-form-item>
     </form>

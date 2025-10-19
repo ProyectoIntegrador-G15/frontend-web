@@ -34,6 +34,7 @@ import {NzDatePickerModule} from 'ng-zorro-antd/date-picker';
 import {NzModalModule} from 'ng-zorro-antd/modal';
 import {NzInputModule} from 'ng-zorro-antd/input';
 import {NzMessageModule} from 'ng-zorro-antd/message';
+import {NzNotificationModule} from 'ng-zorro-antd/notification';
 
 import {AngularSvgIconModule} from 'angular-svg-icon';
 import {BaseChartDirective} from 'ng2-charts';
@@ -90,7 +91,8 @@ const antdModule = [
   NgApexchartsModule,
   PerfectScrollbarModule,
   FullCalendarModule,
-  NzMessageModule
+  NzMessageModule,
+  NzNotificationModule
 ];
 
 @NgModule({
