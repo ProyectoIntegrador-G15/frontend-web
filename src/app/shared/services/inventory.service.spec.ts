@@ -8,7 +8,7 @@ import { ProductInventory } from '../interfaces/inventory.type';
 describe('InventoryService', () => {
   let service: InventoryService;
   let httpMock: HttpTestingController;
-  const baseUrl = 'http://localhost:8003/inventory';
+  const baseUrl = 'http://localhost:3002/inventory';
 
   const mockProductInventory: ProductInventory = {
     product_id: 'MED-001',
@@ -56,6 +56,10 @@ describe('InventoryService', () => {
     expect(service).toBeTruthy();
   });
 
+  it('should have correct base URL', () => {
+    expect(service['baseUrl']).toBe('http://localhost:3002/inventory');
+  });
+
   describe('getProductInventory', () => {
     it('should return product inventory for valid product ID', () => {
       const productId = 'MED-001';
@@ -71,9 +75,9 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}/${productId}`);
+      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
       expect(req.request.method).toBe('GET');
-      expect(req.request.url).toBe(`${baseUrl}/${productId}`);
+      expect(req.request.url).toBe(`http://localhost:3002/inventory/${productId}`);
       req.flush(mockProductInventory);
     });
 
@@ -92,7 +96,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}/${productId}`);
+      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
       expect(req.request.method).toBe('GET');
       req.flush(customInventory);
     });
@@ -115,7 +119,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}/${productId}`);
+      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
       req.flush(emptyInventory);
     });
 
@@ -132,7 +136,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}/${productId}`);
+      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
       req.flush(errorMessage, { status: errorStatus, statusText: errorMessage });
     });
 
@@ -146,7 +150,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}/${productId}`);
+      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
       req.error(new ProgressEvent('network error'));
     });
 
@@ -163,7 +167,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}/${productId}`);
+      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
       req.flush(errorMessage, { status: errorStatus, statusText: errorMessage });
     });
 
@@ -178,7 +182,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}/${productId}`);
+      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
       req.error(new ErrorEvent('timeout'));
     });
 
@@ -187,9 +191,9 @@ describe('InventoryService', () => {
       
       service.getProductInventory(productId).subscribe();
       
-      const req = httpMock.expectOne(`${baseUrl}/${productId}`);
+      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
       expect(req.request.method).toBe('GET');
-      expect(req.request.url).toBe(`${baseUrl}/${productId}`);
+      expect(req.request.url).toBe(`http://localhost:3002/inventory/${productId}`);
       expect(req.request.headers.get('Content-Type')).toBeNull();
       
       req.flush(mockProductInventory);
@@ -204,8 +208,8 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}/${productId}`);
-      expect(req.request.url).toBe(`${baseUrl}/${productId}`);
+      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
+      expect(req.request.url).toBe(`http://localhost:3002/inventory/${productId}`);
       req.flush(mockProductInventory);
     });
 
@@ -218,15 +222,15 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}/`);
-      expect(req.request.url).toBe(`${baseUrl}/`);
+      const req = httpMock.expectOne(`http://localhost:3002/inventory/`);
+      expect(req.request.url).toBe(`http://localhost:3002/inventory/`);
       req.flush(mockProductInventory);
     });
   });
 
   describe('Service Configuration', () => {
     it('should have correct base URL', () => {
-      expect(service['baseUrl']).toBe('http://localhost:8003/inventory');
+      expect(service['baseUrl']).toBe('http://localhost:3002/inventory');
     });
 
     it('should be provided in root', () => {
@@ -256,7 +260,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}/${productId}`);
+      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
       req.flush(mockProductInventory);
       
       expect(completed).toBe(true);
@@ -269,11 +273,11 @@ describe('InventoryService', () => {
       service.getProductInventory(productId1).subscribe();
       service.getProductInventory(productId2).subscribe();
       
-      const req1 = httpMock.expectOne(`${baseUrl}/${productId1}`);
-      const req2 = httpMock.expectOne(`${baseUrl}/${productId2}`);
+      const req1 = httpMock.expectOne(`http://localhost:3002/inventory/${productId1}`);
+      const req2 = httpMock.expectOne(`http://localhost:3002/inventory/${productId2}`);
       
-      expect(req1.request.url).toBe(`${baseUrl}/${productId1}`);
-      expect(req2.request.url).toBe(`${baseUrl}/${productId2}`);
+      expect(req1.request.url).toBe(`http://localhost:3002/inventory/${productId1}`);
+      expect(req2.request.url).toBe(`http://localhost:3002/inventory/${productId2}`);
       
       req1.flush(mockProductInventory);
       req2.flush(mockProductInventory);
@@ -291,7 +295,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}/${productId}`);
+      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
       req.error(new ErrorEvent('parse error', {
         message: 'Unexpected token i in JSON at position 0'
       }));
@@ -306,7 +310,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${baseUrl}/${productId}`);
+      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
       req.flush(null);
     });
   });

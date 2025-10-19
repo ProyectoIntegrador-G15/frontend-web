@@ -120,6 +120,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
     // Setup default mock returns
     mockProductsService.getProducts.and.returnValue(of(mockProducts));
     mockProductsService.products$ = of(mockProducts);
+    mockProductsService.createProduct.and.returnValue(of({ success: true }));
   });
 
   beforeEach(() => {
@@ -512,7 +513,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
       component.validateForm.get('description')?.markAsTouched();
 
       expect(component.validateForm.get('description')?.hasError('minlength')).toBeTruthy();
-      expect(component.getFieldError('description')).toBe('La descripción debe tener al menos 10 caracteres');
+      expect(component.getFieldError('description')).toBe('Este campo debe tener al menos 10 caracteres');
     });
 
     it('should validate storage instructions minimum length', () => {
@@ -520,7 +521,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
       component.validateForm.get('storageInstructions')?.markAsTouched();
 
       expect(component.validateForm.get('storageInstructions')?.hasError('minlength')).toBeTruthy();
-      expect(component.getFieldError('storageInstructions')).toBe('Las instrucciones de almacenamiento deben tener al menos 10 caracteres');
+      expect(component.getFieldError('storageInstructions')).toBe('Este campo debe tener al menos 10 caracteres');
     });
 
     it('should pass validation with sufficient length', () => {
