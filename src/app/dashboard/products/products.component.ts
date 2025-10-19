@@ -2,6 +2,7 @@ import {Component, OnDestroy, OnInit, TemplateRef} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 
 import {ProductsService} from '../../shared/services/products.service';
+import {WarehousesService, Warehouse} from '../../shared/services/warehouses.service';
 import {Subscription} from 'rxjs';
 import {Router} from '@angular/router';
 import {NzModalService} from 'ng-zorro-antd/modal';
@@ -43,6 +44,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
   errorMessage = '';
   isProductModalVisible = false;
   isProductModalLoading = false;
+  
+  // Bodegas
+  warehouses: Warehouse[] = [];
+  isLoadingWarehouses = false;
 
   // Formulario reactivo para validaciones
   validateForm: FormGroup;
@@ -53,6 +58,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private productsService: ProductsService,
+    private warehousesService: WarehousesService,
     private modalService: NzModalService,
     private fb: FormBuilder,
     private notification: NzNotificationService
@@ -62,6 +68,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscribeToProducts();
     this.getProducts();
+    this.getWarehouses();
     this.initForm();
   }
 
@@ -93,6 +100,20 @@ export class ProductsComponent implements OnInit, OnDestroy {
       });
 
     this.subscription.add(searchSubscription);
+  }
+
+  getWarehouses(): void {
+    this.isLoadingWarehouses = true;
+    this.warehousesService.getWarehouses().subscribe({
+      next: (warehouses) => {
+        this.warehouses = warehouses;
+        this.isLoadingWarehouses = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar bodegas:', error);
+        this.isLoadingWarehouses = false;
+      }
+    });
   }
 
   navigateToInventory(productId: string): void {

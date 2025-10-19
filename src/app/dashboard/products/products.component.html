@@ -108,10 +108,8 @@
                 Bodega: <span class="text-red-500">*</span></nz-form-label>
               <nz-select
                 class="min-w-[260px] capitalize [&>nz-select-top-control]:border-normal dark:[&>nz-select-top-control]:border-white/10 [&>nz-select-top-control]:bg-white [&>nz-select-top-control]:dark:bg-white/10 [&>nz-select-top-control]:shadow-none [&>nz-select-top-control]:text-dark [&>nz-select-top-control]:dark:text-white/60 [&>nz-select-top-control]:h-[50px] [&>nz-select-top-control]:flex [&>nz-select-top-control]:items-center [&>nz-select-top-control]:rounded-[5px] [&>nz-select-top-control]:px-[20px] [&>.ant-select-arrow]:text-theme-gray dark:[&>.ant-select-arrow]:text-white/60"
-                nzPlaceHolder="Seleccionar bodega" nzAllowClear formControlName="warehouse">
-                <nz-option nzValue="bodega1" nzLabel="Bodega Central"></nz-option>
-                <nz-option nzValue="bodega2" nzLabel="Bodega Sur"></nz-option>
-                <nz-option nzValue="bodega3" nzLabel="Bodega Este"></nz-option>
+                nzPlaceHolder="Seleccionar bodega" nzAllowClear formControlName="warehouse" [nzLoading]="isLoadingWarehouses">
+                <nz-option *ngFor="let warehouse of warehouses" [nzValue]="warehouse.id" [nzLabel]="warehouse.name"></nz-option>
               </nz-select>
             </nz-form-control>
           </nz-form-item>

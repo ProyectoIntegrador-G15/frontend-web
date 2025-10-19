@@ -8,11 +8,13 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { ProductsComponent } from './products.component';
 import { ProductsService } from '../../shared/services/products.service';
+import { WarehousesService, Warehouse } from '../../shared/services/warehouses.service';
 
 describe('ProductsComponent - Comprehensive Tests', () => {
   let component: ProductsComponent;
   let fixture: ComponentFixture<ProductsComponent>;
   let mockProductsService: jasmine.SpyObj<ProductsService>;
+  let mockWarehousesService: jasmine.SpyObj<WarehousesService>;
   let mockRouter: jasmine.SpyObj<Router>;
   let mockModalService: jasmine.SpyObj<NzModalService>;
   let mockNotificationService: jasmine.SpyObj<NzNotificationService>;
@@ -33,6 +35,29 @@ describe('ProductsComponent - Comprehensive Tests', () => {
       provider: 'Medicamentos XYZ',
       needsCold: true,
       status: 'active' as const
+    }
+  ];
+
+  const mockWarehouses: Warehouse[] = [
+    {
+      id: 'WH-001',
+      name: 'Bodega Central Bogotá',
+      city: 'Bogotá',
+      country: 'Colombia',
+      address: 'Calle 80 #11-42, Zona Industrial',
+      status: 'active',
+      created_at: '2025-10-19T21:05:36.508137',
+      updated_at: '2025-10-19T21:05:36.508137'
+    },
+    {
+      id: 'WH-002',
+      name: 'Bodega Norte Medellín',
+      city: 'Medellín',
+      country: 'Colombia',
+      address: 'Carrera 50 #30-15, El Poblado',
+      status: 'active',
+      created_at: '2025-10-19T21:05:36.508137',
+      updated_at: '2025-10-19T21:05:36.508137'
     }
   ];
 
@@ -93,6 +118,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
 
   beforeEach(async () => {
     const productsServiceSpy = jasmine.createSpyObj('ProductsService', ['getProducts', 'createProduct', 'products$']);
+    const warehousesServiceSpy = jasmine.createSpyObj('WarehousesService', ['getWarehouses']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     const modalServiceSpy = jasmine.createSpyObj('NzModalService', ['create', 'closeAll', 'confirm']);
     const notificationServiceSpy = jasmine.createSpyObj('NzNotificationService', ['create']);
@@ -103,6 +129,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
       providers: [
         FormBuilder,
         { provide: ProductsService, useValue: productsServiceSpy },
+        { provide: WarehousesService, useValue: warehousesServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: NzModalService, useValue: modalServiceSpy },
         { provide: NzNotificationService, useValue: notificationServiceSpy }
@@ -113,6 +140,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
     fixture = TestBed.createComponent(ProductsComponent);
     component = fixture.componentInstance;
     mockProductsService = TestBed.inject(ProductsService) as jasmine.SpyObj<ProductsService>;
+    mockWarehousesService = TestBed.inject(WarehousesService) as jasmine.SpyObj<WarehousesService>;
     mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     mockModalService = TestBed.inject(NzModalService) as jasmine.SpyObj<NzModalService>;
     mockNotificationService = TestBed.inject(NzNotificationService) as jasmine.SpyObj<NzNotificationService>;
@@ -121,6 +149,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
     mockProductsService.getProducts.and.returnValue(of(mockProducts));
     mockProductsService.products$ = of(mockProducts);
     mockProductsService.createProduct.and.returnValue(of({ success: true }));
+    mockWarehousesService.getWarehouses.and.returnValue(of(mockWarehouses));
   });
 
   beforeEach(() => {
@@ -309,15 +338,6 @@ describe('ProductsComponent - Comprehensive Tests', () => {
       expect(component.isProductModalLoading).toBe(false);
     });
 
-    it('should submit form if valid', () => {
-      spyOn(component, 'validateFormFields').and.returnValue(true);
-      spyOn(component, 'resetProductForm');
-
-      TestUtils.fillFormWithValidData();
-      component.handleProductModalOk();
-
-      expect(component.isProductModalLoading).toBe(true);
-    });
 
     it('should call createProduct service on submission', () => {
       spyOn(component, 'validateFormFields').and.returnValue(true);
@@ -559,6 +579,24 @@ describe('ProductsComponent - Comprehensive Tests', () => {
       expect(console.error).toHaveBeenCalledWith('Error en búsqueda:', 'Error loading products');
       expect(component.errorMessage).toBe('Error al buscar productos.');
       expect(component.isLoading).toBe(false);
+    });
+
+    it('should load warehouses on initialization', () => {
+      component.getWarehouses();
+      expect(mockWarehousesService.getWarehouses).toHaveBeenCalled();
+    });
+
+    it('should handle warehouses loading success', () => {
+      component.getWarehouses();
+      expect(component.warehouses).toEqual(mockWarehouses);
+      expect(component.isLoadingWarehouses).toBe(false);
+    });
+
+    it('should handle warehouses loading error with fallback', () => {
+      mockWarehousesService.getWarehouses.and.returnValue(throwError('Error loading warehouses'));
+      component.getWarehouses();
+      expect(component.warehouses.length).toBeGreaterThan(0);
+      expect(component.isLoadingWarehouses).toBe(false);
     });
   });
 

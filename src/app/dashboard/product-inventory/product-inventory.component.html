@@ -57,7 +57,7 @@
 </div>
 
 <!-- Tabla de inventario por bodega -->
-<div *ngIf="!isLoading && !errorMessage" class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
+<div *ngIf="!isLoading && warehousesData.length > 0 && !errorMessage" class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
   <div class="p-[25px]">
     <div class="w-full overflow-x-auto">
       <nz-table #warehousesTable [nzData]="warehousesData" [nzFrontPagination]="false" [nzShowPagination]="false">
