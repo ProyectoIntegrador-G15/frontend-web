@@ -8,8 +8,19 @@
     </button>
   </div>
 
+  <!-- Indicador de carga -->
+  <div *ngIf="loading" class="flex justify-center items-center py-12">
+    <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="error && !loading" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+    <p class="font-medium">{{ error }}</p>
+    <button class="mt-2 text-sm underline" (click)="loadRoutes()">Reintentar</button>
+  </div>
+
   <!-- Tabla de rutas con estilos globales -->
-  <div class="table-container">
+  <div *ngIf="!loading && !error" class="table-container">
     <table>
       <thead>
         <tr>

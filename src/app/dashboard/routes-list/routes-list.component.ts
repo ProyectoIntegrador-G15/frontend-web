@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { RoutesService, Route } from '../../shared/services/routes.service';
 
 export interface RouteItem {
   id: string;
@@ -7,7 +8,7 @@ export interface RouteItem {
   originWarehouse: string;
   assignedDeliveries: number;
   status: 'planned' | 'in_progress' | 'with_incidents' | 'completed';
-  assignedTruck: number;
+  assignedTruck: string;
 }
 
 @Component({
@@ -15,64 +16,45 @@ export interface RouteItem {
   templateUrl: './routes-list.component.html',
   styleUrls: ['./routes-list.component.scss']
 })
-export class RoutesListComponent {
+export class RoutesListComponent implements OnInit {
 
-  constructor(private router: Router) { }
-
-  routes: RouteItem[] = [
-    {
-      id: '123456',
-      creationDate: '25-07-2025',
-      originWarehouse: 'Bodega Sur',
-      assignedDeliveries: 15,
-      status: 'planned',
-      assignedTruck: 4
-    },
-    {
-      id: '123457',
-      creationDate: '23-07-2025',
-      originWarehouse: 'Bodega Norte',
-      assignedDeliveries: 8,
-      status: 'in_progress',
-      assignedTruck: 9
-    },
-    {
-      id: '128457',
-      creationDate: '23-07-2025',
-      originWarehouse: 'Bodega Norte',
-      assignedDeliveries: 5,
-      status: 'in_progress',
-      assignedTruck: 6
-    },
-    {
-      id: '129457',
-      creationDate: '22-07-2025',
-      originWarehouse: 'Bodega Central',
-      assignedDeliveries: 12,
-      status: 'with_incidents',
-      assignedTruck: 8
-    },
-    {
-      id: '173457',
-      creationDate: '20-07-2025',
-      originWarehouse: 'Bodega Sur',
-      assignedDeliveries: 8,
-      status: 'completed',
-      assignedTruck: 4
-    },
-    {
-      id: '123457',
-      creationDate: '19-07-2025',
-      originWarehouse: 'Bodega Norte',
-      assignedDeliveries: 10,
-      status: 'completed',
-      assignedTruck: 9
-    }
-  ];
+  routes: RouteItem[] = [];
+  loading = false;
+  error: string | null = null;
 
   currentPage = 1;
   pageSize = 10;
-  totalItems = this.routes.length;
+  totalItems = 0;
+
+  constructor(
+    private router: Router,
+    private routesService: RoutesService
+  ) { }
+
+  ngOnInit(): void {
+    this.loadRoutes();
+  }
+
+  /**
+   * Carga las rutas desde el backend
+   */
+  loadRoutes(): void {
+    this.loading = true;
+    this.error = null;
+
+    this.routesService.getRoutes().subscribe({
+      next: (routes) => {
+        this.routes = routes;
+        this.totalItems = routes.length;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar las rutas:', error);
+        this.error = 'No se pudieron cargar las rutas. Por favor, intente nuevamente.';
+        this.loading = false;
+      }
+    });
+  }
 
   // Método para navegar a crear ruta
   createRoute() {
