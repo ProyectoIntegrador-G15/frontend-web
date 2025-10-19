@@ -34,6 +34,9 @@ import {NzDatePickerModule} from 'ng-zorro-antd/date-picker';
 import {NzModalModule} from 'ng-zorro-antd/modal';
 import {NzInputModule} from 'ng-zorro-antd/input';
 import {NzMessageModule} from 'ng-zorro-antd/message';
+import {NzSpinModule} from 'ng-zorro-antd/spin';
+import {NzIconModule} from 'ng-zorro-antd/icon';
+import {NzPaginationModule} from 'ng-zorro-antd/pagination';
 
 import {AngularSvgIconModule} from 'angular-svg-icon';
 import {BaseChartDirective} from 'ng2-charts';
@@ -48,6 +51,8 @@ import {WarehousesComponent} from './warehouse/warehouses.component';
 import {WarehouseInventoryComponent} from './warehouse-inventory/warehouse-inventory.component';
 import {ProductsComponent} from './products/products.component';
 import {ProductInventoryComponent} from './product-inventory/product-inventory.component';
+import {RoutesListComponent} from './routes-list/routes-list.component';
+import {CreateRouteComponent} from './create-route/create-route.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -87,7 +92,10 @@ const antdModule = [
   NgApexchartsModule,
   PerfectScrollbarModule,
   FullCalendarModule,
-  NzMessageModule
+  NzMessageModule,
+  NzSpinModule,
+  NzIconModule,
+  NzPaginationModule
 ];
 
 @NgModule({
@@ -104,6 +112,8 @@ const antdModule = [
     ProductInventoryComponent,
     WarehousesComponent,
     WarehouseInventoryComponent,
+    RoutesListComponent,
+    CreateRouteComponent,
   ],
   providers: [
     ThemeConstantService,

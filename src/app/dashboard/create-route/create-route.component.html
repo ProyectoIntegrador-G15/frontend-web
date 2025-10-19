@@ -1,0 +1,119 @@
+<div class="delivery-routes-container">
+  <!-- Header con botón de regresar y título -->
+  <div class="flex items-center mb-6">
+    <button 
+      nz-button
+      nzType="text"
+      (click)="goBack()"
+      class="mr-4 p-2 hover:bg-gray-100 rounded-md">
+      <span class="text-[16px]" nz-icon nzType="arrow-left" nzTheme="outline"></span>
+    </button>
+    <h1 class="text-2xl font-bold text-dark dark:text-white">Generar ruta de entrega</h1>
+  </div>
+
+  <!-- Card principal -->
+  <div class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
+    <div class="p-[25px]">
+      <!-- Campos en línea: Fecha y Bodega -->
+      <div class="flex gap-6 mb-6">
+        <div class="flex-1">
+          <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+            Fecha de la ruta
+          </label>
+          <nz-date-picker
+            nzFormat="dd/MM/yyyy"
+            class="w-full"
+            nzPlaceHolder="dd/mm/yyyy">
+          </nz-date-picker>
+        </div>
+        
+        <div class="flex-1">
+          <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+            Bodega de origen
+          </label>
+          <nz-select
+            class="w-full"
+            nzPlaceHolder="Seleccionar bodega">
+            <nz-option value="Bodega Central" label="Bodega Central"></nz-option>
+          </nz-select>
+        </div>
+      </div>
+
+      <!-- Tabla de pedidos pendientes -->
+      <div class="mb-6">
+        <h2 class="text-lg font-semibold text-dark dark:text-white mb-4">Pedidos pendientes</h2>
+        
+        <div class="w-full overflow-x-auto">
+          <nz-table [nzData]="pendingOrders" [nzFrontPagination]="false" [nzShowPagination]="false">
+            <thead>
+              <tr>
+                <th class="bg-regularBG dark:bg-[#323440] px-[20px] py-[16px] text-start text-dark dark:text-white/[.87] text-15px font-medium border-none before:hidden rounded-s-[10px] capitalize">
+                  Selección
+                </th>
+                <th class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
+                  ID Pedido
+                </th>
+                <th class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
+                  Cliente
+                </th>
+                <th class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
+                  Dirección
+                </th>
+                <th class="bg-regularBG dark:bg-[#323440] px-[20px] py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden rounded-e-[10px] capitalize">
+                  Fecha de ingreso
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="group" *ngFor="let order of pendingOrders">
+                <td class="px-[20px] py-4 text-center before:hidden border-none group-hover:bg-transparent">
+                  <label nz-checkbox 
+                         [ngModel]="order.selected"
+                         (ngModelChange)="toggleOrderSelection(order.id)">
+                  </label>
+                </td>
+                <td class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent font-medium">
+                  #{{ order.id }}
+                </td>
+                <td class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
+                  {{ order.client }}
+                </td>
+                <td class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
+                  {{ order.address }}
+                </td>
+                <td class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
+                  {{ order.entryDate }}
+                </td>
+              </tr>
+            </tbody>
+          </nz-table>
+        </div>
+      </div>
+
+      <!-- Campo Vehículo/Conductor -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+          Vehículo/Conductor
+        </label>
+        <nz-select
+          class="w-full"
+          nzPlaceHolder="Seleccionar vehículo">
+          <nz-option value="Asignación automática" label="Asignación automática"></nz-option>
+        </nz-select>
+      </div>
+
+      <!-- Botón de generar ruta -->
+      <div class="flex justify-center">
+        <button 
+          nz-button
+          nzType="primary"
+          nzSize="large"
+          (click)="generateRoute()"
+          class="bg-purple-600 hover:bg-purple-700 border-none text-white text-base font-semibold px-8 py-4 h-auto rounded-lg">
+          <span class="text-lg mr-2" nz-icon nzType="plus" nzTheme="outline"></span>
+          Generar ruta automática
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
