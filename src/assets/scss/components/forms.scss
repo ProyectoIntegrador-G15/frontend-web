@@ -1,0 +1,233 @@
+@import '../variables';
+
+// Estilos para Labels
+label {
+  font-size: 16px !important;
+  color: var(--gray-dark, #1E1E1F);
+  font-weight: 500;
+}
+
+// Labels de formularios específicos
+.ant-form-item-label > label {
+  font-size: 16px !important;
+  color: var(--gray-dark, #1E1E1F);
+}
+
+// Modo oscuro para labels
+.dark {
+  label,
+  .ant-form-item-label > label {
+    color: rgba(255, 255, 255, 0.87) !important;
+  }
+}
+
+// Estilos para DatePicker
+.ant-picker {
+  height: 50px !important;
+  border-radius: 6px !important;
+  border-color: var(--gray-main, #6F6F70) !important;
+  padding: 0 16px !important;
+  
+  input {
+    font-size: 16px !important;
+    
+    &::placeholder {
+      font-size: 16px !important;
+      color: var(--gray-main, #6F6F70) !important;
+    }
+  }
+  
+  .ant-picker-input > input {
+    font-size: 16px !important;
+  }
+  
+  // Hover state
+  &:hover {
+    border-color: var(--blue-violet-dark, #3749B3) !important;
+  }
+  
+  // Focus state
+  &.ant-picker-focused {
+    border-color: var(--blue-violet-dark, #3749B3) !important;
+    box-shadow: 0 0 0 2px rgba(55, 73, 179, 0.1) !important;
+  }
+  
+  // Icono del calendario
+  .ant-picker-suffix {
+    color: var(--gray-main, #6F6F70);
+  }
+}
+
+// Estilos para Select
+.ant-select {
+  .ant-select-selector {
+    height: 50px !important;
+    border-radius: 6px !important;
+    border-color: var(--gray-main, #6F6F70) !important;
+    padding: 0 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    
+    .ant-select-selection-search-input {
+      height: 50px !important;
+      font-size: 16px !important;
+    }
+    
+    .ant-select-selection-item {
+      line-height: 50px !important;
+      font-size: 16px !important;
+    }
+    
+    .ant-select-selection-placeholder {
+      line-height: 50px !important;
+      font-size: 16px !important;
+      color: var(--gray-main, #6F6F70) !important;
+    }
+  }
+  
+  // Hover state
+  &:hover .ant-select-selector {
+    border-color: var(--blue-violet-dark, #3749B3) !important;
+  }
+  
+  // Focus/Open state
+  &.ant-select-focused .ant-select-selector,
+  &.ant-select-open .ant-select-selector {
+    border-color: var(--blue-violet-dark, #3749B3) !important;
+    box-shadow: 0 0 0 2px rgba(55, 73, 179, 0.1) !important;
+  }
+  
+  // Flecha del select
+  .ant-select-arrow {
+    color: var(--gray-main, #6F6F70);
+  }
+}
+
+// Select en single mode
+.ant-select-single {
+  .ant-select-selector {
+    .ant-select-selection-search {
+      input {
+        height: 50px !important;
+      }
+    }
+  }
+}
+
+// Dropdown del select (opciones)
+.ant-select-dropdown {
+  border-radius: 6px !important;
+  
+  .ant-select-item {
+    font-size: 16px !important;
+    padding: 12px 16px !important;
+    
+    &.ant-select-item-option-selected {
+      background-color: var(--blue-violet-extralight, #E8ECFF) !important;
+      color: var(--gray-dark, #1E1E1F) !important;
+    }
+    
+    &.ant-select-item-option-active {
+      background-color: var(--blue-violet-extralight, #E8ECFF) !important;
+    }
+  }
+}
+
+// Panel del DatePicker (calendario)
+.ant-picker-dropdown {
+  .ant-picker-panel-container {
+    border-radius: 6px !important;
+  }
+  
+  .ant-picker-cell-selected .ant-picker-cell-inner {
+    background-color: var(--blue-violet-dark, #3749B3) !important;
+  }
+  
+  .ant-picker-cell:hover:not(.ant-picker-cell-selected) .ant-picker-cell-inner {
+    background-color: var(--blue-violet-extralight, #E8ECFF) !important;
+  }
+  
+  .ant-picker-today-btn {
+    color: var(--blue-violet-dark, #3749B3) !important;
+  }
+}
+
+// Modo oscuro
+.dark {
+  .ant-picker,
+  .ant-select .ant-select-selector {
+    background-color: #1b1c29 !important;
+    border-color: var(--gray-main, #6F6F70) !important;
+  }
+  
+  .ant-picker input,
+  .ant-select-selection-item,
+  .ant-select-selection-placeholder {
+    color: rgba(255, 255, 255, 0.87) !important;
+  }
+}
+
+// Estilos para checkboxes
+.ant-checkbox-wrapper {
+  // Checkbox no seleccionado
+  .ant-checkbox-inner {
+    border-radius: 4px;
+    border-color: $gray-light;
+  }
+  
+  // Checkbox seleccionado
+  .ant-checkbox-checked .ant-checkbox-inner {
+    background-color: var(--blue-violet-dark, #3749B3) !important;
+    border-color: var(--blue-violet-dark, #3749B3) !important;
+  }
+  
+  // Hover en checkbox
+  .ant-checkbox:hover .ant-checkbox-inner {
+    border-color: var(--blue-violet-dark, #3749B3);
+  }
+  
+  // Focus en checkbox
+  .ant-checkbox-input:focus + .ant-checkbox-inner {
+    border-color: var(--blue-violet-dark, #3749B3);
+  }
+  
+  // Efecto después del click
+  .ant-checkbox-checked::after {
+    border-color: var(--blue-violet-dark, #3749B3);
+  }
+}
+
+// Selectores más específicos para sobrescribir estilos de Ant Design
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: var(--blue-violet-dark, #3749B3) !important;
+  border-color: var(--blue-violet-dark, #3749B3) !important;
+}
+
+.ant-checkbox-wrapper:hover .ant-checkbox-inner,
+.ant-checkbox:hover .ant-checkbox-inner,
+.ant-checkbox-input:focus + .ant-checkbox-inner {
+  border-color: var(--blue-violet-dark, #3749B3) !important;
+}
+
+// Estado indeterminado
+.ant-checkbox-indeterminate .ant-checkbox-inner {
+  background-color: var(--blue-violet-dark, #3749B3) !important;
+  border-color: var(--blue-violet-dark, #3749B3) !important;
+}
+
+.ant-checkbox-indeterminate .ant-checkbox-inner::after {
+  background-color: $white !important;
+}
+
+// Modo oscuro
+.dark {
+  .ant-checkbox-checked .ant-checkbox-inner {
+    background-color: var(--blue-violet-dark, #3749B3) !important;
+    border-color: var(--blue-violet-dark, #3749B3) !important;
+  }
+  
+  .ant-checkbox-indeterminate .ant-checkbox-inner {
+    background-color: var(--blue-violet-dark, #3749B3) !important;
+    border-color: var(--blue-violet-dark, #3749B3) !important;
+  }
+}
