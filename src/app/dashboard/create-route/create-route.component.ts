@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-create-route',
@@ -36,7 +37,10 @@ export class CreateRouteComponent implements OnInit {
   isLoading = true;
   showContent = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private location: Location
+  ) {}
 
   ngOnInit(): void {
     // Simulate loading time
@@ -63,6 +67,6 @@ export class CreateRouteComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/dashboard/delivery-routes']);
+    this.location.back();
   }
 }

@@ -1,84 +1,53 @@
 <div class="routes-list-container">
   <!-- Header con título y botón crear ruta -->
   <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-dark dark:text-white">Rutas de Entrega</h1>
-    <button 
-      nz-button
-      nzType="primary"
-      (click)="createRoute()"
-      class="bg-purple-600 hover:bg-purple-700 border-none text-white font-semibold">
-      <span class="text-lg mr-2" nz-icon nzType="plus" nzTheme="outline"></span>
+    <h1 class="screen-title">Rutas de Entrega</h1>
+    <button class="btn-primary" (click)="createRoute()">
+      <span nz-icon nzType="plus" nzTheme="outline"></span>
       Crear ruta
     </button>
   </div>
 
-  <!-- Card principal -->
-  <div class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
-    <div class="p-[25px]">
+  <!-- Tabla de rutas con estilos globales -->
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID de ruta</th>
+          <th>Fecha de creación</th>
+          <th>Bodega de origen</th>
+          <th>Entregas asignadas</th>
+          <th>Estado</th>
+          <th>Camion asignado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let route of routes">
+          <td>
+            <p>#{{ route.id }}</p>
+          </td>
+          <td>
+            <p>{{ route.creationDate }}</p>
+          </td>
+          <td>{{ route.originWarehouse }}</td>
+          <td>{{ route.assignedDeliveries }}</td>
+          <td>
+            <nz-tag [nzColor]="getStatusColor(route.status)">
+              {{ getStatusText(route.status) }}
+            </nz-tag>
+          </td>
+          <td>
+            <p>{{ route.assignedTruck }}</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-      <!-- Tabla de rutas -->
-      <div class="w-full overflow-x-auto">
-        <nz-table [nzData]="routes" [nzFrontPagination]="false" [nzShowPagination]="false">
-          <thead>
-            <tr>
-              <th class="bg-regularBG dark:bg-[#323440] px-[20px] py-[16px] text-start text-dark dark:text-white/[.87] text-15px font-medium border-none before:hidden rounded-s-[10px] capitalize">
-                ID de ruta
-              </th>
-              <th class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
-                Fecha de creación
-              </th>
-              <th class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
-                Bodega de origen
-              </th>
-              <th class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
-                Entregas asignadas
-              </th>
-              <th class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
-                Estado
-              </th>
-              <th class="bg-regularBG dark:bg-[#323440] px-[20px] py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden rounded-e-[10px] capitalize">
-                Camión asignado
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="group" *ngFor="let route of routes">
-              <td class="px-[20px] py-4 before:hidden border-none group-hover:bg-transparent font-medium">
-                <a class="text-blue-600 hover:text-blue-800 cursor-pointer">#{{ route.id }}</a>
-              </td>
-              <td class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-                <a class="text-blue-600 hover:text-blue-800 cursor-pointer">{{ route.creationDate }}</a>
-              </td>
-              <td class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-                {{ route.originWarehouse }}
-              </td>
-              <td class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-                {{ route.assignedDeliveries }}
-              </td>
-              <td class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-                <nz-tag 
-                  [nzColor]="getStatusColor(route.status)">
-                  {{ getStatusText(route.status) }}
-                </nz-tag>
-              </td>
-              <td class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-                <a class="text-blue-600 hover:text-blue-800 cursor-pointer">{{ route.assignedTruck }}</a>
-              </td>
-            </tr>
-          </tbody>
-        </nz-table>
-      </div>
-
-      <!-- Paginador -->
-      <div class="flex justify-center mt-6">
-        <nz-pagination
-          [(nzPageIndex)]="currentPage"
-          [nzTotal]="totalItems"
-          [nzPageSize]="pageSize"
-          [nzShowSizeChanger]="false"
-          [nzShowQuickJumper]="false">
-        </nz-pagination>
-      </div>
-    </div>
+  <!-- Paginador -->
+  <div class="flex justify-center mt-6">
+    <nz-pagination [(nzPageIndex)]="currentPage" [nzTotal]="totalItems" [nzPageSize]="pageSize"
+      [nzShowSizeChanger]="false" [nzShowQuickJumper]="false">
+    </nz-pagination>
   </div>
 </div>

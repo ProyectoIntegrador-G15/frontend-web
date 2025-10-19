@@ -1,0 +1,47 @@
+// Estilos globales de layout y fondo
+body {
+  background: 
+    url('/assets/images/banners/main-leitmotive.svg') no-repeat center center, 
+    linear-gradient(180deg, #EFF1FE -0.96%, #FFF 70.88%) !important;
+  background-size: 100% auto, cover;
+  min-height: 100vh;
+}
+
+// Sobrescribir el page-container que está aplicando el fondo gris
+.page-container {
+  background: 
+    url('/assets/images/banners/main-leitmotive.svg') no-repeat center center, 
+    linear-gradient(180deg, #EFF1FE -0.96%, #FFF 70.88%) !important;
+  background-size: 100% auto, cover;
+}
+
+.page-container.bg-\[\#f4f5f7\],
+.page-container[class*="bg-[#f4f5f7]"] {
+  background: 
+    url('/assets/images/banners/main-leitmotive.svg') repeat-x top right, 
+    linear-gradient(180deg, #EFF1FE -0.96%, #FFF 70.88%) !important;
+  background-size: auto 100%, cover;
+}
+
+// Modo oscuro
+.dark body {
+  background: 
+    url('/assets/images/banners/main-leitmotive.svg') no-repeat center center, 
+    linear-gradient(180deg, #1a1a2e -0.96%, #16213e 70.88%) !important;
+  background-size: 100% auto, cover;
+}
+
+.dark .page-container {
+  background: 
+    url('/assets/images/banners/main-leitmotive.svg') no-repeat center center, 
+    linear-gradient(180deg, #1a1a2e -0.96%, #16213e 70.88%) !important;
+  background-size: 100% auto, cover;
+}
+
+.dark .page-container.bg-\[\#f4f5f7\],
+.dark .page-container[class*="bg-[#f4f5f7]"] {
+  background: 
+    url('/assets/images/banners/main-leitmotive.svg') no-repeat center center, 
+    linear-gradient(180deg, #1a1a2e -0.96%, #16213e 70.88%) !important;
+  background-size: 100% auto, cover;
+}
