@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { ProductsService } from './products.service';
+import { ProductsService, ProductApiResponse } from './products.service';
 import { Product } from '../interfaces/product.type';
 import { environment } from '../../../environments/environment';
 
@@ -8,24 +8,55 @@ describe('ProductsService', () => {
   let service: ProductsService;
   let httpMock: HttpTestingController;
 
+  // Mock data del backend (ProductApiResponse[])
+  const mockApiProducts: ProductApiResponse[] = [
+    {
+      id: 1,
+      name: 'Paracetamol 500mg',
+      description: 'Analgésico y antipirético',
+      purchase_price: 0.85,
+      storage_instructions: 'Almacenar en lugar seco, protegido de la luz y humedad',
+      temperature_range: '15-25°C',
+      requires_cold_chain: false,
+      status: true,
+      created_at: '2025-10-19T03:52:27.518332',
+      updated_at: '2025-10-19T03:52:27.518332'
+    },
+    {
+      id: 2,
+      name: 'Insulina Humana Regular',
+      description: 'Hormona para el control de la diabetes',
+      purchase_price: 12.5,
+      storage_instructions: 'Refrigerar entre 2-8°C. No congelar. Proteger de la luz',
+      temperature_range: '2-8°C',
+      requires_cold_chain: true,
+      status: true,
+      created_at: '2025-10-19T03:52:27.518332',
+      updated_at: '2025-10-19T03:52:27.518332'
+    }
+  ];
+
+  // Mock data transformada (frontend format)
   const mockProducts: Product[] = [
     {
       id: '1',
       name: 'Paracetamol 500mg',
       description: 'Analgésico y antipirético',
       price: 0.85,
-      provider: 'Proveedor 1',
+      provider: 'N/A',
       needsCold: false,
-      status: 'active'
+      status: 'active',
+      storageInstructions: 'Almacenar en lugar seco, protegido de la luz y humedad'
     },
     {
       id: '2',
       name: 'Insulina Humana Regular',
       description: 'Hormona para el control de la diabetes',
       price: 12.5,
-      provider: 'Proveedor 2',
+      provider: 'N/A',
       needsCold: true,
-      status: 'active'
+      status: 'active',
+      storageInstructions: 'Refrigerar entre 2-8°C. No congelar. Proteger de la luz'
     }
   ];
 
@@ -67,7 +98,7 @@ describe('ProductsService', () => {
 
       const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.products}`);
       expect(req.request.method).toBe('GET');
-      req.flush(mockProducts);
+      req.flush(mockApiProducts);
     });
 
     it('should handle HTTP errors when getting products', (done) => {
@@ -123,9 +154,10 @@ describe('ProductsService', () => {
       name: 'Nuevo Producto',
       description: 'Descripción del producto',
       price: 10.5,
-      provider: 'Proveedor 1',
+      provider: 'N/A',
       needsCold: false,
-      status: 'active'
+      status: 'active',
+      storageInstructions: 'Almacenar en lugar seco'
     };
 
     const createdProductResponse = {
@@ -151,7 +183,7 @@ describe('ProductsService', () => {
       // Expect GET request (refreshProducts)
       const refreshReq = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.products}`);
       expect(refreshReq.request.method).toBe('GET');
-      refreshReq.flush(mockProducts);
+      refreshReq.flush(mockApiProducts);
     });
 
     it('should handle errors when creating product', (done) => {
@@ -195,7 +227,7 @@ describe('ProductsService', () => {
 
       // GET request (refresh)
       const refreshReq = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.products}`);
-      refreshReq.flush(mockProducts);
+      refreshReq.flush(mockApiProducts);
     });
   });
 
@@ -235,7 +267,7 @@ describe('ProductsService', () => {
 
       // GET request (refresh)
       const refreshReq = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.products}`);
-      refreshReq.flush(mockProducts);
+      refreshReq.flush(mockApiProducts);
     });
   });
 
@@ -366,7 +398,7 @@ describe('ProductsService', () => {
 
       // GET request (refresh)
       const refreshReq = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.products}`);
-      refreshReq.flush(mockProducts);
+      refreshReq.flush(mockApiProducts);
     });
 
     it('should handle errors during refresh gracefully', (done) => {
@@ -427,7 +459,7 @@ describe('ProductsService', () => {
 
       const requests = httpMock.match(`${environment.apiUrl}${environment.apiEndpoints.products}`);
       expect(requests.length).toBe(2);
-      requests.forEach(req => req.flush(mockProducts));
+      requests.forEach(req => req.flush(mockApiProducts));
     });
   });
 
@@ -464,14 +496,17 @@ describe('ProductsService', () => {
     });
 
     it('should handle products with special characters', (done) => {
-      const specialProduct: Product = {
-        id: '99',
+      const specialProductApi: ProductApiResponse = {
+        id: 99,
         name: 'Ácido Fólico 5mg',
         description: 'Vitamina B9 para mujeres embarazadas',
-        price: 2.5,
-        provider: 'Proveedor Especial',
-        needsCold: false,
-        status: 'active'
+        purchase_price: 2.5,
+        storage_instructions: 'Almacenar en lugar fresco y seco',
+        temperature_range: '15-25°C',
+        requires_cold_chain: false,
+        status: true,
+        created_at: '2025-10-19T03:52:27.518332',
+        updated_at: '2025-10-19T03:52:27.518332'
       };
 
       service.getProducts().subscribe({
@@ -483,7 +518,7 @@ describe('ProductsService', () => {
       });
 
       const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.products}`);
-      req.flush([specialProduct]);
+      req.flush([specialProductApi]);
     });
   });
 
@@ -494,11 +529,14 @@ describe('ProductsService', () => {
   describe('Edge cases', () => {
     it('should handle null response gracefully', (done) => {
       service.getProducts().subscribe({
-        next: (products) => {
-          expect(products).toBeNull();
-          done();
+        next: () => {
+          done.fail('should have thrown an error');
         },
-        error: done.fail
+        error: (error) => {
+          expect(error).toBeTruthy();
+          expect(error.message).toContain('map');
+          done();
+        }
       });
 
       const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.products}`);
