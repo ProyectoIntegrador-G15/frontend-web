@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-
-const WAREHOUSES_API_URL = 'http://localhost:3001';
+import { environment } from '../../../environments/environment';
 
 export interface Warehouse {
   id: string;
@@ -26,7 +25,7 @@ export class WarehousesService {
   constructor(private http: HttpClient) {}
 
   getWarehouses(): Observable<Warehouse[]> {
-    return this.http.get<Warehouse[]>(`${WAREHOUSES_API_URL}/warehouses`)
+    return this.http.get<Warehouse[]>(`${environment.apiUrl}${environment.apiEndpoints.warehouses}`)
       .pipe(
         map(warehouses => {
           this.warehousesSubject.next(warehouses);
