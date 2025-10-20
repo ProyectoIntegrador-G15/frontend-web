@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 // Interfaz para la respuesta del backend
 export interface RouteApiResponse {
@@ -24,8 +25,6 @@ export interface Route {
   assignedTruck: string;
 }
 
-const ROUTES_API_URL = 'http://35.190.67.42';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -37,7 +36,7 @@ export class RoutesService {
    * Obtener todas las rutas del backend
    */
   getRoutes(): Observable<Route[]> {
-    return this.http.get<RouteApiResponse[]>(`${ROUTES_API_URL}/routes`)
+    return this.http.get<RouteApiResponse[]>(`${environment.apiUrl}${environment.apiEndpoints.routes}`)
       .pipe(
         map(routes => routes.map(route => this.transformRoute(route))),
         catchError(this.handleError)

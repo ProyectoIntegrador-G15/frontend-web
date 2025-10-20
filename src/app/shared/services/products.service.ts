@@ -5,8 +5,7 @@ import {map, catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 
 import {Product} from '../interfaces/product.type';
-
-const PRODUCTS_API_URL = 'http://localhost:3002';
+import {environment} from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -19,14 +18,14 @@ export class ProductsService {
   }
 
   getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(`${PRODUCTS_API_URL}/products`)
+    return this.http.get<Product[]>(`${environment.apiUrl}${environment.apiEndpoints.products}`)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   createProduct(productData: any): Observable<any> {
-    return this.http.post<any>(`${PRODUCTS_API_URL}/products`, productData)
+    return this.http.post<any>(`${environment.apiUrl}${environment.apiEndpoints.products}`, productData)
       .pipe(
         map(response => {
           // Actualizar la lista de productos después de crear uno nuevo
