@@ -1,13 +1,14 @@
 {
   "name": "medisupply",
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
     "ng": "ng",
     "serve": "ng serve",
     "start": "ng serve --port 4200 -o",
     "build": "ng build",
     "test": "ng test",
+    "test:coverage": "ng test --no-watch --code-coverage",
+    "test:coverage:open": "ng test --no-watch --code-coverage && open coverage/medisupply/index.html",
     "lint": "ng lint",
     "e2e": "cypress open",
     "e2e:ci": "start-server-and-test start http://localhost:4200 cypress:run",

@@ -1,6 +1,6 @@
 <!-- Botón de regreso -->
 <div class="mb-6">
-  <button 
+  <button
     (click)="goBack()"
     class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -26,7 +26,7 @@
         <p class="text-sm text-blue-700 dark:text-blue-200 mb-1">ID: {{ inventoryData?.product_id || 'N/A' }}</p>
         <p class="text-lg font-bold text-blue-900 dark:text-blue-100">{{ inventoryData?.product_name || 'N/A' }}</p>
       </div>
-      
+
       <div class="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg">
         <div class="flex items-center mb-3">
           <div class="w-10 h-10 bg-green-100 dark:bg-green-800 rounded-lg flex items-center justify-center mr-3">
@@ -39,7 +39,7 @@
         <p class="text-3xl font-bold text-green-900 dark:text-green-100">{{ inventoryData?.total_warehouses || 0 }}</p>
         <p class="text-sm text-green-700 dark:text-green-200">con inventario</p>
       </div>
-      
+
       <div class="bg-purple-50 dark:bg-purple-900/20 p-6 rounded-lg">
         <div class="flex items-center mb-3">
           <div class="w-10 h-10 bg-purple-100 dark:bg-purple-800 rounded-lg flex items-center justify-center mr-3">
@@ -57,76 +57,42 @@
 </div>
 
 <!-- Tabla de inventario por bodega -->
-<div *ngIf="!isLoading && !errorMessage" class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
-  <div class="p-[25px]">
-    <div class="w-full overflow-x-auto">
-      <nz-table #warehousesTable [nzData]="warehousesData" [nzFrontPagination]="false" [nzShowPagination]="false">
-        <thead>
-        <tr>
-          <th
-            class="bg-regularBG dark:bg-[#323440] px-[20px] py-[16px] text-start text-dark dark:text-white/[.87] text-15px font-medium border-none before:hidden rounded-s-[10px] capitalize">
-            Nombre de Bodega
-          </th>
-          <th
-            class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
-            Ubicación
-          </th>
-          <th
-            class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
-            Dirección
-          </th>
-          <th
-            class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
-            Ubicación
-          </th>
-          <th
-            class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
-            Cantidad Disponible
-          </th>
-          <th
-            class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
-            Estado
-          </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr class="group" *ngFor="let warehouse of warehousesTable.data">
-          <td
-            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-            {{ warehouse.name }}
-          </td>
-          <td
-            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-            {{ warehouse.city }}, {{ warehouse.country }}
-          </td>
-          <td
-            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-            {{ warehouse.address }}
-          </td>
-          <td
-            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300">
-              {{ warehouse.location_identifier }}
-            </span>
-          </td>
-          <td
-            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-              {{ warehouse.available_quantity }} unidades
-            </span>
-          </td>
-          <td
-            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                  [ngClass]="getStatusClass(warehouse.status)">
-              {{ getStatusText(warehouse.status) }}
-            </span>
-          </td>
-        </tr>
-        </tbody>
-      </nz-table>
-    </div>
-  </div>
+<div *ngIf="!isLoading && warehousesData.length > 0 && !errorMessage" class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre de Bodega</th>
+        <th>Ubicación</th>
+        <th>Dirección</th>
+        <th>Sector</th>
+        <th>Cantidad Disponible</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let warehouse of warehousesData">
+        <td>{{ warehouse.name }}</td>
+        <td>{{ warehouse.city }}, {{ warehouse.country }}</td>
+        <td>{{ warehouse.address }}</td>
+        <td>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300">
+            {{ warehouse.location_identifier }}
+          </span>
+        </td>
+        <td>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+            {{ warehouse.available_quantity }} unidades
+          </span>
+        </td>
+        <td>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                [ngClass]="getStatusClass(warehouse.status)">
+            {{ getStatusText(warehouse.status) }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 <!-- Mensaje cuando no hay datos -->

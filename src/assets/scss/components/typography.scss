@@ -1,0 +1,37 @@
+// Estilos globales para colores de texto
+body {
+  color: $gray-main;
+}
+
+// Clases utilitarias para colores
+.text-gray-main {
+  color: $gray-main;
+}
+
+.text-gray-dark {
+  color: $gray-dark;
+}
+
+.text-gray-light {
+  color: $gray-light;
+}
+
+// Aplicar gray-main como color por defecto para elementos comunes
+p, span, div, td, th {
+  color: $gray-main;
+}
+
+// Headers usan gray-dark para mayor contraste
+h1, h2, h3, h4, h5, h6 {
+  color: $gray-dark;
+}
+
+// Clase para títulos de pantalla
+.screen-title {
+  color: var(--blue-violet-dark, #3749B3);
+  font-family: 'Nunito', sans-serif;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 40px; /* 111.111% */
+}

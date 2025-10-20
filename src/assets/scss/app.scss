@@ -1,10 +1,15 @@
 
-// @import 'variables';
+@import 'variables';
 @import 'mixins';
 @import 'template/theme.scss';
 @import 'template/layout.scss';
 @import 'template/header.scss';
 @import 'template/side-nav.scss';
+@import 'components/tables.scss';
+@import 'components/typography.scss';
+@import 'components/background.scss';
+@import 'components/buttons.scss';
+@import 'components/forms.scss';
 
 /*****************/
 /***** Apps *****/

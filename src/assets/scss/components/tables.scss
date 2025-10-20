@@ -1,0 +1,247 @@
+// Estilos globales para tablas
+.table-container {
+  border: $table-border-width solid $gray-light;
+  border-radius: $table-border-radius;
+  overflow: hidden;
+  background: white;
+  
+  // Estilos para la tabla dentro del contenedor
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    
+    // Solo bordes horizontales entre filas
+    td, th {
+      border-bottom: $table-border-width solid $gray-light;
+    }
+    
+    // Última fila sin borde inferior
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    // Estilos para el header
+    thead th {
+      background-color: #f8f9fa;
+      font-weight: 500;
+      color: $gray-dark;
+      padding: 16px 20px;
+      text-align: left;
+    }
+    
+    // Estilos para las celdas del cuerpo
+    tbody td {
+      padding: 16px 20px;
+      background-color: white;
+      color: $gray-main;
+      
+      // Enlaces en las celdas
+      a {
+        color: #1890ff;
+        text-decoration: none;
+        
+        &:hover {
+          color: #40a9ff;
+          text-decoration: underline;
+        }
+      }
+    }
+    
+    // Hover effect para las filas
+    tbody tr:hover {
+      background-color: #f5f5f5;
+    }
+  }
+}
+
+// Variante para modo oscuro
+.dark .table-container {
+  background: rgba(255, 255, 255, 0.1);
+  
+  table {
+    thead th {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.87);
+    }
+    
+    tbody td {
+      background-color: transparent;
+      color: rgba(255, 255, 255, 0.6);
+      
+      a {
+        color: #40a9ff;
+        
+        &:hover {
+          color: #69c0ff;
+        }
+      }
+    }
+    
+    tbody tr:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  }
+}
+
+// Estilos para tags de estado - usando selectores más específicos
+.ant-tag,
+nz-tag,
+.ant-tag-blue,
+.ant-tag-green,
+.ant-tag-orange,
+.ant-tag-default {
+  display: flex !important;
+  width: 133px !important;
+  height: 32px !important;
+  min-width: 84px !important;
+  max-width: 480px !important;
+  padding: 0 16px !important;
+  justify-content: center !important;
+  align-items: center !important;
+  border-radius: 12px !important;
+  border: none !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  
+  // Asegurar que el texto sea blanco por defecto
+  color: white !important;
+  
+  // Colores específicos para cada estado
+  &[nzcolor="blue"],
+  &.ant-tag-blue {
+    background-color: var(--turquoise-extralight, #DAF4FB) !important;
+    background: var(--turquoise-extralight, #DAF4FB) !important;
+    color: black !important;
+  }
+  
+  &[nzcolor="green"],
+  &.ant-tag-green {
+    background-color: var(--Success, #3A823D) !important;
+    background: var(--Success, #3A823D) !important;
+    color: white !important;
+  }
+  
+  &[nzcolor="orange"],
+  &.ant-tag-orange {
+    background-color: var(--Warning, #FA8B0C) !important;
+    background: var(--Warning, #FA8B0C) !important;
+    color: white !important;
+  }
+  
+  &[nzcolor="default"],
+  &.ant-tag-default {
+    background-color: #f0f0f0 !important;
+    background: #f0f0f0 !important;
+    color: $gray-dark !important;
+  }
+}
+
+// Ocultar div que repite información
+.flex.flex-wrap.items-center.justify-between.leading-\[1\.8571428571\].mb-\[23px\].gap-y-\[15px\].gap-x-\[30px\].max-sm\:flex-col.ng-star-inserted {
+  display: none !important;
+}
+
+// Estilos para el paginador
+.ant-pagination {
+  // Items del paginador (números de página, anterior, siguiente)
+  .ant-pagination-item {
+    border: none !important;
+    background-color: transparent !important;
+    
+    a {
+      color: var(--gray-dark, #1E1E1F) !important;
+      font-weight: 500;
+    }
+    
+    // Hover en items
+    &:hover {
+      background-color: var(--blue-violet-extralight, #E8ECFF) !important;
+      border-radius: 6px;
+      
+      a {
+        color: var(--gray-dark, #1E1E1F) !important;
+      }
+    }
+  }
+  
+  // Item activo (página actual)
+  .ant-pagination-item-active {
+    background-color: var(--blue-violet-extralight, #E8ECFF) !important;
+    border: none !important;
+    border-radius: 6px;
+    
+    a {
+      color: var(--gray-dark, #1E1E1F) !important;
+      font-weight: 600;
+    }
+  }
+  
+  // Botones de anterior y siguiente
+  .ant-pagination-prev,
+  .ant-pagination-next {
+    .ant-pagination-item-link {
+      border: none !important;
+      background-color: transparent !important;
+      color: var(--gray-dark, #1E1E1F) !important;
+      
+      &:hover {
+        background-color: var(--blue-violet-extralight, #E8ECFF) !important;
+        border-radius: 6px;
+        color: var(--gray-dark, #1E1E1F) !important;
+      }
+    }
+  }
+  
+  // Botones deshabilitados
+  .ant-pagination-disabled {
+    .ant-pagination-item-link {
+      color: var(--gray-light, #BABABB) !important;
+      
+      &:hover {
+        background-color: transparent !important;
+        color: var(--gray-light, #BABABB) !important;
+      }
+    }
+  }
+  
+  // Jump to page (ir a página)
+  .ant-pagination-options {
+    .ant-pagination-options-quick-jumper {
+      input {
+        border-color: var(--gray-main, #6F6F70) !important;
+        border-radius: 6px;
+        
+        &:hover,
+        &:focus {
+          border-color: var(--blue-violet-dark, #3749B3) !important;
+        }
+      }
+    }
+  }
+}
+
+// Modo oscuro para el paginador
+.dark {
+  .ant-pagination {
+    .ant-pagination-item {
+      a {
+        color: rgba(255, 255, 255, 0.87) !important;
+      }
+    }
+    
+    .ant-pagination-item-active {
+      background-color: var(--blue-violet-dark, #3749B3) !important;
+      
+      a {
+        color: white !important;
+      }
+    }
+    
+    .ant-pagination-prev,
+    .ant-pagination-next {
+      .ant-pagination-item-link {
+        color: rgba(255, 255, 255, 0.87) !important;
+      }
+    }
+  }
+}

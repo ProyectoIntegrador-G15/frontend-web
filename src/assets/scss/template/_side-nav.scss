@@ -135,23 +135,87 @@ margin-top: -2px;
   &.ant-menu-inline{
     .ant-menu-item{
       padding: 0 30px !important;
+      color: var(--gray-dark, #1E1E1F) !important;
       a{
         @apply flex items-center;
+        color: var(--gray-dark, #1E1E1F) !important;
       }
     }
     .ant-menu-submenu{
       .ant-menu{
         .ant-menu-item{
           @apply h-[36px] leading-[36px];
+          color: var(--gray-dark, #1E1E1F) !important;
+          a{
+            color: var(--gray-dark, #1E1E1F) !important;
+          }
         }
       }
     }
     .ant-menu-submenu-title{
       @apply mt-1 mb-1 text-dark dark:text-white/[.87] dark:hover:text-primary;
+      color: var(--gray-dark, #1E1E1F) !important;
     }
   }
 }
 
+// Estilos para elementos seleccionados/focus del sidebar
+.side-nav-menu {
+  &.ant-menu-inline {
+    .ant-menu-item-selected,
+    .ant-menu-item-active,
+    .ant-menu-submenu-selected > .ant-menu-submenu-title {
+      background: var(--blue-violet-extralight, #E8ECFF) !important;
+      border-radius: 12px !important;
+      color: var(--gray-dark, #1E1E1F) !important;
+      
+      a {
+        color: var(--gray-dark, #1E1E1F) !important;
+      }
+      
+      span {
+        color: var(--gray-dark, #1E1E1F) !important;
+      }
+      
+      .ant-menu-item-icon,
+      .anticon,
+      i {
+        color: var(--blue-violet-dark, #3749B3) !important;
+      }
+    }
+    
+    // Hover effect
+    .ant-menu-item:hover,
+    .ant-menu-submenu-title:hover {
+      background: var(--blue-violet-extralight, #E8ECFF) !important;
+      border-radius: 12px !important;
+    }
+    
+    // Estilos específicos para spans del sidebar
+    .ant-menu-item span,
+    .ant-menu-submenu-title span {
+      color: var(--gray-dark, #1E1E1F) !important;
+    }
+    
+    // Estilos para spans con iconos
+    .ant-menu-item .ant-menu-item-icon + span,
+    .ant-menu-submenu-title .ant-menu-item-icon + span,
+    .ant-menu-item .anticon + span,
+    .ant-menu-submenu-title .anticon + span {
+      color: var(--gray-dark, #1E1E1F) !important;
+    }
+    
+    // Estilos para iconos del sidebar - por defecto gray-dark
+    .ant-menu-item .ant-menu-item-icon,
+    .ant-menu-submenu-title .ant-menu-item-icon,
+    .ant-menu-item .anticon,
+    .ant-menu-submenu-title .anticon,
+    .ant-menu-item i,
+    .ant-menu-submenu-title i {
+      color: var(--gray-dark, #1E1E1F) !important;
+    }
+  }
+}
 
 .is-expand {
     @include screen-tablet {

@@ -1,0 +1,64 @@
+<div class="routes-list-container">
+  <!-- Header con título y botón crear ruta -->
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="screen-title">Rutas de Entrega</h1>
+    <button class="btn-primary" (click)="createRoute()">
+      <span nz-icon nzType="plus" nzTheme="outline"></span>
+      Crear ruta
+    </button>
+  </div>
+
+  <!-- Indicador de carga -->
+  <div *ngIf="loading" class="flex justify-center items-center py-12">
+    <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="error && !loading" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+    <p class="font-medium">{{ error }}</p>
+    <button class="mt-2 text-sm underline" (click)="loadRoutes()">Reintentar</button>
+  </div>
+
+  <!-- Tabla de rutas con estilos globales -->
+  <div *ngIf="!loading && !error" class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID de ruta</th>
+          <th>Fecha de creación</th>
+          <th>Bodega de origen</th>
+          <th>Entregas asignadas</th>
+          <th>Estado</th>
+          <th>Camion asignado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let route of routes">
+          <td>
+            <p>#{{ route.id }}</p>
+          </td>
+          <td>
+            <p>{{ route.creationDate }}</p>
+          </td>
+          <td>{{ route.originWarehouse }}</td>
+          <td>{{ route.assignedDeliveries }}</td>
+          <td>
+            <nz-tag [nzColor]="getStatusColor(route.status)">
+              {{ getStatusText(route.status) }}
+            </nz-tag>
+          </td>
+          <td>
+            <p>{{ route.assignedTruck }}</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginador -->
+  <div class="flex justify-center mt-6">
+    <nz-pagination [(nzPageIndex)]="currentPage" [nzTotal]="totalItems" [nzPageSize]="pageSize"
+      [nzShowSizeChanger]="false" [nzShowQuickJumper]="false">
+    </nz-pagination>
+  </div>
+</div>

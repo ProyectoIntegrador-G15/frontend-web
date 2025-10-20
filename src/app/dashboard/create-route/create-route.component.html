@@ -1,0 +1,96 @@
+<div class="delivery-routes-container">
+  <!-- Header con botón de regresar y título -->
+  <div class="flex items-center mb-6">
+    <button 
+      nz-button
+      nzType="text"
+      (click)="goBack()"
+      class="mr-4 p-2 hover:bg-gray-100 rounded-md">
+      <span class="text-[16px]" nz-icon nzType="arrow-left" nzTheme="outline"></span>
+    </button>
+    <h1 class="screen-title">Generar ruta de entrega</h1>
+  </div>
+
+  <!-- Card principal -->
+  <div class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
+    <div class="p-[25px]">
+      <!-- Campos en línea: Fecha y Bodega -->
+      <div class="flex gap-6 mb-6">
+        <div class="flex-1">
+          <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+            Fecha de la ruta
+          </label>
+          <nz-date-picker
+            nzFormat="dd/MM/yyyy"
+            class="w-full"
+            nzPlaceHolder="dd/mm/yyyy">
+          </nz-date-picker>
+        </div>
+        
+        <div class="flex-1">
+          <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+            Bodega de origen
+          </label>
+          <nz-select
+            class="w-full"
+            nzPlaceHolder="Seleccionar bodega">
+            <nz-option value="Bodega Central" label="Bodega Central"></nz-option>
+          </nz-select>
+        </div>
+      </div>
+
+      <!-- Tabla de pedidos pendientes -->
+      <div class="mb-6">
+        <h2 class="text-lg font-semibold text-dark dark:text-white mb-4">Pedidos pendientes</h2>
+        
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Selección</th>
+                <th>ID Pedido</th>
+                <th>Cliente</th>
+                <th>Dirección</th>
+                <th>Fecha de ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of pendingOrders">
+                <td class="text-center">
+                  <label nz-checkbox 
+                         [ngModel]="order.selected"
+                         (ngModelChange)="toggleOrderSelection(order.id)">
+                  </label>
+                </td>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.client }}</td>
+                <td>{{ order.address }}</td>
+                <td>{{ order.entryDate }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Campo Vehículo/Conductor -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+          Vehículo/Conductor
+        </label>
+        <nz-select
+          class="w-full"
+          nzPlaceHolder="Seleccionar vehículo">
+          <nz-option value="Asignación automática" label="Asignación automática"></nz-option>
+        </nz-select>
+      </div>
+
+      <!-- Botón de generar ruta -->
+      <div class="flex justify-center">
+        <button class="btn-primary" (click)="generateRoute()">
+          <span nz-icon nzType="plus" nzTheme="outline"></span>
+          Generar ruta automática
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
