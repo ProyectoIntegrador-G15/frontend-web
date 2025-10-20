@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ProductInventory } from '../interfaces/inventory.type';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InventoryService {
-  private baseUrl = 'https://api-gateway-953169391315.us-central1.run.app/inventory';
+  private baseUrl = `${environment.apiUrl}/inventory`;
 
   constructor(private http: HttpClient) { }
 
