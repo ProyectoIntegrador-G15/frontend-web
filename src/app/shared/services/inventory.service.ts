@@ -7,7 +7,7 @@ import { ProductInventory } from '../interfaces/inventory.type';
   providedIn: 'root'
 })
 export class InventoryService {
-  private baseUrl = 'http://localhost:3002/inventory';
+  private baseUrl = 'https://api-gateway-953169391315.us-central1.run.app/inventory';
 
   constructor(private http: HttpClient) { }
 

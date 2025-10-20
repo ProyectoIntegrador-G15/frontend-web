@@ -8,7 +8,7 @@ import {ProductInventory} from '../interfaces/inventory.type';
 describe('InventoryService', () => {
   let service: InventoryService;
   let httpMock: HttpTestingController;
-  const baseUrl = 'http://localhost:3002/inventory';
+  const baseUrl = 'https://api-gateway-953169391315.us-central1.run.app/inventory';
 
   const mockProductInventory: ProductInventory = {
     product_id: 'MED-001',
@@ -57,7 +57,7 @@ describe('InventoryService', () => {
   });
 
   it('should have correct base URL', () => {
-    expect(service['baseUrl']).toBe('http://localhost:3002/inventory');
+    expect(service['baseUrl']).toBe('https://api-gateway-953169391315.us-central1.run.app/inventory');
   });
 
   describe('getProductInventory', () => {
@@ -75,9 +75,9 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
+      const req = httpMock.expectOne(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId}`);
       expect(req.request.method).toBe('GET');
-      expect(req.request.url).toBe(`http://localhost:3002/inventory/${productId}`);
+      expect(req.request.url).toBe(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId}`);
       req.flush(mockProductInventory);
     });
 
@@ -96,7 +96,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
+      const req = httpMock.expectOne(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId}`);
       expect(req.request.method).toBe('GET');
       req.flush(customInventory);
     });
@@ -119,7 +119,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
+      const req = httpMock.expectOne(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId}`);
       req.flush(emptyInventory);
     });
 
@@ -136,7 +136,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
+      const req = httpMock.expectOne(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId}`);
       req.flush(errorMessage, {status: errorStatus, statusText: errorMessage});
     });
 
@@ -150,7 +150,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
+      const req = httpMock.expectOne(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId}`);
       req.error(new ProgressEvent('network error'));
     });
 
@@ -167,7 +167,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
+      const req = httpMock.expectOne(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId}`);
       req.flush(errorMessage, {status: errorStatus, statusText: errorMessage});
     });
 
@@ -182,7 +182,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
+      const req = httpMock.expectOne(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId}`);
       req.error(new ErrorEvent('timeout'));
     });
 
@@ -191,9 +191,9 @@ describe('InventoryService', () => {
 
       service.getProductInventory(productId).subscribe();
 
-      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
+      const req = httpMock.expectOne(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId}`);
       expect(req.request.method).toBe('GET');
-      expect(req.request.url).toBe(`http://localhost:3002/inventory/${productId}`);
+      expect(req.request.url).toBe(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId}`);
       expect(req.request.headers.get('Content-Type')).toBeNull();
 
       req.flush(mockProductInventory);
@@ -208,8 +208,8 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
-      expect(req.request.url).toBe(`http://localhost:3002/inventory/${productId}`);
+      const req = httpMock.expectOne(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId}`);
+      expect(req.request.url).toBe(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId}`);
       req.flush(mockProductInventory);
     });
 
@@ -222,15 +222,15 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`http://localhost:3002/inventory/`);
-      expect(req.request.url).toBe(`http://localhost:3002/inventory/`);
+      const req = httpMock.expectOne(`https://api-gateway-953169391315.us-central1.run.app/inventory/`);
+      expect(req.request.url).toBe(`https://api-gateway-953169391315.us-central1.run.app/inventory/`);
       req.flush(mockProductInventory);
     });
   });
 
   describe('Service Configuration', () => {
     it('should have correct base URL', () => {
-      expect(service['baseUrl']).toBe('http://localhost:3002/inventory');
+      expect(service['baseUrl']).toBe('https://api-gateway-953169391315.us-central1.run.app/inventory');
     });
 
     it('should be provided in root', () => {
@@ -261,7 +261,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
+      const req = httpMock.expectOne(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId}`);
       req.flush(mockProductInventory);
 
       expect(completed).toBe(true);
@@ -274,11 +274,11 @@ describe('InventoryService', () => {
       service.getProductInventory(productId1).subscribe();
       service.getProductInventory(productId2).subscribe();
 
-      const req1 = httpMock.expectOne(`http://localhost:3002/inventory/${productId1}`);
-      const req2 = httpMock.expectOne(`http://localhost:3002/inventory/${productId2}`);
+      const req1 = httpMock.expectOne(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId1}`);
+      const req2 = httpMock.expectOne(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId2}`);
 
-      expect(req1.request.url).toBe(`http://localhost:3002/inventory/${productId1}`);
-      expect(req2.request.url).toBe(`http://localhost:3002/inventory/${productId2}`);
+      expect(req1.request.url).toBe(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId1}`);
+      expect(req2.request.url).toBe(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId2}`);
 
       req1.flush(mockProductInventory);
       req2.flush(mockProductInventory);
@@ -296,7 +296,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
+      const req = httpMock.expectOne(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId}`);
       req.error(new ErrorEvent('parse error', {
         message: 'Unexpected token i in JSON at position 0'
       }));
@@ -311,7 +311,7 @@ describe('InventoryService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`http://localhost:3002/inventory/${productId}`);
+      const req = httpMock.expectOne(`https://api-gateway-953169391315.us-central1.run.app/inventory/${productId}`);
       req.flush(null);
     });
   });
