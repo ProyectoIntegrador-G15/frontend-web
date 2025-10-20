@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environment';
 describe('InventoryService', () => {
   let service: InventoryService;
   let httpMock: HttpTestingController;
-  const baseUrl = `${environment.apiUrl}/inventory`;
+  const baseUrl = `${environment.apiUrl}${environment.apiEndpoints.inventory}`;
 
   const mockProductInventory: ProductInventory = {
     product_id: 'MED-001',

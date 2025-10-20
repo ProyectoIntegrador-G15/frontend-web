@@ -6,6 +6,7 @@ export interface Product {
   needsCold: boolean;
   status: 'active' | 'inactive';
   description?: string;
+  storageInstructions?: string;
   category?: string;
   stock?: number;
   warehouseId?: string;

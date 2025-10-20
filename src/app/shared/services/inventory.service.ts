@@ -13,6 +13,6 @@ export class InventoryService {
   constructor(private http: HttpClient) { }
 
   getProductInventory(productId: string): Observable<ProductInventory> {
-    return this.http.get<ProductInventory>(`${this.baseUrl}/${productId}`);
+    return this.http.get<ProductInventory>(`${environment.apiUrl}${environment.apiEndpoints.inventory}/${productId}`);
   }
 }
