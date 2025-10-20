@@ -28,7 +28,7 @@ jobs:
         run: npm run lint || echo "Linting not configured, skipping..."
         
       - name: Run unit tests
-        run: npm run test:coverage
+        run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
         
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
