@@ -1,12 +1,11 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {Injectable, inject} from '@angular/core';
 import {Observable, BehaviorSubject} from 'rxjs';
 import {map, catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 
 import {Product} from '../interfaces/product.type';
-
-const PRODUCTS_API_URL = 'http://localhost:3002';
+import {ApiService, ApiResponse} from './api/api.service';
+import {EndpointsService} from './api/endpoints.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,18 +14,21 @@ export class ProductsService {
   private productsSubject = new BehaviorSubject<Product[]>([]);
   public products$ = this.productsSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  private apiService = inject(ApiService);
+  private endpointsService = inject(EndpointsService);
+
+  constructor() {
   }
 
   getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(`${PRODUCTS_API_URL}/products`)
+    return this.apiService.getDirect<Product[]>(this.endpointsService.getEndpointPath('products'))
       .pipe(
         catchError(this.handleError)
       );
   }
 
   createProduct(productData: any): Observable<any> {
-    return this.http.post<any>(`${PRODUCTS_API_URL}/products`, productData)
+    return this.apiService.post<any>(this.endpointsService.getEndpointPath('products'), productData)
       .pipe(
         map(response => {
           // Actualizar la lista de productos después de crear uno nuevo
