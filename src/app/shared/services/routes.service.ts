@@ -7,12 +7,14 @@ import { environment } from '../../../environments/environment';
 // Interfaz para la respuesta del backend
 export interface RouteApiResponse {
   id: number;
-  vehicle_id: string;
+  vehicle_id: number;
   created_at: string;
-  start_location: string;
-  end_location: string;
+  warehouse_id: string;
+  warehouse_name: string;
   state: string;
-  stops: number;
+  deliveries: number;
+  gmaps_metrics: string;
+  country: string;
 }
 
 // Interfaz para el frontend
@@ -50,10 +52,10 @@ export class RoutesService {
     return {
       id: apiRoute.id.toString(),
       creationDate: this.formatDate(apiRoute.created_at),
-      originWarehouse: apiRoute.start_location,
-      assignedDeliveries: apiRoute.stops,
+      originWarehouse: apiRoute.warehouse_name,
+      assignedDeliveries: apiRoute.deliveries,
       status: this.mapStatus(apiRoute.state),
-      assignedTruck: apiRoute.vehicle_id
+      assignedTruck: `VEH-${String(apiRoute.vehicle_id).padStart(3, '0')}`
     };
   }
 

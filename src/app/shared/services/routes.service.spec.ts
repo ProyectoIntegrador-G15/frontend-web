@@ -10,30 +10,36 @@ describe('RoutesService', () => {
   const mockApiRoutes: RouteApiResponse[] = [
     {
       id: 1,
-      vehicle_id: 'VEH-001',
+      vehicle_id: 1,
       created_at: '2025-10-14T09:00:00',
-      start_location: 'Bogotá',
-      end_location: 'Medellín',
+      warehouse_id: 'WH-001',
+      warehouse_name: 'Bodega Central Bogotá',
       state: 'scheduled',
-      stops: 5
+      deliveries: 5,
+      gmaps_metrics: '{"performed_shipment_count": 0, "total_duration": 0}',
+      country: 'Colombia'
     },
     {
       id: 2,
-      vehicle_id: 'VEH-002',
+      vehicle_id: 2,
       created_at: '2025-10-14T10:30:00',
-      start_location: 'Cali',
-      end_location: 'Barranquilla',
+      warehouse_id: 'WH-002',
+      warehouse_name: 'Bodega Norte Cali',
       state: 'in_transit',
-      stops: 8
+      deliveries: 8,
+      gmaps_metrics: '{"performed_shipment_count": 5, "total_duration": 120}',
+      country: 'Colombia'
     },
     {
       id: 3,
-      vehicle_id: 'VEH-003',
+      vehicle_id: 3,
       created_at: '2025-10-14T11:15:00',
-      start_location: 'Cartagena',
-      end_location: 'Santa Marta',
+      warehouse_id: 'WH-003',
+      warehouse_name: 'Bodega Sur Cartagena',
       state: 'delivered',
-      stops: 3
+      deliveries: 3,
+      gmaps_metrics: '{"performed_shipment_count": 3, "total_duration": 90}',
+      country: 'Colombia'
     }
   ];
 
@@ -41,7 +47,7 @@ describe('RoutesService', () => {
     {
       id: '1',
       creationDate: '14-10-2025',
-      originWarehouse: 'Bogotá',
+      originWarehouse: 'Bodega Central Bogotá',
       assignedDeliveries: 5,
       status: 'planned',
       assignedTruck: 'VEH-001'
@@ -49,7 +55,7 @@ describe('RoutesService', () => {
     {
       id: '2',
       creationDate: '14-10-2025',
-      originWarehouse: 'Cali',
+      originWarehouse: 'Bodega Norte Cali',
       assignedDeliveries: 8,
       status: 'in_progress',
       assignedTruck: 'VEH-002'
@@ -57,7 +63,7 @@ describe('RoutesService', () => {
     {
       id: '3',
       creationDate: '14-10-2025',
-      originWarehouse: 'Cartagena',
+      originWarehouse: 'Bodega Sur Cartagena',
       assignedDeliveries: 3,
       status: 'completed',
       assignedTruck: 'VEH-003'
@@ -182,12 +188,14 @@ describe('RoutesService', () => {
     it('should format ISO date to DD-MM-YYYY', (done) => {
       const testRoute: RouteApiResponse = {
         id: 99,
-        vehicle_id: 'VEH-099',
+        vehicle_id: 99,
         created_at: '2025-01-05T12:30:00',
-        start_location: 'Test',
-        end_location: 'Test',
+        warehouse_id: 'WH-099',
+        warehouse_name: 'Bodega Test',
         state: 'scheduled',
-        stops: 1
+        deliveries: 1,
+        gmaps_metrics: '{}',
+        country: 'Colombia'
       };
 
       service.getRoutes().subscribe({
@@ -396,11 +404,11 @@ describe('RoutesService', () => {
       req.flush(mockApiRoutes);
     });
 
-    it('should map start_location to originWarehouse', (done) => {
+    it('should map warehouse_name to originWarehouse', (done) => {
       service.getRoutes().subscribe({
         next: (routes) => {
-          expect(routes[0].originWarehouse).toBe('Bogotá');
-          expect(routes[1].originWarehouse).toBe('Cali');
+          expect(routes[0].originWarehouse).toBe('Bodega Central Bogotá');
+          expect(routes[1].originWarehouse).toBe('Bodega Norte Cali');
           done();
         },
         error: done.fail
@@ -410,7 +418,7 @@ describe('RoutesService', () => {
       req.flush(mockApiRoutes);
     });
 
-    it('should map stops to assignedDeliveries', (done) => {
+    it('should map deliveries to assignedDeliveries', (done) => {
       service.getRoutes().subscribe({
         next: (routes) => {
           expect(routes[0].assignedDeliveries).toBe(5);
@@ -470,10 +478,10 @@ describe('RoutesService', () => {
       req.flush([largeIdRoute]);
     });
 
-    it('should handle zero stops', (done) => {
-      const zeroStopsRoute: RouteApiResponse = {
+    it('should handle zero deliveries', (done) => {
+      const zeroDeliveriesRoute: RouteApiResponse = {
         ...mockApiRoutes[0],
-        stops: 0
+        deliveries: 0
       };
 
       service.getRoutes().subscribe({
@@ -610,16 +618,15 @@ describe('RoutesService', () => {
   // ========================================
 
   describe('Edge cases', () => {
-    it('should handle route with very long location names', (done) => {
-      const longLocationRoute: RouteApiResponse = {
+    it('should handle route with very long warehouse names', (done) => {
+      const longWarehouseNameRoute: RouteApiResponse = {
         ...mockApiRoutes[0],
-        start_location: 'Bogotá D.C. - Centro Internacional de Distribución Norte - Zona Industrial',
-        end_location: 'Medellín - Antioquia - Centro de Acopio Regional'
+        warehouse_name: 'Bodega Central Bogotá D.C. - Centro Internacional de Distribución Norte - Zona Industrial'
       };
 
       service.getRoutes().subscribe({
         next: (routes) => {
-          expect(routes[0].originWarehouse).toContain('Bogotá D.C.');
+          expect(routes[0].originWarehouse).toContain('Bodega Central Bogotá D.C.');
           expect(routes[0].originWarehouse.length).toBeGreaterThan(10);
           done();
         },
@@ -627,31 +634,31 @@ describe('RoutesService', () => {
       });
 
       const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
-      req.flush([longLocationRoute]);
+      req.flush([longWarehouseNameRoute]);
     });
 
-    it('should handle route with special characters in vehicle_id', (done) => {
-      const specialVehicleRoute: RouteApiResponse = {
+    it('should format vehicle_id with padding', (done) => {
+      const singleDigitVehicleRoute: RouteApiResponse = {
         ...mockApiRoutes[0],
-        vehicle_id: 'VEH-001-A/B'
+        vehicle_id: 5
       };
 
       service.getRoutes().subscribe({
         next: (routes) => {
-          expect(routes[0].assignedTruck).toBe('VEH-001-A/B');
+          expect(routes[0].assignedTruck).toBe('VEH-005');
           done();
         },
         error: done.fail
       });
 
       const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
-      req.flush([specialVehicleRoute]);
+      req.flush([singleDigitVehicleRoute]);
     });
 
-    it('should handle very large number of stops', (done) => {
-      const manyStopsRoute: RouteApiResponse = {
+    it('should handle very large number of deliveries', (done) => {
+      const manyDeliveriesRoute: RouteApiResponse = {
         ...mockApiRoutes[0],
-        stops: 999
+        deliveries: 999
       };
 
       service.getRoutes().subscribe({
@@ -663,18 +670,20 @@ describe('RoutesService', () => {
       });
 
       const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
-      req.flush([manyStopsRoute]);
+      req.flush([manyDeliveriesRoute]);
     });
 
     it('should handle large list of routes', (done) => {
       const largeRouteList: RouteApiResponse[] = Array.from({ length: 100 }, (_, i) => ({
         id: i + 1,
-        vehicle_id: `VEH-${String(i + 1).padStart(3, '0')}`,
+        vehicle_id: i + 1,
         created_at: '2025-10-14T09:00:00',
-        start_location: `Location ${i + 1}`,
-        end_location: `Destination ${i + 1}`,
+        warehouse_id: `WH-${String(i + 1).padStart(3, '0')}`,
+        warehouse_name: `Bodega ${i + 1}`,
         state: ['scheduled', 'in_transit', 'delivered', 'cancelled'][i % 4],
-        stops: i + 1
+        deliveries: i + 1,
+        gmaps_metrics: '{}',
+        country: 'Colombia'
       }));
 
       service.getRoutes().subscribe({
@@ -691,16 +700,16 @@ describe('RoutesService', () => {
       req.flush(largeRouteList);
     });
 
-    it('should handle routes with accented characters', (done) => {
+    it('should handle warehouse names with accented characters', (done) => {
       const accentedRoute: RouteApiResponse = {
         ...mockApiRoutes[0],
-        start_location: 'Bogotá',
-        end_location: 'Medellín'
+        warehouse_name: 'Bodega Bogotá - Medellín'
       };
 
       service.getRoutes().subscribe({
         next: (routes) => {
-          expect(routes[0].originWarehouse).toBe('Bogotá');
+          expect(routes[0].originWarehouse).toContain('Bogotá');
+          expect(routes[0].originWarehouse).toContain('Medellín');
           done();
         },
         error: done.fail
@@ -724,7 +733,7 @@ describe('RoutesService', () => {
           // Verify first route transformation
           expect(routes[0].id).toBe('1');
           expect(routes[0].creationDate).toBe('14-10-2025');
-          expect(routes[0].originWarehouse).toBe('Bogotá');
+          expect(routes[0].originWarehouse).toBe('Bodega Central Bogotá');
           expect(routes[0].assignedDeliveries).toBe(5);
           expect(routes[0].status).toBe('planned');
           expect(routes[0].assignedTruck).toBe('VEH-001');
