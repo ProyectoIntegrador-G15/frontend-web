@@ -493,7 +493,7 @@ describe('RoutesService', () => {
       });
 
       const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
-      req.flush([zeroStopsRoute]);
+      req.flush([zeroDeliveriesRoute]);
     });
   });
 
