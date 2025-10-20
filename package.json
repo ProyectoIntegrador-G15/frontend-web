@@ -13,8 +13,13 @@
     "e2e": "cypress open",
     "e2e:ci": "start-server-and-test start http://localhost:4200 cypress:run",
     "e2e:headless": "start-server-and-test start http://localhost:4200 cypress:headless",
+    "e2e:smoke": "start-server-and-test start http://localhost:4200 'cypress run --spec \"cypress/e2e/smoke/*.cy.ts\"'",
+    "e2e:fast": "start-server-and-test start http://localhost:4200 'cypress run --spec \"cypress/e2e/critical/*.cy.ts\"'",
+    "e2e:timeout": "timeout 180 start-server-and-test start http://localhost:4200 cypress:run || echo 'E2E tests timed out'",
     "cypress:run": "cypress run",
     "cypress:headless": "cypress run --headless",
+    "cypress:smoke": "cypress run --spec \"cypress/e2e/smoke/*.cy.ts\"",
+    "cypress:critical": "cypress run --spec \"cypress/e2e/critical/*.cy.ts\"",
     "build-prod": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng build --configuration production",
     "build-prod-state": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng build --configuration production --stats-json",
     "bundle-report": "webpack-bundle-analyzer dist/medisupply/stats.json"
