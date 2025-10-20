@@ -174,10 +174,16 @@
     <tbody>
       <tr *ngFor="let data of listOfData">
         <td>{{ data.name }}</td>
-        <td>{{ data.purchase_price }}</td>
+        <td>${{ data.price | number:'1.2-2' }}</td>
         <td>{{ data.provider }}</td>
-        <td>{{ data.requires_cold_chain }}</td>
-        <td>{{ data.status }}</td>
+        <td style="max-width: 400px; white-space: normal; word-wrap: break-word;">
+          {{ data.storageInstructions || 'N/A' }}
+        </td>
+        <td>
+          <nz-tag [nzColor]="data.status === 'active' ? 'green' : 'default'">
+            {{ data.status === 'active' ? 'Activo' : 'Inactivo' }}
+          </nz-tag>
+        </td>
         <td>
           <button
             (click)="navigateToInventory(data.id)"
