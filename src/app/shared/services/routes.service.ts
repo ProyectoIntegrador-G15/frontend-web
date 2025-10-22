@@ -1,28 +1,18 @@
-<<<<<<< HEAD
 import {Injectable, inject} from '@angular/core';
 import {Observable, throwError} from 'rxjs';
 import {map, catchError} from 'rxjs/operators';
 import {ApiService} from './api/api.service';
 import {EndpointsService} from './api/endpoints.service';
-=======
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
->>>>>>> develop
 
 // Interfaz para la respuesta del backend
 export interface RouteApiResponse {
   id: number;
-  vehicle_id: number;
+  vehicle_id: string;
   created_at: string;
-  warehouse_id: string;
-  warehouse_name: string;
+  start_location: string;
+  end_location: string;
   state: string;
-  deliveries: number;
-  gmaps_metrics: string;
-  country: string;
+  stops: number;
 }
 
 // Interfaz para el frontend
@@ -49,11 +39,7 @@ export class RoutesService {
    * Obtener todas las rutas del backend
    */
   getRoutes(): Observable<Route[]> {
-<<<<<<< HEAD
     return this.apiService.getDirect<RouteApiResponse[]>(this.endpointsService.getEndpointPath('routes'))
-=======
-    return this.http.get<RouteApiResponse[]>(`${environment.apiUrl}${environment.apiEndpoints.routes}`)
->>>>>>> develop
       .pipe(
         map(routes => routes.map(route => this.transformRoute(route))),
         catchError(this.handleError)
@@ -67,10 +53,10 @@ export class RoutesService {
     return {
       id: apiRoute.id.toString(),
       creationDate: this.formatDate(apiRoute.created_at),
-      originWarehouse: apiRoute.warehouse_name,
-      assignedDeliveries: apiRoute.deliveries,
+      originWarehouse: apiRoute.start_location,
+      assignedDeliveries: apiRoute.stops,
       status: this.mapStatus(apiRoute.state),
-      assignedTruck: `VEH-${String(apiRoute.vehicle_id).padStart(3, '0')}`
+      assignedTruck: apiRoute.vehicle_id
     };
   }
 

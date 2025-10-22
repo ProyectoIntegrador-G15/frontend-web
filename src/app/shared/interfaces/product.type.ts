@@ -6,7 +6,6 @@ export interface Product {
   requires_cold_chain: boolean;
   status: 'active' | 'inactive';
   description?: string;
-  storageInstructions?: string;
   category?: string;
   stock?: number;
   warehouseId?: string;
