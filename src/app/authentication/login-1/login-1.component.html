@@ -8,7 +8,11 @@
       <div nz-col nzXs="24" nzSm="18" nzMd="12" nzXl="8" nzXXl="6">
         <div class="rounded-6 mt-[25px] shadow_[0px_5px_20px_rgba(173,181,217, 0.03)] dark:shadow_[0px_5px_15px_rgba(0, 0, 0, .1)] bg-white dark:bg-[#1b1d2a]">
           <div class="p-[25px] text-center border-b border-regular dark:border-white/[.05] top">
+<<<<<<< HEAD
             <h2 class="text-18 font-semibold leading-[1] mb-0 text-dark dark:text-white/[.87] title">Sign in MediSupply</h2>
+=======
+            <h2 class="text-18 font-semibold leading-[1] mb-0 text-dark dark:text-white/[.87] title">Sign in</h2>
+>>>>>>> develop
           </div>
           <div class="py-[30px] px-[40px] content">
             <form nz-form [formGroup]="validateForm" nzLayout="vertical" class="login-form" (ngSubmit)="submitForm()">
@@ -45,8 +49,7 @@
                 </label>
                 <a class="text-13 text-primary hover:text-dark dark:hover:text-white/[.87]" routerLink="/authentication/forget-pass">forget password?</a>
               </div>
-              <button nz-button type="submit"
-                class=" inline-flex items-center justify-center w-full h-[48px] text-14 rounded-6 font-medium bg-primary text-white cursor-pointer hover:bg-primary-hbr border-primary transition duration-300">
+              <button type="submit" class="btn-primary w-full" [disabled]="isLoading">
                 <i class="fas fa-cog fa-spin" [hidden]="!isLoading"></i>
                 Log in
               </button>

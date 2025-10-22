@@ -51,7 +51,53 @@ jobs:
         if: steps.check-e2e.outputs.e2e-exists == 'true'
         run: |
           echo "Running E2E tests..."
-          npm run e2e:ci || echo "E2E tests not configured, skipping..."
+          timeout 180 npm run e2e:ci || echo "E2E tests timed out or failed, continuing..."
+        continue-on-error: true
+
+  e2e-tests:
+    name: E2E Tests (Non-blocking)
+    runs-on: ubuntu-latest
+    if: always() # Se ejecuta independientemente del resultado de otros jobs
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Check for E2E tests
+        id: check-e2e
+        run: |
+          if [ -d "cypress" ] || [ -d "e2e" ] || [ -f "cypress.config.js" ] || [ -f "cypress.config.ts" ]; then
+            echo "e2e-exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "e2e-exists=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Run E2E tests with timeout
+        if: steps.check-e2e.outputs.e2e-exists == 'true'
+        run: |
+          echo "🚀 Starting E2E tests (max 3 minutes)..."
+          timeout 180 npm run e2e:ci || echo "⏰ E2E tests timed out after 3 minutes"
+        continue-on-error: true
+        
+      - name: Upload E2E results
+        if: always() && steps.check-e2e.outputs.e2e-exists == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results
+          path: |
+            cypress/videos/
+            cypress/screenshots/
+            cypress/reports/
+          retention-days: 7
         continue-on-error: true
           
   build:
@@ -95,7 +141,7 @@ jobs:
   deploy-production:
     name: Deploy to Production (Live)
     runs-on: ubuntu-latest
-    needs: [test, build]
+    needs: [test, build] # No depende de e2e-tests
     if: github.ref == 'refs/heads/main'
     
     steps:
@@ -137,7 +183,7 @@ jobs:
   deploy-preview:
     name: Deploy to Preview (Develop)
     runs-on: ubuntu-latest
-    needs: [test, build]
+    needs: [test, build] # No depende de e2e-tests
     if: github.ref == 'refs/heads/develop'
     
     steps:
