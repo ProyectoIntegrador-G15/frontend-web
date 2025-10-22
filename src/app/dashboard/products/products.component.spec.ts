@@ -23,17 +23,17 @@ describe('ProductsComponent - Comprehensive Tests', () => {
     {
       id: '1',
       name: 'Paracetamol 500mg',
-      price: 0.85,
-      provider: 'Farmacéutica ABC',
-      needsCold: false,
+      purchase_price: 0.85,
+      supplier: 'Farmacéutica ABC',
+      requires_cold_chain: false,
       status: 'active' as const
     },
     {
       id: '2',
       name: 'Insulina Humana Regular',
-      price: 12.5,
-      provider: 'Medicamentos XYZ',
-      needsCold: true,
+      purchase_price: 12.5,
+      supplier: 'Medicamentos XYZ',
+      requires_cold_chain: true,
       status: 'active' as const
     }
   ];

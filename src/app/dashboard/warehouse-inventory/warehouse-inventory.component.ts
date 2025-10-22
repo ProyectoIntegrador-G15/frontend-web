@@ -1,8 +1,11 @@
 import {Component, OnInit, OnDestroy} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Subscription} from 'rxjs';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {NzNotificationService} from 'ng-zorro-antd/notification';
 
 import {ProductsWarehouseService} from '../../shared/services/products-warehouse.service';
+import {ProductsService} from '../../shared/services/products.service';
 import {Product} from '../../shared/interfaces/product.type';
 
 @Component({
@@ -17,12 +20,25 @@ export class WarehouseInventoryComponent implements OnInit, OnDestroy {
   isLoading = true;
   errorMessage = '';
 
+  // Modal de inventario
+  isInventoryModalVisible = false;
+  isInventoryModalLoading = false;
+  inventoryForm: FormGroup;
+  inputClass = 'w-full rounded-[6px] text-[16px] dark:bg-white/10 px-[16px] py-[12px] min-h-[50px] outline-none';
+
+  // Productos para el modal
+  allProducts: Product[] = [];
+  filteredProducts: Product[] = [];
+  isLoadingProducts = false;
 
   private subscription: Subscription = new Subscription();
 
   constructor(
     private productsService: ProductsWarehouseService,
-    private route: ActivatedRoute
+    private productsServiceAll: ProductsService,
+    private route: ActivatedRoute,
+    private fb: FormBuilder,
+    private notification: NzNotificationService
   ) {
   }
 
@@ -33,6 +49,8 @@ export class WarehouseInventoryComponent implements OnInit, OnDestroy {
       this.getProductsByWarehouse();
     });
     this.subscribeToProducts();
+    this.initInventoryForm();
+    this.loadAllProducts();
   }
 
   ngOnDestroy(): void {
@@ -78,5 +96,136 @@ export class WarehouseInventoryComponent implements OnInit, OnDestroy {
 
   getStatusText(status: string): string {
     return status === 'active' ? 'Activo' : 'Inactivo';
+  }
+
+  // Métodos del modal de inventario
+  initInventoryForm(): void {
+    this.inventoryForm = this.fb.group({
+      product: [null, [Validators.required]],
+      quantity: [null, [Validators.required, Validators.min(1)]],
+      location: [null, [Validators.required]]
+    });
+  }
+
+  loadAllProducts(): void {
+    this.isLoadingProducts = true;
+    this.productsServiceAll.getProducts().subscribe({
+      next: (products) => {
+        this.allProducts = products;
+        this.filteredProducts = products;
+        this.isLoadingProducts = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar productos:', error);
+        this.isLoadingProducts = false;
+      }
+    });
+  }
+
+  onProductSearch(searchTerm: string): void {
+    if (!searchTerm || searchTerm.trim() === '') {
+      this.filteredProducts = this.allProducts;
+      return;
+    }
+
+    this.filteredProducts = this.allProducts.filter(product =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
+
+  showInventoryModal(): void {
+    this.isInventoryModalVisible = true;
+  }
+
+  handleInventoryModalCancel(): void {
+    this.isInventoryModalVisible = false;
+    this.resetInventoryForm();
+  }
+
+  handleInventoryModalOk(): void {
+    if (!this.validateInventoryForm()) {
+      return;
+    }
+
+    this.isInventoryModalLoading = true;
+
+    const formData = this.inventoryForm.value;
+    const inventoryData = {
+      warehouse_id: parseInt(this.warehouseId),
+      quantity: formData.quantity,
+      location_identifier: formData.location
+    };
+
+    // Aquí se hará la llamada a la API
+    this.addInventoryToProduct(formData.product, inventoryData);
+  }
+
+  addInventoryToProduct(productId: string, inventoryData: any): void {
+    this.productsServiceAll.addInventoryToProduct(productId, inventoryData).subscribe({
+      next: (response) => {
+        console.log('=== INVENTARIO AGREGADO EXITOSAMENTE ===');
+        console.log('Respuesta del servidor:', response);
+
+        this.isInventoryModalLoading = false;
+        this.isInventoryModalVisible = false;
+        this.resetInventoryForm();
+
+        this.notification.create(
+          'success',
+          '¡Inventario agregado exitosamente!',
+          `Se ha agregado ${inventoryData.quantity} unidades del producto a la bodega.`
+        );
+
+        // Recargar datos de la bodega
+        this.getProductsByWarehouse();
+      },
+      error: (error) => {
+        console.error('=== ERROR AL AGREGAR INVENTARIO ===');
+        console.error('Error:', error);
+
+        this.isInventoryModalLoading = false;
+        this.errorMessage = 'Error al agregar inventario. Por favor, inténtalo de nuevo.';
+
+        this.notification.create(
+          'error',
+          'Error al agregar inventario',
+          'No se pudo agregar el inventario. Por favor, verifica los datos e inténtalo de nuevo.'
+        );
+      }
+    });
+  }
+
+  resetInventoryForm(): void {
+    this.inventoryForm.reset();
+  }
+
+  // Métodos de validación
+  getFieldStatus(fieldName: string): string {
+    const field = this.inventoryForm.get(fieldName);
+    if (field && field.dirty && field.invalid) {
+      return 'error';
+    }
+    return '';
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.inventoryForm.get(fieldName);
+    if (field && field.errors) {
+      if (field.errors.required) {
+        return 'Este campo es obligatorio';
+      }
+      if (field.errors.min) {
+        return 'La cantidad debe ser mayor a 0';
+      }
+    }
+    return '';
+  }
+
+  validateInventoryForm(): boolean {
+    for (const i in this.inventoryForm.controls) {
+      this.inventoryForm.controls[i].markAsDirty();
+      this.inventoryForm.controls[i].updateValueAndValidity();
+    }
+    return this.inventoryForm.valid;
   }
 }

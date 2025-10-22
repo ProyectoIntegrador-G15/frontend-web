@@ -12,6 +12,18 @@ import {Product} from '../../shared/interfaces/product.type';
 @Component({
   selector: 'app-products',
   templateUrl: 'products.component.html',
+  styles: [`
+    .pagination-centered ::ng-deep .ant-pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 24px;
+    }
+    
+    .pagination-centered ::ng-deep .ant-pagination .ant-pagination-options {
+      display: none;
+    }
+  `]
 })
 export class ProductsComponent implements OnInit, OnDestroy {
   products: Product[] = [];
@@ -20,6 +32,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
   errorMessage = '';
   isProductModalVisible = false;
   isProductModalLoading = false;
+
+  // Paginación
+  currentPage = 1;
+  pageSize = 10;
+  totalProducts = 0;
+  statusFilter = true;
+  hasNextPage = true;
 
   // Bodegas
   warehouses: Warehouse[] = [];
@@ -62,10 +81,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   getProducts(): void {
     this.isLoading = true;
-    const searchSubscription = this.productsService.getProducts()
+    const searchSubscription = this.productsService.getProductsPaginated(this.currentPage, this.statusFilter)
       .subscribe({
-        next: (products) => {
-          this.products = products;
+        next: (response) => {
+          this.products = response.data;
+          this.totalProducts = response.total;
+          this.hasNextPage = response.hasNextPage;
           this.isLoading = false;
         },
         error: (error) => {
@@ -114,9 +135,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
       tempMax: [null, [Validators.required]],
       description: [null, [Validators.required, Validators.minLength(10)]],
       storageInstructions: [null, [Validators.required, Validators.minLength(10)]],
-      warehouse: [null, [Validators.required]],
-      quantity: [null, [Validators.required, Validators.min(1)]],
-      location: [null, [Validators.required]]
     }, {validators: this.temperatureRangeValidator});
 
     // Suscribirse a cambios en los campos de temperatura para validar en tiempo real
@@ -228,16 +246,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
       temperatureRange: `${formData.tempMin}°F - ${formData.tempMax}°F`,
       description: formData.description,
       storageInstructions: formData.storageInstructions,
-      warehouse: formData.warehouse,
-      quantity: formData.quantity,
-      location: formData.location
     };
 
     this.productsService.createProduct(productData).subscribe({
       next: (response) => {
-        console.log('=== PRODUCTO CREADO EXITOSAMENTE ===');
-        console.log('Respuesta del servidor:', response);
-
         // Cerrar modal y limpiar formulario
         this.isProductModalVisible = false;
         this.isProductModalLoading = false;
@@ -251,9 +263,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
         );
       },
       error: (error) => {
-        console.error('=== ERROR AL CREAR PRODUCTO ===');
-        console.error('Error:', error);
-
         this.isProductModalLoading = false;
         this.errorMessage = 'Error al crear el producto. Por favor, inténtalo de nuevo.';
 
@@ -270,5 +279,19 @@ export class ProductsComponent implements OnInit, OnDestroy {
   resetProductForm(): void {
     this.validateForm.reset();
   }
+
+  // Métodos de paginación
+  onPageIndexChange(page: number): void {
+    this.currentPage = page;
+    this.getProducts();
+  }
+
+
+  onStatusFilterChange(status: boolean): void {
+    this.statusFilter = status;
+    this.currentPage = 1; // Reset to first page when changing filter
+    this.getProducts();
+  }
+
 
 }

@@ -1,3 +1,79 @@
+<!-- Modal de agregar inventario -->
+<nz-modal
+  [(nzVisible)]="isInventoryModalVisible"
+  [nzTitle]="inventoryModalTitle"
+  [nzContent]="inventoryModalContent"
+  [nzFooter]="inventoryModalFooter"
+  (nzOnCancel)="handleInventoryModalCancel()"
+  nzWidth="75%"
+>
+  <ng-template #inventoryModalTitle>Agregar Inventario</ng-template>
+
+  <ng-template #inventoryModalContent>
+    <form nz-form nzLayout="vertical" [formGroup]="inventoryForm" (ngSubmit)="handleInventoryModalOk()">
+      <nz-form-item>
+        <nz-form-control [nzValidateStatus]="getFieldStatus('product')" [nzErrorTip]="getFieldError('product')">
+          <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+            Producto: <span class="text-red-500">*</span></nz-form-label>
+          <nz-select
+            class="w-full"
+            nzPlaceHolder="Buscar producto" 
+            nzAllowClear 
+            nzShowSearch
+            nzServerSearch
+            [nzLoading]="isLoadingProducts"
+            (nzOnSearch)="onProductSearch($event)"
+            formControlName="product">
+            <nz-option *ngFor="let product of filteredProducts" [nzValue]="product.id" [nzLabel]="product.name"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <div nz-row nzGutter="16">
+        <div nz-col nzXs="24" nzSm="12">
+          <nz-form-item>
+            <nz-form-control [nzValidateStatus]="getFieldStatus('quantity')" [nzErrorTip]="getFieldError('quantity')">
+              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+                Cantidad: <span class="text-red-500">*</span></nz-form-label>
+              <input class="{{inputClass}}" type="number" nz-input placeholder="Cantidad" formControlName="quantity">
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzXs="24" nzSm="12">
+          <nz-form-item>
+            <nz-form-control [nzValidateStatus]="getFieldStatus('location')" [nzErrorTip]="getFieldError('location')">
+              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+                Ubicación: <span class="text-red-500">*</span></nz-form-label>
+              <input class="{{inputClass}}" type="text" nz-input placeholder="Identificador de ubicación" formControlName="location">
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+    </form>
+  </ng-template>
+
+  <ng-template #inventoryModalFooter>
+    <div class="flex justify-center gap-3 w-full">
+      <button class="btn-secondary" (click)="handleInventoryModalCancel()">
+        Cancelar
+      </button>
+      <button class="btn-primary" (click)="handleInventoryModalOk()" [nzLoading]="isInventoryModalLoading">
+        <span nz-icon nzType="plus" nzTheme="outline"></span>
+        Agregar Inventario
+      </button>
+    </div>
+  </ng-template>
+</nz-modal>
+
+<div class="flex justify-end mb-[25px] mt-[4px]">
+  <!-- Add Inventory -->
+  <button class="btn-primary" (click)="showInventoryModal()">
+    <span nz-icon nzType="plus" nzTheme="outline"></span>
+    Agregar inventario
+  </button>
+  <!-- end: Add Inventory -->
+</div>
+
 <div
   class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
   <div class="p-[25px]">

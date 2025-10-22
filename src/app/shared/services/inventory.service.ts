@@ -14,6 +14,6 @@ export class InventoryService {
   constructor() { }
 
   getProductInventory(productId: string): Observable<ProductInventory> {
-    return this.apiService.getDirect<ProductInventory>(`${this.endpointsService.getEndpointPath('inventory')}/${productId}`);
+    return this.apiService.getDirect<ProductInventory>(`${this.endpointsService.getEndpointPath('products')}/${productId}/inventory`);
   }
 }

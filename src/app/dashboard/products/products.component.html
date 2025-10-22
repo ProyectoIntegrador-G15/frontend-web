@@ -100,38 +100,6 @@
         </nz-form-control>
       </nz-form-item>
 
-      <div nz-row nzGutter="16">
-        <div nz-col nzXs="24" nzSm="12">
-          <nz-form-item>
-            <nz-form-control [nzValidateStatus]="getFieldStatus('warehouse')" [nzErrorTip]="getFieldError('warehouse')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
-                Bodega: <span class="text-red-500">*</span></nz-form-label>
-              <nz-select
-                class="w-full"
-                nzPlaceHolder="Seleccionar bodega" nzAllowClear formControlName="warehouse" [nzLoading]="isLoadingWarehouses">
-                <nz-option *ngFor="let warehouse of warehouses" [nzValue]="warehouse.id" [nzLabel]="warehouse.name"></nz-option>
-              </nz-select>
-            </nz-form-control>
-          </nz-form-item>
-        </div>
-        <div nz-col nzXs="24" nzSm="12">
-          <nz-form-item>
-            <nz-form-control [nzValidateStatus]="getFieldStatus('quantity')" [nzErrorTip]="getFieldError('quantity')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
-                Cantidad: <span class="text-red-500">*</span></nz-form-label>
-              <input class="{{inputClass}}" type="number" nz-input placeholder="Cantidad" formControlName="quantity">
-            </nz-form-control>
-          </nz-form-item>
-        </div>
-      </div>
-
-      <nz-form-item class="mb-0">
-        <nz-form-control [nzValidateStatus]="getFieldStatus('location')" [nzErrorTip]="getFieldError('location')">
-          <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
-            Ubicación del producto: <span class="text-red-500">*</span></nz-form-label>
-          <input class="{{inputClass}}" type="text" nz-input placeholder="Ubicación del producto" formControlName="location">
-        </nz-form-control>
-      </nz-form-item>
     </form>
   </ng-template>
 
@@ -148,7 +116,22 @@
   </ng-template>
 </nz-modal>
 
-<div class="flex justify-end mb-[25px] mt-[4px]">
+<div class="flex justify-between items-center mb-[25px] mt-[4px]">
+  <!-- Status Filter -->
+  <div class="flex items-center gap-4">
+    <span class="text-sm font-medium text-dark dark:text-white/[.87]">Filtrar por estado:</span>
+    <nz-radio-group [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange($event)">
+      <label nz-radio-button [nzValue]="true">
+        <span nz-icon nzType="check-circle" nzTheme="outline" class="mr-1"></span>
+        Activos
+      </label>
+      <label nz-radio-button [nzValue]="false">
+        <span nz-icon nzType="close-circle" nzTheme="outline" class="mr-1"></span>
+        Inactivos
+      </label>
+    </nz-radio-group>
+  </div>
+  
   <!-- New Product -->
   <button class="btn-primary" (click)="showProductModal()">
     <span nz-icon nzType="plus" nzTheme="outline"></span>
@@ -160,7 +143,16 @@
   class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
   <div class="p-[25px]">
     <div class="w-full overflow-x-auto">
-      <nz-table #productsTable [nzData]="products" [nzFrontPagination]="false" [nzShowPagination]="false">
+      <nz-table 
+        #productsTable 
+        [nzData]="products" 
+        [nzFrontPagination]="false" 
+        [nzShowPagination]="true"
+        [nzPageSize]="pageSize"
+        [nzTotal]="totalProducts"
+        [nzLoading]="isLoading"
+        (nzPageIndexChange)="onPageIndexChange($event)"
+        class="pagination-centered">
         <thead>
         <tr>
           <th
@@ -201,15 +193,15 @@
           </td>
           <td
             class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-            {{ data.provider || "Por asignar" }}
+            {{ data.supplier || "Por asignar" }}
           </td>
           <td
             class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
             <div class="flex items-center gap-2">
               <span *ngIf="data.requires_cold_chain === true"
                     class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
-                    nzTooltipTitle="Requiere cadena de frío" 
-                    nzTooltipPlacement="top" 
+                    nzTooltipTitle="Requiere cadena de frío"
+                    nzTooltipPlacement="top"
                     nz-tooltip>
                 <span nz-icon nzType="cloud" nzTheme="outline" class="text-sm"></span>
               </span>

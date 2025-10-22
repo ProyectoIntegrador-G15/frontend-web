@@ -2,7 +2,7 @@ export interface Product {
   id: string;
   name: string;
   purchase_price: number;
-  provider: string;
+  supplier: string;
   requires_cold_chain: boolean;
   status: 'active' | 'inactive';
   description?: string;

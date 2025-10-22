@@ -17,6 +17,7 @@ describe('ProductsService', () => {
       purchase_price: 0.85,
       storage_instructions: 'Almacenar en lugar seco, protegido de la luz y humedad',
       temperature_range: '15-25°C',
+      supplier: 'Farmacéutica ABC',
       requires_cold_chain: false,
       status: true,
       created_at: '2025-10-19T03:52:27.518332',
@@ -29,6 +30,7 @@ describe('ProductsService', () => {
       purchase_price: 12.5,
       storage_instructions: 'Refrigerar entre 2-8°C. No congelar. Proteger de la luz',
       temperature_range: '2-8°C',
+      supplier: 'Laboratorios XYZ',
       requires_cold_chain: true,
       status: true,
       created_at: '2025-10-19T03:52:27.518332',
@@ -42,9 +44,9 @@ describe('ProductsService', () => {
       id: '1',
       name: 'Paracetamol 500mg',
       description: 'Analgésico y antipirético',
-      price: 0.85,
-      provider: 'N/A',
-      needsCold: false,
+      purchase_price: 0.85,
+      supplier: 'Farmacéutica ABC',
+      requires_cold_chain: false,
       status: 'active',
       storageInstructions: 'Almacenar en lugar seco, protegido de la luz y humedad'
     },
@@ -52,9 +54,9 @@ describe('ProductsService', () => {
       id: '2',
       name: 'Insulina Humana Regular',
       description: 'Hormona para el control de la diabetes',
-      price: 12.5,
-      provider: 'N/A',
-      needsCold: true,
+      purchase_price: 12.5,
+      supplier: 'Laboratorios XYZ',
+      requires_cold_chain: true,
       status: 'active',
       storageInstructions: 'Refrigerar entre 2-8°C. No congelar. Proteger de la luz'
     }
@@ -503,6 +505,7 @@ describe('ProductsService', () => {
         purchase_price: 2.5,
         storage_instructions: 'Almacenar en lugar fresco y seco',
         temperature_range: '15-25°C',
+        supplier: 'Laboratorios Especializados',
         requires_cold_chain: false,
         status: true,
         created_at: '2025-10-19T03:52:27.518332',
@@ -548,9 +551,9 @@ describe('ProductsService', () => {
         id: `${i + 1}`,
         name: `Product ${i + 1}`,
         description: `Description ${i + 1}`,
-        price: i * 1.5,
-        provider: `Provider ${i + 1}`,
-        needsCold: i % 2 === 0,
+        purchase_price: i * 1.5,
+        supplier: `Supplier ${i + 1}`,
+        requires_cold_chain: i % 2 === 0,
         status: 'active' as const
       }));
 
