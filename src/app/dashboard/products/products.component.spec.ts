@@ -185,7 +185,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
   describe('Form Initialization', () => {
     it('should initialize form with all required fields', () => {
       component.initForm();
-      
+
       expect(component.validateForm.get('name')).toBeTruthy();
       expect(component.validateForm.get('price')).toBeTruthy();
       expect(component.validateForm.get('supplier')).toBeTruthy();
@@ -342,10 +342,10 @@ describe('ProductsComponent - Comprehensive Tests', () => {
     it('should call createProduct service on submission', () => {
       spyOn(component, 'validateFormFields').and.returnValue(true);
       mockProductsService.createProduct.and.returnValue(of({ success: true }));
-      
+
       TestUtils.fillFormWithValidData();
       component.handleProductModalOk();
-      
+
       expect(mockProductsService.createProduct).toHaveBeenCalled();
     });
 
@@ -353,10 +353,10 @@ describe('ProductsComponent - Comprehensive Tests', () => {
       spyOn(component, 'validateFormFields').and.returnValue(true);
       spyOn(component, 'resetProductForm');
       mockProductsService.createProduct.and.returnValue(of({ success: true }));
-      
+
       TestUtils.fillFormWithValidData();
       component.handleProductModalOk();
-      
+
       expect(component.isProductModalVisible).toBe(false);
       expect(component.isProductModalLoading).toBe(false);
       expect(component.resetProductForm).toHaveBeenCalled();
@@ -365,10 +365,10 @@ describe('ProductsComponent - Comprehensive Tests', () => {
     it('should handle product creation error', () => {
       spyOn(component, 'validateFormFields').and.returnValue(true);
       mockProductsService.createProduct.and.returnValue(throwError('Error creating product'));
-      
+
       TestUtils.fillFormWithValidData();
       component.handleProductModalOk();
-      
+
       expect(component.isProductModalLoading).toBe(false);
       expect(component.errorMessage).toBe('Error al crear el producto. Por favor, inténtalo de nuevo.');
     });
@@ -376,10 +376,10 @@ describe('ProductsComponent - Comprehensive Tests', () => {
     it('should show success notification on successful creation', () => {
       spyOn(component, 'validateFormFields').and.returnValue(true);
       mockProductsService.createProduct.and.returnValue(of({ success: true }));
-      
+
       TestUtils.fillFormWithValidData();
       component.handleProductModalOk();
-      
+
       expect(mockNotificationService.create).toHaveBeenCalledWith(
         'success',
         '¡Producto creado exitosamente!',
@@ -390,10 +390,10 @@ describe('ProductsComponent - Comprehensive Tests', () => {
     it('should show error notification on creation failure', () => {
       spyOn(component, 'validateFormFields').and.returnValue(true);
       mockProductsService.createProduct.and.returnValue(throwError('Error creating product'));
-      
+
       TestUtils.fillFormWithValidData();
       component.handleProductModalOk();
-      
+
       expect(mockNotificationService.create).toHaveBeenCalledWith(
         'error',
         'Error al crear producto',
@@ -566,7 +566,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
 
     it('should handle products loading success', () => {
       component.getProducts();
-      expect(component.listOfData).toEqual(mockProducts);
+      expect(component.products).toEqual(mockProducts);
       expect(component.isLoading).toBe(false);
     });
 

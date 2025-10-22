@@ -37,9 +37,9 @@
               <nz-select
                 class="w-full"
                 nzPlaceHolder="Seleccionar proveedor" nzAllowClear formControlName="supplier">
-                <nz-option nzValue="proveedor1" nzLabel="Proveedor 1"></nz-option>
-                <nz-option nzValue="proveedor2" nzLabel="Proveedor 2"></nz-option>
-                <nz-option nzValue="proveedor3" nzLabel="Proveedor 3"></nz-option>
+                <nz-option nzValue=1 nzLabel="Proveedor 1"></nz-option>
+                <nz-option nzValue=2 nzLabel="Proveedor 2"></nz-option>
+                <nz-option nzValue=3 nzLabel="Proveedor 3"></nz-option>
               </nz-select>
             </nz-form-control>
           </nz-form-item>
@@ -160,7 +160,7 @@
   class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
   <div class="p-[25px]">
     <div class="w-full overflow-x-auto">
-      <nz-table #productsTable [nzData]="listOfData" [nzFrontPagination]="false" [nzShowPagination]="false">
+      <nz-table #productsTable [nzData]="products" [nzFrontPagination]="false" [nzShowPagination]="false">
         <thead>
         <tr>
           <th
@@ -201,15 +201,32 @@
           </td>
           <td
             class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-            {{ data.provider }}
+            {{ data.provider || "Por asignar" }}
           </td>
           <td
             class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-            {{ data.requires_cold_chain }}
+            <div class="flex items-center gap-2">
+              <span *ngIf="data.requires_cold_chain === true"
+                    class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+                    nzTooltipTitle="Requiere cadena de frío" 
+                    nzTooltipPlacement="top" 
+                    nz-tooltip>
+                <span nz-icon nzType="cloud" nzTheme="outline" class="text-sm"></span>
+              </span>
+            </div>
           </td>
           <td
             class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-            {{ data.status }}
+            <span *ngIf="data.status === true"
+                  class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+              <span nz-icon nzType="check-circle" nzTheme="outline" class="mr-1 text-xs"></span>
+              Activo
+            </span>
+            <span *ngIf="data.status === false"
+                  class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+              <span nz-icon nzType="close-circle" nzTheme="outline" class="mr-1 text-xs"></span>
+              Inactivo
+            </span>
           </td>
           <td
             class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">

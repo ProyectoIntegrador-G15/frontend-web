@@ -7,44 +7,20 @@ import {Subscription} from 'rxjs';
 import {Router} from '@angular/router';
 import {NzModalService} from 'ng-zorro-antd/modal';
 import {NzNotificationService} from 'ng-zorro-antd/notification';
+import {Product} from '../../shared/interfaces/product.type';
 
 @Component({
   selector: 'app-products',
   templateUrl: 'products.component.html',
 })
 export class ProductsComponent implements OnInit, OnDestroy {
-  listOfData: any[] = [
-    {
-      id: '1',
-      name: 'Bodega central',
-      location: 'Colombia, Bogotá',
-      capacity: 80,
-      status: 'operativa',
-      creationDate: '2025-10-13',
-    },
-    {
-      id: '2',
-      name: 'Bodega sur',
-      location: 'Colombia, Bogotá',
-      capacity: 75,
-      status: 'operativa',
-      creationDate: '2025-10-13',
-    },
-    {
-      id: '3',
-      name: 'Bodega este',
-      location: 'Colombia, Cali',
-      capacity: 13,
-      status: 'operativa',
-      creationDate: '2025-10-13',
-    }
-  ];
+  products: Product[] = [];
 
   isLoading = true;
   errorMessage = '';
   isProductModalVisible = false;
   isProductModalLoading = false;
-  
+
   // Bodegas
   warehouses: Warehouse[] = [];
   isLoadingWarehouses = false;
@@ -78,7 +54,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   private subscribeToProducts(): void {
     const productsSubscription = this.productsService.products$.subscribe(products => {
-      this.listOfData = products;
+      this.products = products;
     });
 
     this.subscription.add(productsSubscription);
@@ -89,7 +65,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     const searchSubscription = this.productsService.getProducts()
       .subscribe({
         next: (products) => {
-          this.listOfData = products;
+          this.products = products;
           this.isLoading = false;
         },
         error: (error) => {
@@ -152,7 +128,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Método para validar el rango de temperatura en tiempo real
+  // Metodo para validar el rango de temperatura en tiempo real
   validateTemperatureRange(): void {
     // Verificar que el formulario esté inicializado
     if (!this.validateForm) {
@@ -243,7 +219,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
     this.isProductModalLoading = true;
 
-    // Generar el objeto con la estructura correcta
     const formData = this.validateForm.value;
     const productData = {
       name: formData.name,
@@ -258,7 +233,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
       location: formData.location
     };
 
-    // Enviar datos al servicio
     this.productsService.createProduct(productData).subscribe({
       next: (response) => {
         console.log('=== PRODUCTO CREADO EXITOSAMENTE ===');
