@@ -1,18 +1,19 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ProductInventory } from '../interfaces/inventory.type';
-import { environment } from '../../../environments/environment';
+import { ApiService } from './api/api.service';
+import { EndpointsService } from './api/endpoints.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InventoryService {
-  private baseUrl = `${environment.apiUrl}/inventory`;
+  private apiService = inject(ApiService);
+  private endpointsService = inject(EndpointsService);
 
-  constructor(private http: HttpClient) { }
+  constructor() { }
 
   getProductInventory(productId: string): Observable<ProductInventory> {
-    return this.http.get<ProductInventory>(`${environment.apiUrl}${environment.apiEndpoints.inventory}/${productId}`);
+    return this.apiService.getDirect<ProductInventory>(`${this.endpointsService.getEndpointPath('products')}/${productId}/inventory`);
   }
 }

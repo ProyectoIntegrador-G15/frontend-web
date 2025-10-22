@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
+import {Injectable, inject} from '@angular/core';
+import {Observable, throwError} from 'rxjs';
+import {map, catchError} from 'rxjs/operators';
+import {ApiService} from './api/api.service';
+import {EndpointsService} from './api/endpoints.service';
 
 // Interfaz para la respuesta del backend
 export interface RouteApiResponse {
@@ -31,14 +31,17 @@ export interface Route {
   providedIn: 'root'
 })
 export class RoutesService {
+  private apiService = inject(ApiService);
+  private endpointsService = inject(EndpointsService);
 
-  constructor(private http: HttpClient) { }
+  constructor() {
+  }
 
   /**
    * Obtener todas las rutas del backend
    */
   getRoutes(): Observable<Route[]> {
-    return this.http.get<RouteApiResponse[]>(`${environment.apiUrl}${environment.apiEndpoints.routes}`)
+    return this.apiService.getDirect<RouteApiResponse[]>(this.endpointsService.getEndpointPath('routes'))
       .pipe(
         map(routes => routes.map(route => this.transformRoute(route))),
         catchError(this.handleError)
@@ -75,12 +78,12 @@ export class RoutesService {
    */
   private mapStatus(state: string): 'planned' | 'in_progress' | 'with_incidents' | 'completed' {
     const statusMap: { [key: string]: 'planned' | 'in_progress' | 'with_incidents' | 'completed' } = {
-      'scheduled': 'planned',
-      'in_transit': 'in_progress',
-      'delivered': 'completed',
-      'cancelled': 'with_incidents'
+      scheduled: 'planned',
+      in_transit: 'in_progress',
+      delivered: 'completed',
+      cancelled: 'with_incidents'
     };
-    
+
     return statusMap[state] || 'planned';
   }
 

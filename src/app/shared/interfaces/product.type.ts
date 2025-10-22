@@ -1,9 +1,9 @@
 export interface Product {
   id: string;
   name: string;
-  price: number;
-  provider: string;
-  needsCold: boolean;
+  purchase_price: number;
+  supplier: string;
+  requires_cold_chain: boolean;
   status: 'active' | 'inactive';
   description?: string;
   storageInstructions?: string;

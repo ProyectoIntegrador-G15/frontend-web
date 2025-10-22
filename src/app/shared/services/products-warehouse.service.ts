@@ -1,12 +1,11 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {Injectable, inject} from '@angular/core';
 import {Observable, BehaviorSubject} from 'rxjs';
 import {map, catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 
 import {Product} from '../interfaces/product.type';
-
-const PRODUCTS_API_URL = '/api/products'; // Cambia esta URL por la de tu API real
+import {ApiService} from './api/api.service';
+import {EndpointsService} from './api/endpoints.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,12 +13,14 @@ const PRODUCTS_API_URL = '/api/products'; // Cambia esta URL por la de tu API re
 export class ProductsWarehouseService {
   private productsSubject = new BehaviorSubject<Product[]>([]);
   public products$ = this.productsSubject.asObservable();
+  private apiService = inject(ApiService);
+  private endpointsService = inject(EndpointsService);
 
-  constructor(private http: HttpClient) {
+  constructor() {
   }
 
   getProductsByWarehouse(warehouseId: string): Observable<Product[]> {
-    return this.http.get<Product[]>(`${PRODUCTS_API_URL}/warehouse/${warehouseId}`)
+    return this.apiService.getDirect<Product[]>(`${this.endpointsService.getEndpointPath('products')}/warehouse/${warehouseId}`)
       .pipe(
         catchError(this.handleError)
       );

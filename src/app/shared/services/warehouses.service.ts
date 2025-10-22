@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
+import { ApiService } from './api/api.service';
+import { EndpointsService } from './api/endpoints.service';
 
 export interface Warehouse {
   id: string;
@@ -21,11 +21,13 @@ export interface Warehouse {
 export class WarehousesService {
   private warehousesSubject = new BehaviorSubject<Warehouse[]>([]);
   public warehouses$ = this.warehousesSubject.asObservable();
+  private apiService = inject(ApiService);
+  private endpointsService = inject(EndpointsService);
 
-  constructor(private http: HttpClient) {}
+  constructor() {}
 
   getWarehouses(): Observable<Warehouse[]> {
-    return this.http.get<Warehouse[]>(`${environment.apiUrl}${environment.apiEndpoints.warehouses}`)
+    return this.apiService.getDirect<Warehouse[]>(this.endpointsService.getEndpointPath('warehouses'))
       .pipe(
         map(warehouses => {
           this.warehousesSubject.next(warehouses);
