@@ -1,8 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+<<<<<<< HEAD
 import { ApiService } from './api/api.service';
 import { EndpointsService } from './api/endpoints.service';
+=======
+import { environment } from '../../../environments/environment';
+>>>>>>> develop
 
 export interface Warehouse {
   id: string;
@@ -27,7 +31,11 @@ export class WarehousesService {
   constructor() {}
 
   getWarehouses(): Observable<Warehouse[]> {
+<<<<<<< HEAD
     return this.apiService.getDirect<Warehouse[]>(this.endpointsService.getEndpointPath('warehouses'))
+=======
+    return this.http.get<Warehouse[]>(`${environment.apiUrl}${environment.apiEndpoints.warehouses}`)
+>>>>>>> develop
       .pipe(
         map(warehouses => {
           this.warehousesSubject.next(warehouses);
