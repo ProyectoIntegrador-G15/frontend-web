@@ -156,7 +156,6 @@
   </button>
   <!-- end: New Product -->
 </div>
-<<<<<<< HEAD
 <div
   class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
   <div class="p-[25px]">
@@ -245,47 +244,4 @@
       </nz-table>
     </div>
   </div>
-=======
-
-<h1 class="screen-title mb-6">Productos</h1>
-
-<div class="table-container">
-  <table>
-    <thead>
-      <tr>
-        <th>Producto</th>
-        <th>Precio (Und)</th>
-        <th>Proveedor</th>
-        <th>Caracteristicas</th>
-        <th>Estado</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let data of listOfData">
-        <td>{{ data.name }}</td>
-        <td>${{ data.price | number:'1.2-2' }}</td>
-        <td>{{ data.provider }}</td>
-        <td style="max-width: 400px; white-space: normal; word-wrap: break-word;">
-          {{ data.storageInstructions || 'N/A' }}
-        </td>
-        <td>
-          <nz-tag [nzColor]="data.status === 'active' ? 'green' : 'default'">
-            {{ data.status === 'active' ? 'Activo' : 'Inactivo' }}
-          </nz-tag>
-        </td>
-        <td>
-          <button
-            (click)="navigateToInventory(data.id)"
-            class="inline-flex items-center justify-center w-[44px] h-[44px] rounded-[6px] border-none cursor-pointer transition-all duration-200"
-            style="background-color: var(--blue-violet-extralight, #E8ECFF); color: var(--blue-violet-dark, #3749B3);"
-            onmouseover="this.style.backgroundColor='var(--blue-violet-dark, #3749B3)'; this.style.color='white';"
-            onmouseout="this.style.backgroundColor='var(--blue-violet-extralight, #E8ECFF)'; this.style.color='var(--blue-violet-dark, #3749B3)';">
-            <span class="text-[18px]" nz-icon nzType="home" nzTheme="outline"></span>
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
->>>>>>> develop
 </div>

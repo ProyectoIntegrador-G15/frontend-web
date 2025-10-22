@@ -1,16 +1,8 @@
-<<<<<<< HEAD
 import {Injectable, inject} from '@angular/core';
 import {Observable, throwError} from 'rxjs';
 import {map, catchError} from 'rxjs/operators';
 import {ApiService} from './api/api.service';
 import {EndpointsService} from './api/endpoints.service';
-=======
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
->>>>>>> develop
 
 // Interfaz para la respuesta del backend
 export interface RouteApiResponse {
@@ -49,11 +41,7 @@ export class RoutesService {
    * Obtener todas las rutas del backend
    */
   getRoutes(): Observable<Route[]> {
-<<<<<<< HEAD
     return this.apiService.getDirect<RouteApiResponse[]>(this.endpointsService.getEndpointPath('routes'))
-=======
-    return this.http.get<RouteApiResponse[]>(`${environment.apiUrl}${environment.apiEndpoints.routes}`)
->>>>>>> develop
       .pipe(
         map(routes => routes.map(route => this.transformRoute(route))),
         catchError(this.handleError)

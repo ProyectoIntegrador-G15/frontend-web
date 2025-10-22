@@ -4,25 +4,8 @@ import {map, catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 
 import {Product} from '../interfaces/product.type';
-<<<<<<< HEAD
 import {ApiService, ApiResponse} from './api/api.service';
 import {EndpointsService} from './api/endpoints.service';
-=======
-import {environment} from '../../../environments/environment';
-
-export interface ProductApiResponse {
-  id: number;
-  name: string;
-  description: string;
-  purchase_price: number;
-  storage_instructions: string;
-  temperature_range: string;
-  requires_cold_chain: boolean;
-  status: boolean;
-  created_at: string;
-  updated_at: string;
-}
->>>>>>> develop
 
 @Injectable({
   providedIn: 'root'
@@ -38,11 +21,7 @@ export class ProductsService {
   }
 
   getProducts(): Observable<Product[]> {
-<<<<<<< HEAD
     return this.apiService.getDirect<Product[]>(this.endpointsService.getEndpointPath('products'))
-=======
-    return this.http.get<ProductApiResponse[]>(`${environment.apiUrl}${environment.apiEndpoints.products}`)
->>>>>>> develop
       .pipe(
         map(products => products.map(product => this.transformProduct(product))),
         catchError(this.handleError)
@@ -66,11 +45,7 @@ export class ProductsService {
   }
 
   createProduct(productData: any): Observable<any> {
-<<<<<<< HEAD
     return this.apiService.post<any>(this.endpointsService.getEndpointPath('products'), productData)
-=======
-    return this.http.post<any>(`${environment.apiUrl}${environment.apiEndpoints.products}`, productData)
->>>>>>> develop
       .pipe(
         map(response => {
           this.refreshProducts();
