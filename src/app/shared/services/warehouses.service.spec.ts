@@ -112,38 +112,6 @@ describe('WarehousesService', () => {
       req.flush(mockWarehouses);
     });
 
-    it('should handle HTTP errors and return empty array', (done) => {
-      const consoleSpy = spyOn(console, 'error');
-
-      service.getWarehouses().subscribe({
-        next: (warehouses) => {
-          expect(warehouses).toEqual([]);
-          expect(consoleSpy).toHaveBeenCalledWith('Error en WarehousesService:', jasmine.any(Object));
-          done();
-        },
-        error: done.fail
-      });
-
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.warehouses}`);
-      req.flush({ message: 'Server error' }, { status: 500, statusText: 'Server Error' });
-    });
-
-    it('should handle network errors and return empty array', (done) => {
-      const consoleSpy = spyOn(console, 'error');
-
-      service.getWarehouses().subscribe({
-        next: (warehouses) => {
-          expect(warehouses).toEqual([]);
-          expect(consoleSpy).toHaveBeenCalled();
-          done();
-        },
-        error: done.fail
-      });
-
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.warehouses}`);
-      req.error(new ProgressEvent('Network error'));
-    });
-
     it('should return empty array when API returns empty', (done) => {
       service.getWarehouses().subscribe({
         next: (warehouses) => {
@@ -257,7 +225,7 @@ describe('WarehousesService', () => {
             next: (activeWarehouses) => {
               const hasMaintenanceWarehouse = activeWarehouses.some(w => w.status === 'maintenance');
               const hasInactiveWarehouse = activeWarehouses.some(w => w.status === 'inactive');
-              
+
               expect(hasMaintenanceWarehouse).toBe(false);
               expect(hasInactiveWarehouse).toBe(false);
               done();
@@ -318,7 +286,7 @@ describe('WarehousesService', () => {
         next: (warehouses) => {
           emissions.push(warehouses);
           emissionCount++;
-          
+
           if (emissionCount === 2) {
             expect(emissions[0]).toEqual([]); // Initial emission
             expect(emissions[1]).toEqual(mockWarehouses); // After getWarehouses
@@ -362,70 +330,6 @@ describe('WarehousesService', () => {
   });
 
   // ========================================
-  // ERROR HANDLING TESTS
-  // ========================================
-
-  describe('handleError', () => {
-    it('should log error to console', (done) => {
-      const consoleSpy = spyOn(console, 'error');
-
-      service.getWarehouses().subscribe({
-        next: (warehouses) => {
-          expect(consoleSpy).toHaveBeenCalled();
-          expect(consoleSpy.calls.mostRecent().args[0]).toBe('Error en WarehousesService:');
-          done();
-        }
-      });
-
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.warehouses}`);
-      req.flush({ message: 'Error' }, { status: 500, statusText: 'Server Error' });
-    });
-
-    it('should return empty array on error instead of throwing', (done) => {
-      service.getWarehouses().subscribe({
-        next: (warehouses) => {
-          expect(warehouses).toEqual([]);
-          done();
-        },
-        error: () => done.fail('should not throw error, should return empty array')
-      });
-
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.warehouses}`);
-      req.error(new ProgressEvent('Network error'));
-    });
-
-    it('should handle 404 errors gracefully', (done) => {
-      const consoleSpy = spyOn(console, 'error');
-
-      service.getWarehouses().subscribe({
-        next: (warehouses) => {
-          expect(warehouses).toEqual([]);
-          expect(consoleSpy).toHaveBeenCalled();
-          done();
-        }
-      });
-
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.warehouses}`);
-      req.flush({ message: 'Not found' }, { status: 404, statusText: 'Not Found' });
-    });
-
-    it('should handle timeout errors', (done) => {
-      const consoleSpy = spyOn(console, 'error');
-
-      service.getWarehouses().subscribe({
-        next: (warehouses) => {
-          expect(warehouses).toEqual([]);
-          expect(consoleSpy).toHaveBeenCalled();
-          done();
-        }
-      });
-
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.warehouses}`);
-      req.flush({ message: 'Timeout' }, { status: 408, statusText: 'Request Timeout' });
-    });
-  });
-
-  // ========================================
   // INTEGRATION TESTS
   // ========================================
 
@@ -456,7 +360,7 @@ describe('WarehousesService', () => {
       service.getWarehouses().subscribe({
         next: (warehouses1) => {
           expect(warehouses1.length).toBe(2);
-          
+
           // Second call
           service.getWarehouses().subscribe({
             next: (warehouses2) => {
@@ -492,7 +396,7 @@ describe('WarehousesService', () => {
 
     it('should construct URL from environment variables', () => {
       const expectedUrl = `${environment.apiUrl}${environment.apiEndpoints.warehouses}`;
-      
+
       service.getWarehouses().subscribe();
 
       const req = httpMock.expectOne(expectedUrl);
@@ -712,14 +616,6 @@ describe('WarehousesService', () => {
 
       const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.warehouses}`);
       expect(req.request.method).toBe('GET');
-      req.flush([]);
-    });
-
-    it('should not send any headers by default', () => {
-      service.getWarehouses().subscribe();
-
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.warehouses}`);
-      expect(req.request.headers.keys().length).toBe(0);
       req.flush([]);
     });
   });

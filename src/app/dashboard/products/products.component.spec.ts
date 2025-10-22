@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { of, throwError } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
@@ -66,15 +67,12 @@ describe('ProductsComponent - Comprehensive Tests', () => {
     createValidFormData: () => ({
       name: 'Producto de Prueba',
       price: 15.50,
-      supplier: 'proveedor1',
+      supplier: 1,
       requiresColdChain: 'si',
       tempMin: 20,
       tempMax: 30,
       description: 'Descripción del producto de prueba',
-      storageInstructions: 'Instrucciones de almacenamiento del producto',
-      warehouse: 'bodega1',
-      quantity: 100,
-      location: 'Estante A-1'
+      storageInstructions: 'Instrucciones de almacenamiento del producto'
     }),
 
     createInvalidFormData: () => ({
@@ -85,10 +83,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
       tempMin: 30,
       tempMax: 20,
       description: 'Corto',
-      storageInstructions: 'Corto',
-      warehouse: null,
-      quantity: 0,
-      location: ''
+      storageInstructions: 'Corto'
     }),
 
     fillFormWithValidData: () => {
@@ -117,7 +112,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
   };
 
   beforeEach(async () => {
-    const productsServiceSpy = jasmine.createSpyObj('ProductsService', ['getProducts', 'createProduct', 'products$']);
+    const productsServiceSpy = jasmine.createSpyObj('ProductsService', ['getProducts', 'getProductsPaginated', 'createProduct', 'products$']);
     const warehousesServiceSpy = jasmine.createSpyObj('WarehousesService', ['getWarehouses']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     const modalServiceSpy = jasmine.createSpyObj('NzModalService', ['create', 'closeAll', 'confirm']);
@@ -125,7 +120,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
 
     await TestBed.configureTestingModule({
       declarations: [ProductsComponent],
-      imports: [ReactiveFormsModule],
+      imports: [ReactiveFormsModule, FormsModule, NzRadioModule],
       providers: [
         FormBuilder,
         { provide: ProductsService, useValue: productsServiceSpy },
@@ -147,6 +142,13 @@ describe('ProductsComponent - Comprehensive Tests', () => {
 
     // Setup default mock returns
     mockProductsService.getProducts.and.returnValue(of(mockProducts));
+    mockProductsService.getProductsPaginated.and.returnValue(of({
+      data: mockProducts,
+      total: mockProducts.length,
+      page: 1,
+      pageSize: 10,
+      hasNextPage: false
+    }));
     mockProductsService.products$ = of(mockProducts);
     mockProductsService.createProduct.and.returnValue(of({ success: true }));
     mockWarehousesService.getWarehouses.and.returnValue(of(mockWarehouses));
@@ -194,9 +196,6 @@ describe('ProductsComponent - Comprehensive Tests', () => {
       expect(component.validateForm.get('tempMax')).toBeTruthy();
       expect(component.validateForm.get('description')).toBeTruthy();
       expect(component.validateForm.get('storageInstructions')).toBeTruthy();
-      expect(component.validateForm.get('warehouse')).toBeTruthy();
-      expect(component.validateForm.get('quantity')).toBeTruthy();
-      expect(component.validateForm.get('location')).toBeTruthy();
     });
 
     it('should set up value changes subscriptions for temperature fields', () => {
@@ -561,7 +560,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
   describe('Data Loading', () => {
     it('should load products on initialization', () => {
       component.getProducts();
-      expect(mockProductsService.getProducts).toHaveBeenCalled();
+      expect(mockProductsService.getProductsPaginated).toHaveBeenCalled();
     });
 
     it('should handle products loading success', () => {
@@ -571,7 +570,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
     });
 
     it('should handle products loading error', () => {
-      mockProductsService.getProducts.and.returnValue(throwError('Error loading products'));
+      mockProductsService.getProductsPaginated.and.returnValue(throwError('Error loading products'));
       spyOn(console, 'error');
 
       component.getProducts();
@@ -701,10 +700,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
         tempMin: null,
         tempMax: null,
         description: null,
-        storageInstructions: null,
-        warehouse: null,
-        quantity: null,
-        location: null
+        storageInstructions: null
       });
     });
 
