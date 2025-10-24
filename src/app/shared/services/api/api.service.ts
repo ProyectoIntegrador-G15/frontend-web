@@ -133,21 +133,21 @@ export class ApiService {
    * Handle HTTP errors
    */
   private handleError(error: HttpErrorResponse): Observable<never> {
-    let errorMessage = 'An unknown error occurred!';
+    let errorMessage: string;
 
     if (error.error instanceof ErrorEvent) {
-      // Client-side error
-      errorMessage = `Error: ${error.error.message}`;
+      errorMessage = `Network or Client Error: ${error.error.message}`;
     } else {
-      // Server-side error
-      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
-
-      if (error.error?.message) {
+      if (error.error?.detail) {
+        errorMessage = error.error.detail;
+      } else if (error.error?.message) {
         errorMessage = error.error.message;
+      }
+      else {
+        errorMessage = `Server Error (${error.status}): ${error.statusText || 'An unknown server error occurred'}`;
       }
     }
 
-    console.error('API Error:', errorMessage);
     return throwError(() => new Error(errorMessage));
   }
 

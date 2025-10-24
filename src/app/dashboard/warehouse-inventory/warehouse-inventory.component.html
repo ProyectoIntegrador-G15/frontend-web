@@ -17,14 +17,14 @@
             Producto: <span class="text-red-500">*</span></nz-form-label>
           <nz-select
             class="w-full"
-            nzPlaceHolder="Buscar producto" 
-            nzAllowClear 
+            nzPlaceHolder="Buscar producto"
+            nzAllowClear
             nzShowSearch
             nzServerSearch
             [nzLoading]="isLoadingProducts"
             (nzOnSearch)="onProductSearch($event)"
             formControlName="product">
-            <nz-option *ngFor="let product of filteredProducts" [nzValue]="product.id" [nzLabel]="product.name"></nz-option>
+            <nz-option *ngFor="let product of products" [nzValue]="product.id" [nzLabel]="product.name"></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
@@ -111,15 +111,12 @@
           </td>
           <td
             class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-            {{ data.price }}
           </td>
           <td
             class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-            {{ data.provider }}
           </td>
           <td
             class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-            {{ data.needsCold }}
           </td>
           <td
             class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">

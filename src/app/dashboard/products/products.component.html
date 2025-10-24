@@ -117,21 +117,41 @@
 </nz-modal>
 
 <div class="flex justify-between items-center mb-[25px] mt-[4px]">
-  <!-- Status Filter -->
-  <div class="flex items-center gap-4">
-    <span class="text-sm font-medium text-dark dark:text-white/[.87]">Filtrar por estado:</span>
-    <nz-radio-group [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange($event)">
-      <label nz-radio-button [nzValue]="true">
-        <span nz-icon nzType="check-circle" nzTheme="outline" class="mr-1"></span>
-        Activos
-      </label>
-      <label nz-radio-button [nzValue]="false">
-        <span nz-icon nzType="close-circle" nzTheme="outline" class="mr-1"></span>
-        Inactivos
-      </label>
-    </nz-radio-group>
+  <!-- Search and Status Filter -->
+  <div class="flex items-center gap-6">
+    <!-- Search Input -->
+    <div class="w-80">
+      <nz-input-group [nzSuffix]="suffixIconSearch" nzPrefixIcon="search">
+        <input
+          type="text"
+          nz-input
+          placeholder="Buscar productos por nombre"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange($event)"
+          class="w-full"
+        />
+      </nz-input-group>
+      <ng-template #suffixIconSearch>
+        <span *ngIf="searchTerm" nz-icon nzType="close-circle" nzTheme="outline" (click)="clearSearch()" class="cursor-pointer hover:text-red-500"></span>
+      </ng-template>
+    </div>
+
+    <!-- Status Filter -->
+    <div class="flex items-center gap-4">
+      <span class="text-sm font-medium text-dark dark:text-white/[.87]">Estado:</span>
+      <nz-radio-group [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange($event)">
+        <label nz-radio-button [nzValue]="true">
+          <span nz-icon nzType="check-circle" nzTheme="outline" class="mr-1"></span>
+          Activos
+        </label>
+        <label nz-radio-button [nzValue]="false">
+          <span nz-icon nzType="close-circle" nzTheme="outline" class="mr-1"></span>
+          Inactivos
+        </label>
+      </nz-radio-group>
+    </div>
   </div>
-  
+
   <!-- New Product -->
   <button class="btn-primary" (click)="showProductModal()">
     <span nz-icon nzType="plus" nzTheme="outline"></span>
@@ -143,10 +163,10 @@
   class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
   <div class="p-[25px]">
     <div class="w-full overflow-x-auto">
-      <nz-table 
-        #productsTable 
-        [nzData]="products" 
-        [nzFrontPagination]="false" 
+      <nz-table
+        #productsTable
+        [nzData]="products"
+        [nzFrontPagination]="false"
         [nzShowPagination]="true"
         [nzPageSize]="pageSize"
         [nzTotal]="totalProducts"

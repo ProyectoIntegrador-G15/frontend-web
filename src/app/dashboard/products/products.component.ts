@@ -1,5 +1,5 @@
-import {Component, OnDestroy, OnInit, TemplateRef} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 import {ProductsService} from '../../shared/services/products.service';
 import {WarehousesService, Warehouse} from '../../shared/services/warehouses.service';
@@ -8,6 +8,7 @@ import {Router} from '@angular/router';
 import {NzModalService} from 'ng-zorro-antd/modal';
 import {NzNotificationService} from 'ng-zorro-antd/notification';
 import {Product} from '../../shared/interfaces/product.type';
+import {debounceTime, distinctUntilChanged, Subject} from 'rxjs';
 
 @Component({
   selector: 'app-products',
@@ -19,7 +20,7 @@ import {Product} from '../../shared/interfaces/product.type';
       align-items: center;
       margin-top: 24px;
     }
-    
+
     .pagination-centered ::ng-deep .ant-pagination .ant-pagination-options {
       display: none;
     }
@@ -35,10 +36,14 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   // Paginación
   currentPage = 1;
-  pageSize = 10;
+  pageSize = 0;
   totalProducts = 0;
   statusFilter = true;
   hasNextPage = true;
+
+  // Búsqueda
+  searchTerm = '';
+  private searchSubject = new Subject<string>();
 
   // Bodegas
   warehouses: Warehouse[] = [];
@@ -65,6 +70,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.getProducts();
     this.getWarehouses();
     this.initForm();
+    this.setupSearch();
   }
 
   ngOnDestroy(): void {
@@ -81,12 +87,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   getProducts(): void {
     this.isLoading = true;
-    const searchSubscription = this.productsService.getProductsPaginated(this.currentPage, this.statusFilter)
+    const searchSubscription = this.productsService.getProductsPaginated(this.currentPage, this.statusFilter, this.searchTerm)
       .subscribe({
         next: (response) => {
-          this.products = response.data;
+          this.products = response.products;
+          this.pageSize = response.page_size;
           this.totalProducts = response.total;
-          this.hasNextPage = response.hasNextPage;
+          this.hasNextPage = response.page < response.total_pages;
           this.isLoading = false;
         },
         error: (error) => {
@@ -255,7 +262,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
         this.isProductModalLoading = false;
         this.resetProductForm();
 
-        // Mostrar notificación de éxito
+        this.currentPage = 1;
+        this.getProducts();
+
         this.notification.create(
           'success',
           '¡Producto creado exitosamente!',
@@ -264,13 +273,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.isProductModalLoading = false;
-        this.errorMessage = 'Error al crear el producto. Por favor, inténtalo de nuevo.';
-
-        // Mostrar notificación de error
+        this.errorMessage = error.message;
         this.notification.create(
           'error',
           'Error al crear producto',
-          'No se pudo crear el producto. Por favor, verifica los datos e inténtalo de nuevo.'
+          error.message
         );
       }
     });
@@ -280,7 +287,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.validateForm.reset();
   }
 
-  // Métodos de paginación
   onPageIndexChange(page: number): void {
     this.currentPage = page;
     this.getProducts();
@@ -293,5 +299,29 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.getProducts();
   }
 
+  // Métodos de búsqueda
+  setupSearch(): void {
+    const searchSubscription = this.searchSubject
+      .pipe(
+        debounceTime(700),
+        distinctUntilChanged() // Solo emitir si el valor cambió
+      )
+      .subscribe(searchTerm => {
+        this.searchTerm = searchTerm;
+        this.currentPage = 1; // Reset to first page when searching
+        this.getProducts();
+      });
+
+    this.subscription.add(searchSubscription);
+  }
+
+  onSearchChange(searchTerm: string): void {
+    this.searchSubject.next(searchTerm);
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.searchSubject.next('');
+  }
 
 }
