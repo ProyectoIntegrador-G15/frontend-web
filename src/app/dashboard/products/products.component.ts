@@ -20,7 +20,7 @@ import {debounceTime, distinctUntilChanged, Subject} from 'rxjs';
       align-items: center;
       margin-top: 24px;
     }
-
+    
     .pagination-centered ::ng-deep .ant-pagination .ant-pagination-options {
       display: none;
     }
@@ -322,6 +322,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
   clearSearch(): void {
     this.searchTerm = '';
     this.searchSubject.next('');
+  }
+
+  // Método para carga masiva de productos
+  loadBulkProducts(): void {
+    console.log('Cargar masivamente - Funcionalidad pendiente de implementar');
   }
 
 }

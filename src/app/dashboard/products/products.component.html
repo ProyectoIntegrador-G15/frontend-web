@@ -116,48 +116,55 @@
   </ng-template>
 </nz-modal>
 
-<div class="flex justify-between items-center mb-[25px] mt-[4px]">
-  <!-- Search and Status Filter -->
-  <div class="flex items-center gap-6">
-    <!-- Search Input -->
-    <div class="w-80">
-      <nz-input-group [nzSuffix]="suffixIconSearch" nzPrefixIcon="search">
-        <input
-          type="text"
-          nz-input
-          placeholder="Buscar productos por nombre"
-          [(ngModel)]="searchTerm"
-          (ngModelChange)="onSearchChange($event)"
-          class="w-full"
-        />
-      </nz-input-group>
-      <ng-template #suffixIconSearch>
-        <span *ngIf="searchTerm" nz-icon nzType="close-circle" nzTheme="outline" (click)="clearSearch()" class="cursor-pointer hover:text-red-500"></span>
-      </ng-template>
+<div class="mb-[25px] mt-[4px]">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+    <!-- Buscar y Filtros -->
+    <div class="space-y-4">
+      <!-- Buscar por nombre -->
+      <div class="w-full">
+        <nz-input-group [nzSuffix]="suffixIconSearch" nzPrefixIcon="search">
+          <input
+            type="text"
+            nz-input
+            placeholder="Buscar productos por nombre"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchChange($event)"
+            class="w-full"
+          />
+        </nz-input-group>
+        <ng-template #suffixIconSearch>
+          <span *ngIf="searchTerm" nz-icon nzType="close-circle" nzTheme="outline" (click)="clearSearch()" class="cursor-pointer hover:text-red-500"></span>
+        </ng-template>
+      </div>
+
+      <!-- Filtros -->
+      <div class="flex items-center gap-4">
+        <span class="text-sm font-medium text-dark dark:text-white/[.87]">Estado:</span>
+        <nz-radio-group [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange($event)">
+          <label nz-radio-button [nzValue]="true">
+            <span nz-icon nzType="check-circle" nzTheme="outline" class="mr-1"></span>
+            Activos
+          </label>
+          <label nz-radio-button [nzValue]="false">
+            <span nz-icon nzType="close-circle" nzTheme="outline" class="mr-1"></span>
+            Inactivos
+          </label>
+        </nz-radio-group>
+      </div>
     </div>
 
-    <!-- Status Filter -->
-    <div class="flex items-center gap-4">
-      <span class="text-sm font-medium text-dark dark:text-white/[.87]">Estado:</span>
-      <nz-radio-group [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange($event)">
-        <label nz-radio-button [nzValue]="true">
-          <span nz-icon nzType="check-circle" nzTheme="outline" class="mr-1"></span>
-          Activos
-        </label>
-        <label nz-radio-button [nzValue]="false">
-          <span nz-icon nzType="close-circle" nzTheme="outline" class="mr-1"></span>
-          Inactivos
-        </label>
-      </nz-radio-group>
+    <!-- Acciones -->
+    <div class="flex flex-col items-stretch lg:items-end gap-3 justify-start lg:justify-end">
+      <button class="btn-primary-sm w-full lg:w-[300px]" (click)="showProductModal()">
+        <span nz-icon nzType="plus" nzTheme="outline"></span>
+        Crear producto
+      </button>
+      <button class="btn-secondary-sm w-full lg:w-[300px]" (click)="loadBulkProducts()">
+        <span nz-icon nzType="upload" nzTheme="outline"></span>
+        Cargar masivamente
+      </button>
     </div>
   </div>
-
-  <!-- New Product -->
-  <button class="btn-primary" (click)="showProductModal()">
-    <span nz-icon nzType="plus" nzTheme="outline"></span>
-    Crear producto
-  </button>
-  <!-- end: New Product -->
 </div>
 <div
   class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
