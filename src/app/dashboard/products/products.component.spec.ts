@@ -27,7 +27,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
       purchase_price: 0.85,
       supplier: 'Farmacéutica ABC',
       requires_cold_chain: false,
-      status: 'active' as const
+      status: true
     },
     {
       id: '2',
@@ -35,7 +35,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
       purchase_price: 12.5,
       supplier: 'Medicamentos XYZ',
       requires_cold_chain: true,
-      status: 'active' as const
+      status: true
     }
   ];
 
@@ -143,11 +143,11 @@ describe('ProductsComponent - Comprehensive Tests', () => {
     // Setup default mock returns
     mockProductsService.getProducts.and.returnValue(of(mockProducts));
     mockProductsService.getProductsPaginated.and.returnValue(of({
-      data: mockProducts,
+      products: mockProducts,
       total: mockProducts.length,
       page: 1,
-      pageSize: 10,
-      hasNextPage: false
+      page_size: 10,
+      total_pages: 1
     }));
     mockProductsService.products$ = of(mockProducts);
     mockProductsService.createProduct.and.returnValue(of({ success: true }));
@@ -363,13 +363,13 @@ describe('ProductsComponent - Comprehensive Tests', () => {
 
     it('should handle product creation error', () => {
       spyOn(component, 'validateFormFields').and.returnValue(true);
-      mockProductsService.createProduct.and.returnValue(throwError('Error creating product'));
+      mockProductsService.createProduct.and.returnValue(throwError(() => ({ message: 'Error creating product' })));
 
       TestUtils.fillFormWithValidData();
       component.handleProductModalOk();
 
       expect(component.isProductModalLoading).toBe(false);
-      expect(component.errorMessage).toBe('Error al crear el producto. Por favor, inténtalo de nuevo.');
+      expect(component.errorMessage).toBe('Error creating product');
     });
 
     it('should show success notification on successful creation', () => {
@@ -388,7 +388,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
 
     it('should show error notification on creation failure', () => {
       spyOn(component, 'validateFormFields').and.returnValue(true);
-      mockProductsService.createProduct.and.returnValue(throwError('Error creating product'));
+      mockProductsService.createProduct.and.returnValue(throwError(() => ({ message: 'Error creating product' })));
 
       TestUtils.fillFormWithValidData();
       component.handleProductModalOk();
@@ -396,7 +396,7 @@ describe('ProductsComponent - Comprehensive Tests', () => {
       expect(mockNotificationService.create).toHaveBeenCalledWith(
         'error',
         'Error al crear producto',
-        'No se pudo crear el producto. Por favor, verifica los datos e inténtalo de nuevo.'
+        'Error creating product'
       );
     });
 
