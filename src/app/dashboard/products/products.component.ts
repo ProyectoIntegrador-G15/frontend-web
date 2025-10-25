@@ -7,24 +7,15 @@ import {Subscription} from 'rxjs';
 import {Router} from '@angular/router';
 import {NzModalService} from 'ng-zorro-antd/modal';
 import {NzNotificationService} from 'ng-zorro-antd/notification';
+import {NzMessageService} from 'ng-zorro-antd/message';
+import {NzUploadChangeParam, NzUploadFile} from 'ng-zorro-antd/upload';
 import {Product} from '../../shared/interfaces/product.type';
 import {debounceTime, distinctUntilChanged, Subject} from 'rxjs';
 
 @Component({
   selector: 'app-products',
   templateUrl: 'products.component.html',
-  styles: [`
-    .pagination-centered ::ng-deep .ant-pagination {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 24px;
-    }
-    
-    .pagination-centered ::ng-deep .ant-pagination .ant-pagination-options {
-      display: none;
-    }
-  `]
+  styleUrls: ['products.component.scss']
 })
 export class ProductsComponent implements OnInit, OnDestroy {
   products: Product[] = [];
@@ -33,6 +24,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
   errorMessage = '';
   isProductModalVisible = false;
   isProductModalLoading = false;
+
+  // Modal de carga masiva
+  isBulkUploadModalVisible = false;
+  fileList: NzUploadFile[] = [];
 
   // Paginación
   currentPage = 1;
@@ -61,7 +56,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private warehousesService: WarehousesService,
     private modalService: NzModalService,
     private fb: FormBuilder,
-    private notification: NzNotificationService
+    private notification: NzNotificationService,
+    private msg: NzMessageService
   ) {
   }
 
@@ -326,7 +322,103 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   // Método para carga masiva de productos
   loadBulkProducts(): void {
-    console.log('Cargar masivamente - Funcionalidad pendiente de implementar');
+    this.isBulkUploadModalVisible = true;
   }
 
+  handleBulkUploadModalCancel(): void {
+    this.isBulkUploadModalVisible = false;
+    this.clearFileList();
+  }
+
+  private clearFileList(): void {
+    this.fileList = [];
+  }
+
+  downloadExcelTemplate(): void {
+    this.downloadStaticFile('assets/templates/productos-template.xlsx', 'productos-template.xlsx');
+  }
+
+  downloadCsvTemplate(): void {
+    this.downloadStaticFile('assets/templates/productos-template.csv', 'productos-template.csv');
+  }
+
+  private downloadStaticFile(filePath: string, filename: string): void {
+    const link = document.createElement('a');
+    link.href = filePath;
+    link.download = filename;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    this.msg.success(`Plantilla ${filename} descargada exitosamente`);
+  }
+
+  selectFile(): void {
+    console.log('Seleccionar archivo - Funcionalidad pendiente de implementar');
+  }
+
+  beforeUpload = (file: NzUploadFile): boolean => {
+    if (this.fileList.length > 0) {
+      this.msg.error('Solo se permite cargar un archivo a la vez. Elimina el archivo actual antes de cargar uno nuevo.');
+      return false;
+    }
+
+    const isValidType = file.type === 'text/csv' ||
+                       file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+                       file.name?.endsWith('.csv') ||
+                       file.name?.endsWith('.xlsx');
+
+    if (!isValidType) {
+      this.msg.error('Solo se permiten archivos CSV (.csv) o Excel (.xlsx)');
+      return false;
+    }
+
+    const isLt10M = file.size! / 1024 / 1024 < 10;
+    if (!isLt10M) {
+      this.msg.error('El archivo debe ser menor a 10MB');
+      return false;
+    }
+
+    return true;
+  }
+
+  customRequest = (item: any): void => {
+    setTimeout(() => {
+      item.onSuccess({}, item.file);
+    }, 200);
+  }
+
+  handleFileChange({ file, fileList }: NzUploadChangeParam): void {
+    const status = file.status;
+    if (status !== 'uploading') {
+      console.log(file, fileList);
+    }
+    if (status === 'done') {
+      this.msg.success(`${file.name} archivo subido exitosamente.`);
+    } else if (status === 'error') {
+      this.msg.error(`${file.name} falló la subida del archivo.`);
+    }
+    this.fileList = [...fileList];
+  }
+
+  onFileDownload = (file: NzUploadFile): void => {
+    if (file.originFileObj) {
+      this.downloadFile(file.originFileObj, file.name);
+    } else {
+      this.msg.error('No se puede descargar el archivo');
+    }
+  };
+
+  private downloadFile(file: File, filename: string): void {
+    const url = window.URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    this.msg.success(`Archivo ${filename} descargado exitosamente`);
+  }
 }

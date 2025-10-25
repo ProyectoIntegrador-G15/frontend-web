@@ -116,6 +116,105 @@
   </ng-template>
 </nz-modal>
 
+<!-- Modal de carga masiva -->
+<nz-modal
+  [(nzVisible)]="isBulkUploadModalVisible"
+  [nzTitle]="bulkUploadModalTitle"
+  [nzContent]="bulkUploadModalContent"
+  [nzFooter]="bulkUploadModalFooter"
+  (nzOnCancel)="handleBulkUploadModalCancel()"
+  nzWidth="75%"
+>
+  <ng-template #bulkUploadModalTitle>Cargar productos masivamente</ng-template>
+
+  <ng-template #bulkUploadModalContent>
+    <div class="space-y-6">
+
+      <!-- Descargar plantillas -->
+      <div class="bg-gray-50 dark:bg-white/5 p-4 rounded-lg border border-dashed border-gray-300 dark:border-white/10">
+        <div class="text-center mb-4">
+          <p class="font-medium text-dark dark:text-white/[.87] mb-1">Plantillas de ejemplo</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- Plantilla Excel -->
+          <div class="flex items-center justify-between p-3 bg-white dark:bg-white/10 rounded-lg border border-gray-200 dark:border-white/20">
+            <div class="flex items-center gap-3">
+              <span nz-icon nzType="file-excel" nzTheme="outline" class="text-green-500 text-xl"></span>
+              <div>
+                <p class="font-medium text-dark dark:text-white/[.87] text-sm">Excel (.xlsx)</p>
+                <p class="text-xs text-gray-500 dark:text-white/50">Formato Excel</p>
+              </div>
+            </div>
+            <button
+              class="btn-secondary-sm text-xs px-3 py-1"
+              (click)="downloadExcelTemplate()">
+              <span nz-icon nzType="download" nzTheme="outline" class="text-xs"></span>
+              Descargar
+            </button>
+          </div>
+
+          <!-- Plantilla CSV -->
+          <div class="flex items-center justify-between p-3 bg-white dark:bg-white/10 rounded-lg border border-gray-200 dark:border-white/20">
+            <div class="flex items-center gap-3">
+              <span nz-icon nzType="file-text" nzTheme="outline" class="text-blue-500 text-xl"></span>
+              <div>
+                <p class="font-medium text-dark dark:text-white/[.87] text-sm">CSV (.csv)</p>
+                <p class="text-xs text-gray-500 dark:text-white/50">Formato CSV</p>
+              </div>
+            </div>
+            <button
+              class="btn-secondary-sm text-xs px-3 py-1"
+              (click)="downloadCsvTemplate()">
+              <span nz-icon nzType="download" nzTheme="outline" class="text-xs"></span>
+              Descargar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Área de carga -->
+      <div class="upload-area">
+        <nz-upload
+          class="upload-list-inline"
+          nzListType="picture"
+          nzType="drag"
+          [nzMultiple]="false"
+          [nzFileList]="fileList"
+          nzAccept=".xlsx,.csv"
+          [nzCustomRequest]="customRequest"
+          [nzBeforeUpload]="beforeUpload"
+          [nzDownload]="onFileDownload"
+          (nzChange)="handleFileChange($event)"
+        >
+          <p class="text-center mb-[20px]">
+            <span nz-icon nzType="cloud-upload" nzTheme="outline" class="text-6xl text-blue-500"></span>
+          </p>
+          <p class="text-[20px] font-medium text-dark dark:text-white/[.87]">
+            Arrastra tu archivo aquí o <strong class="text-primary">haz clic para seleccionar</strong>
+          </p>
+          <p class="text-sm text-gray-500 dark:text-white/50 mt-2">
+            Formatos soportados: Excel (.xlsx) o CSV (.csv)
+          </p>
+        </nz-upload>
+      </div>
+
+    </div>
+  </ng-template>
+
+  <ng-template #bulkUploadModalFooter>
+    <div class="flex justify-center gap-3 w-full">
+      <button class="btn-secondary-sm" (click)="handleBulkUploadModalCancel()">
+        Cancelar
+      </button>
+      <button class="btn-primary-sm" (click)="selectFile()">
+        <span nz-icon nzType="folder-open" nzTheme="outline"></span>
+        Seleccionar archivo
+      </button>
+    </div>
+  </ng-template>
+</nz-modal>
+
 <div class="mb-[25px] mt-[4px]">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
     <!-- Buscar y Filtros -->

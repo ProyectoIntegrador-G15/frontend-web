@@ -36,6 +36,7 @@ import {NzInputModule} from 'ng-zorro-antd/input';
 import {NzMessageModule} from 'ng-zorro-antd/message';
 import {NzPaginationModule} from 'ng-zorro-antd/pagination';
 import {NzSpinModule} from 'ng-zorro-antd/spin';
+import {NzUploadModule} from 'ng-zorro-antd/upload';
 
 import {AngularSvgIconModule} from 'angular-svg-icon';
 import {BaseChartDirective} from 'ng2-charts';
@@ -96,7 +97,8 @@ const antdModule = [
   FullCalendarModule,
   NzMessageModule,
   NzPaginationModule,
-  NzSpinModule
+  NzSpinModule,
+  NzUploadModule
 ];
 
 @NgModule({
