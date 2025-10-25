@@ -456,6 +456,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
             this.handleBulkUploadModalCancel();
 
             // Recargar la lista de productos
+            this.currentPage = 1;
             this.getProducts();
           } else {
             // Mostrar errores en el modal
