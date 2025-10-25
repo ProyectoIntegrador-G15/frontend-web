@@ -47,7 +47,7 @@ describe('ProductsService', () => {
       purchase_price: 0.85,
       supplier: 'Proveedor 1',
       requires_cold_chain: false,
-      status: 'active',
+      status: true,
       storageInstructions: 'Almacenar en lugar seco, protegido de la luz y humedad'
     },
     {
@@ -57,7 +57,7 @@ describe('ProductsService', () => {
       purchase_price: 12.5,
       supplier: 'Proveedor 2',
       requires_cold_chain: true,
-      status: 'active',
+      status: true,
       storageInstructions: 'Refrigerar entre 2-8°C. No congelar. Proteger de la luz'
     }
   ];
@@ -117,7 +117,7 @@ describe('ProductsService', () => {
       price: 10.5,
       provider: 'N/A',
       needsCold: false,
-      status: 'active',
+      status: true,
       storageInstructions: 'Almacenar en lugar seco'
     };
 

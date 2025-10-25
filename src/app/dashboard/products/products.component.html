@@ -116,37 +116,184 @@
   </ng-template>
 </nz-modal>
 
-<div class="flex justify-between items-center mb-[25px] mt-[4px]">
-  <!-- Status Filter -->
-  <div class="flex items-center gap-4">
-    <span class="text-sm font-medium text-dark dark:text-white/[.87]">Filtrar por estado:</span>
-    <nz-radio-group [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange($event)">
-      <label nz-radio-button [nzValue]="true">
-        <span nz-icon nzType="check-circle" nzTheme="outline" class="mr-1"></span>
-        Activos
-      </label>
-      <label nz-radio-button [nzValue]="false">
-        <span nz-icon nzType="close-circle" nzTheme="outline" class="mr-1"></span>
-        Inactivos
-      </label>
-    </nz-radio-group>
+<!-- Modal de carga masiva -->
+<nz-modal
+  [(nzVisible)]="isBulkUploadModalVisible"
+  [nzTitle]="bulkUploadModalTitle"
+  [nzContent]="bulkUploadModalContent"
+  [nzFooter]="bulkUploadModalFooter"
+  (nzOnCancel)="handleBulkUploadModalCancel()"
+  nzWidth="75%"
+>
+  <ng-template #bulkUploadModalTitle>Cargar productos masivamente</ng-template>
+
+  <ng-template #bulkUploadModalContent>
+    <div class="space-y-6">
+
+      <!-- Descargar plantillas -->
+      <div class="bg-gray-50 dark:bg-white/5 p-4 rounded-lg border border-dashed border-gray-300 dark:border-white/10">
+        <div class="text-center mb-4">
+          <p class="font-medium text-dark dark:text-white/[.87] mb-1">Plantillas de ejemplo</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- Plantilla Excel -->
+          <div class="flex items-center justify-between p-3 bg-white dark:bg-white/10 rounded-lg border border-gray-200 dark:border-white/20">
+            <div class="flex items-center gap-3">
+              <span nz-icon nzType="file-excel" nzTheme="outline" class="text-green-500 text-xl"></span>
+              <div>
+                <p class="font-medium text-dark dark:text-white/[.87] text-sm">Excel (.xlsx)</p>
+                <p class="text-xs text-gray-500 dark:text-white/50">Formato Excel</p>
+              </div>
+            </div>
+            <button
+              class="btn-secondary-sm text-xs px-3 py-1"
+              (click)="downloadExcelTemplate()">
+              <span nz-icon nzType="download" nzTheme="outline" class="text-xs"></span>
+              Descargar
+            </button>
+          </div>
+
+          <!-- Plantilla CSV -->
+          <div class="flex items-center justify-between p-3 bg-white dark:bg-white/10 rounded-lg border border-gray-200 dark:border-white/20">
+            <div class="flex items-center gap-3">
+              <span nz-icon nzType="file-text" nzTheme="outline" class="text-blue-500 text-xl"></span>
+              <div>
+                <p class="font-medium text-dark dark:text-white/[.87] text-sm">CSV (.csv)</p>
+                <p class="text-xs text-gray-500 dark:text-white/50">Formato CSV</p>
+              </div>
+            </div>
+            <button
+              class="btn-secondary-sm text-xs px-3 py-1"
+              (click)="downloadCsvTemplate()">
+              <span nz-icon nzType="download" nzTheme="outline" class="text-xs"></span>
+              Descargar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Área de carga -->
+      <div class="upload-area">
+        <nz-upload
+          class="upload-list-inline"
+          nzListType="picture"
+          nzType="drag"
+          [nzMultiple]="false"
+          [nzFileList]="fileList"
+          nzAccept=".xlsx,.csv"
+          [nzCustomRequest]="customRequest"
+          [nzBeforeUpload]="beforeUpload"
+          [nzDownload]="onFileDownload"
+          (nzChange)="handleFileChange($event)"
+        >
+          <p class="text-center mb-[20px]">
+            <span nz-icon nzType="cloud-upload" nzTheme="outline" class="text-6xl text-blue-500"></span>
+          </p>
+          <p class="text-[20px] font-medium text-dark dark:text-white/[.87]">
+            Arrastra tu archivo aquí o <strong class="text-primary">haz clic para seleccionar</strong>
+          </p>
+          <p class="text-sm text-gray-500 dark:text-white/50 mt-2">
+            Formatos soportados: Excel (.xlsx) o CSV (.csv)
+          </p>
+        </nz-upload>
+      </div>
+
+      <!-- Sección de errores -->
+      <div *ngIf="bulkUploadErrors.length > 0" class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+        <div class="flex items-center gap-2 mb-3">
+          <span nz-icon nzType="exclamation-circle" nzTheme="outline" class="text-red-500 text-lg"></span>
+          <h4 class="font-medium text-red-700 dark:text-red-400">Errores encontrados:</h4>
+        </div>
+        <ul class="space-y-2">
+          <li *ngFor="let error of bulkUploadErrors" class="text-sm text-red-600 dark:text-red-300 bg-red-100 dark:bg-red-900/30 px-3 py-2 rounded">
+            {{ error }}
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </ng-template>
+
+  <ng-template #bulkUploadModalFooter>
+    <div class="flex justify-center gap-3 w-full">
+      <button class="btn-secondary-sm" (click)="handleBulkUploadModalCancel()">
+        Cancelar
+      </button>
+      <button 
+        class="btn-primary-sm" 
+        (click)="loadFile()"
+        [disabled]="isBulkUploadLoading"
+        [class.opacity-50]="isBulkUploadLoading"
+        [class.cursor-not-allowed]="isBulkUploadLoading">
+        <span nz-icon nzType="upload" nzTheme="outline" *ngIf="!isBulkUploadLoading"></span>
+        <span nz-icon nzType="loading" nzTheme="outline" *ngIf="isBulkUploadLoading"></span>
+        {{ isBulkUploadLoading ? 'Cargando...' : 'Cargar archivo' }}
+      </button>
+    </div>
+  </ng-template>
+</nz-modal>
+
+<h1 class="screen-title mb-6">Productos</h1>
+
+<div class="mb-[25px] mt-[4px]">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+    <!-- Buscar y Filtros -->
+    <div class="space-y-4">
+      <!-- Buscar por nombre -->
+      <div class="w-full">
+        <nz-input-group [nzSuffix]="suffixIconSearch" nzPrefixIcon="search">
+          <input
+            type="text"
+            nz-input
+            placeholder="Buscar productos por nombre"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchChange($event)"
+            class="w-full"
+          />
+        </nz-input-group>
+        <ng-template #suffixIconSearch>
+          <span *ngIf="searchTerm" nz-icon nzType="close-circle" nzTheme="outline" (click)="clearSearch()" class="cursor-pointer hover:text-red-500"></span>
+        </ng-template>
+      </div>
+
+      <!-- Filtros -->
+      <div class="flex items-center gap-4">
+        <span class="text-sm font-medium text-dark dark:text-white/[.87]">Estado:</span>
+        <nz-radio-group [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange($event)">
+          <label nz-radio-button [nzValue]="true">
+            <span nz-icon nzType="check-circle" nzTheme="outline" class="mr-1"></span>
+            Activos
+          </label>
+          <label nz-radio-button [nzValue]="false">
+            <span nz-icon nzType="close-circle" nzTheme="outline" class="mr-1"></span>
+            Inactivos
+          </label>
+        </nz-radio-group>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="flex flex-col items-stretch lg:items-end gap-3 justify-start lg:justify-end">
+      <button class="btn-primary-sm w-full lg:w-[300px]" (click)="showProductModal()">
+        <span nz-icon nzType="plus" nzTheme="outline"></span>
+        Crear producto
+      </button>
+      <button class="btn-secondary-sm w-full lg:w-[300px]" (click)="loadBulkProducts()">
+        <span nz-icon nzType="upload" nzTheme="outline"></span>
+        Cargar masivamente
+      </button>
+    </div>
   </div>
-  
-  <!-- New Product -->
-  <button class="btn-primary" (click)="showProductModal()">
-    <span nz-icon nzType="plus" nzTheme="outline"></span>
-    Crear producto
-  </button>
-  <!-- end: New Product -->
 </div>
 <div
   class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
   <div class="p-[25px]">
     <div class="w-full overflow-x-auto">
-      <nz-table 
-        #productsTable 
-        [nzData]="products" 
-        [nzFrontPagination]="false" 
+      <nz-table
+        #productsTable
+        [nzData]="products"
+        [nzFrontPagination]="false"
         [nzShowPagination]="true"
         [nzPageSize]="pageSize"
         [nzTotal]="totalProducts"

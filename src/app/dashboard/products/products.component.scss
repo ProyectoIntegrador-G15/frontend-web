@@ -1,0 +1,31 @@
+.pagination-centered ::ng-deep .ant-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.pagination-centered ::ng-deep .ant-pagination .ant-pagination-options {
+  display: none;
+}
+
+// Estilos para el área de upload
+.upload-area ::ng-deep .ant-upload.ant-upload-drag {
+  @apply border-2 border-dashed border-normal dark:border-white/10 rounded-10 h-auto mb-[15px] bg-regularBG dark:bg-white/10;
+}
+
+.upload-area ::ng-deep .ant-upload.ant-upload-drag .ant-upload-btn {
+  @apply min-h-[200px];
+}
+
+.upload-area ::ng-deep .ant-upload-list-picture .ant-upload-list-item-thumbnail{
+  @apply flex items-center justify-center;
+}
+
+.upload-area ::ng-deep .ant-upload-list-picture .ant-upload-list-item{
+  @apply rounded-6 py-[8px] px-[15px] border-regular dark:border-white/30;
+}
+
+.upload-area ::ng-deep .ant-upload-list-picture .ant-upload-list-item-error{
+  @apply border-danger dark:border-danger;
+}
