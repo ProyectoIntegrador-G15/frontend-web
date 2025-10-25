@@ -1,0 +1,6 @@
+nombre,descripcion,precio_compra,proveedor_id,cadena_fria,instrucciones_almacenamiento
+Paracetamol 500mg,Analgésico y antipirético para el alivio del dolor y la fiebre,22000,1,false,Almacenar en lugar seco y fresco
+Insulina Humana Regular,Insulina de acción rápida para el control de la diabetes,12500,2,true,Refrigerar entre 2-8°C
+Ibuprofeno 400mg,Antiinflamatorio no esteroideo para el alivio del dolor,43000,1,false,Almacenar en lugar seco
+Acetaminofén 500mg,Medicamento para el dolor y la fiebre,48500,1,false,Conservar en lugar seco
+Morfina 10mg,Analgésico opioide para dolor severo,81000,3,true,Almacenar en lugar fresco y seco
