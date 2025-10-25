@@ -91,6 +91,20 @@ export class ProductsService {
       );
   }
 
+  bulkUploadProducts(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.apiService.postDirect<any>(`${this.endpointsService.getEndpointPath('products')}/bulk`, formData)
+      .pipe(
+        map(response => {
+          this.refreshProducts();
+          return response;
+        }),
+        catchError(this.handleError)
+      );
+  }
+
   private refreshProducts(): void {
     this.getProducts().subscribe({
       next: (products) => {

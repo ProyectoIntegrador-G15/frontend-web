@@ -74,6 +74,17 @@ export class ApiService {
   }
 
   /**
+   * POST request direct (sin wrapper ApiResponse) - FormData
+   */
+  postDirect<T>(endpoint: string, data: any): Observable<T> {
+    const url = `${this.baseUrl}${endpoint}`;
+
+    return this.http.post<T>(url, data, {}).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /**
    * PUT request
    */
   put<T>(endpoint: string, data: any): Observable<ApiResponse<T>> {

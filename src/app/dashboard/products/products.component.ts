@@ -5,7 +5,6 @@ import {ProductsService} from '../../shared/services/products.service';
 import {WarehousesService, Warehouse} from '../../shared/services/warehouses.service';
 import {Subscription} from 'rxjs';
 import {Router} from '@angular/router';
-import {NzModalService} from 'ng-zorro-antd/modal';
 import {NzNotificationService} from 'ng-zorro-antd/notification';
 import {NzMessageService} from 'ng-zorro-antd/message';
 import {NzUploadChangeParam, NzUploadFile} from 'ng-zorro-antd/upload';
@@ -28,6 +27,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
   // Modal de carga masiva
   isBulkUploadModalVisible = false;
   fileList: NzUploadFile[] = [];
+  isBulkUploadLoading = false;
+  bulkUploadErrors: string[] = [];
 
   // Paginación
   currentPage = 1;
@@ -54,7 +55,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private router: Router,
     private productsService: ProductsService,
     private warehousesService: WarehousesService,
-    private modalService: NzModalService,
     private fb: FormBuilder,
     private notification: NzNotificationService,
     private msg: NzMessageService
@@ -327,6 +327,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   handleBulkUploadModalCancel(): void {
     this.isBulkUploadModalVisible = false;
+    this.isBulkUploadLoading = false;
+    this.bulkUploadErrors = [];
     this.clearFileList();
   }
 
@@ -353,9 +355,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.msg.success(`Plantilla ${filename} descargada exitosamente`);
   }
 
-  selectFile(): void {
-    console.log('Seleccionar archivo - Funcionalidad pendiente de implementar');
-  }
 
   beforeUpload = (file: NzUploadFile): boolean => {
     if (this.fileList.length > 0) {
@@ -364,9 +363,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
     }
 
     const isValidType = file.type === 'text/csv' ||
-                       file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-                       file.name?.endsWith('.csv') ||
-                       file.name?.endsWith('.xlsx');
+      file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+      file.name?.endsWith('.csv') ||
+      file.name?.endsWith('.xlsx');
 
     if (!isValidType) {
       this.msg.error('Solo se permiten archivos CSV (.csv) o Excel (.xlsx)');
@@ -388,11 +387,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
     }, 200);
   }
 
-  handleFileChange({ file, fileList }: NzUploadChangeParam): void {
+  handleFileChange({file, fileList}: NzUploadChangeParam): void {
     const status = file.status;
-    if (status !== 'uploading') {
-      console.log(file, fileList);
-    }
     if (status === 'done') {
       this.msg.success(`${file.name} archivo subido exitosamente.`);
     } else if (status === 'error') {
@@ -420,5 +416,66 @@ export class ProductsComponent implements OnInit, OnDestroy {
     window.URL.revokeObjectURL(url);
 
     this.msg.success(`Archivo ${filename} descargado exitosamente`);
+  }
+
+  loadFile(): void {
+    if (this.isBulkUploadLoading) {
+      return; // Prevenir múltiples clics
+    }
+
+    if (this.fileList.length === 0) {
+      this.msg.error('Por favor selecciona un archivo antes de cargar');
+      return;
+    }
+
+    const file = this.fileList[0];
+    if (!file.originFileObj) {
+      this.msg.error('No se puede procesar el archivo');
+      return;
+    }
+
+    this.uploadFileToBackend(file.originFileObj);
+  }
+
+  private uploadFileToBackend(file: File): void {
+    this.isBulkUploadLoading = true;
+    this.bulkUploadErrors = [];
+    this.msg.loading('Cargando archivo...', {nzDuration: 0});
+
+    const uploadSubscription = this.productsService.bulkUploadProducts(file)
+      .subscribe({
+        next: (data) => {
+          this.msg.remove();
+          this.isBulkUploadLoading = false;
+
+          if (data.success) {
+            this.msg.success(data.message);
+            this.msg.info(`Productos creados: ${data.created_products} de ${data.total_rows}`);
+
+            // Cerrar modal y limpiar archivos
+            this.handleBulkUploadModalCancel();
+
+            // Recargar la lista de productos
+            this.getProducts();
+          } else {
+            // Mostrar errores en el modal
+            this.bulkUploadErrors = data.errors || [];
+            this.msg.error(data.message);
+          }
+        },
+        error: (error) => {
+          this.msg.remove();
+          this.isBulkUploadLoading = false;
+          console.error('Error al cargar archivo:', error);
+
+          // Mostrar solo el message del servicio
+          const errorMessage = error.message || 'Error al conectar con el servidor. Verifica que el backend esté ejecutándose.';
+          this.msg.error(errorMessage);
+
+          // NO hacer getProducts() si falla el request
+        }
+      });
+
+    this.subscription.add(uploadSubscription);
   }
 }

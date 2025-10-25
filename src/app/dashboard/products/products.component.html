@@ -199,6 +199,19 @@
         </nz-upload>
       </div>
 
+      <!-- Sección de errores -->
+      <div *ngIf="bulkUploadErrors.length > 0" class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+        <div class="flex items-center gap-2 mb-3">
+          <span nz-icon nzType="exclamation-circle" nzTheme="outline" class="text-red-500 text-lg"></span>
+          <h4 class="font-medium text-red-700 dark:text-red-400">Errores encontrados:</h4>
+        </div>
+        <ul class="space-y-2">
+          <li *ngFor="let error of bulkUploadErrors" class="text-sm text-red-600 dark:text-red-300 bg-red-100 dark:bg-red-900/30 px-3 py-2 rounded">
+            {{ error }}
+          </li>
+        </ul>
+      </div>
+
     </div>
   </ng-template>
 
@@ -207,9 +220,15 @@
       <button class="btn-secondary-sm" (click)="handleBulkUploadModalCancel()">
         Cancelar
       </button>
-      <button class="btn-primary-sm" (click)="selectFile()">
-        <span nz-icon nzType="folder-open" nzTheme="outline"></span>
-        Seleccionar archivo
+      <button 
+        class="btn-primary-sm" 
+        (click)="loadFile()"
+        [disabled]="isBulkUploadLoading"
+        [class.opacity-50]="isBulkUploadLoading"
+        [class.cursor-not-allowed]="isBulkUploadLoading">
+        <span nz-icon nzType="upload" nzTheme="outline" *ngIf="!isBulkUploadLoading"></span>
+        <span nz-icon nzType="loading" nzTheme="outline" *ngIf="isBulkUploadLoading"></span>
+        {{ isBulkUploadLoading ? 'Cargando...' : 'Cargar archivo' }}
       </button>
     </div>
   </ng-template>
