@@ -323,5 +323,43 @@ describe('OrdersService', () => {
       req.error(new ProgressEvent('timeout'));
     });
   });
+
+  describe('Error Message Handling', () => {
+    it('should prioritize detail error message over message', () => {
+      service.getOrders().subscribe({
+        next: () => fail('Should have failed'),
+        error: (error) => {
+          expect(error.message).toBe('Error específico');
+        }
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req.flush({ detail: 'Error específico', message: 'Error genérico' }, { status: 500, statusText: 'Server Error' });
+    });
+
+    it('should use error.error.message when detail is not available', () => {
+      service.getOrders().subscribe({
+        next: () => fail('Should have failed'),
+        error: (error) => {
+          expect(error.message).toBe('Error en el objeto');
+        }
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req.flush({ message: 'Error en el objeto' }, { status: 500, statusText: 'Server Error' });
+    });
+
+    it('should use default message when no error details available', () => {
+      service.getOrders().subscribe({
+        next: () => fail('Should have failed'),
+        error: (error) => {
+          expect(error.message).toBeTruthy();
+        }
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req.error(new ProgressEvent('error'));
+    });
+  });
 });
 
