@@ -23,6 +23,7 @@ import { AppComponent } from './app.component';
 import { CommonLayoutComponent } from './layouts/common-layout/common-layout.component';
 import { FullLayoutComponent } from './layouts/full-layout/full-layout.component';
 import { ThemeConstantService } from './shared/services/theme-constant.service';
+import { SnackContainerComponent } from './shared/components/snack-container/snack-container.component';
 
 registerLocaleData(en);
 
@@ -44,7 +45,8 @@ registerLocaleData(en);
         NgApexchartsModule,
         FullCalendarModule,
         HttpClientModule,
-        AngularSvgIconModule.forRoot() 
+        AngularSvgIconModule.forRoot(),
+        SnackContainerComponent
     ],
     providers: [
         {

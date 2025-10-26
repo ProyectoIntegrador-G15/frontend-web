@@ -12,23 +12,41 @@ describe('RoutesService', () => {
       id: 1,
       vehicle_id: 1,
       created_at: '2025-10-14T09:00:00',
-      warehouse_id: 'WH-001',
-      warehouse_name: 'Bodega Central Bogotá',
       state: 'scheduled',
       deliveries: 5,
       gmaps_metrics: '{"performed_shipment_count": 0, "total_duration": 0}',
-      country: 'Colombia'
+      country: 'Colombia',
+      waypoints: [
+        {
+          id: 1,
+          order_id: 1,
+          sequence: 0,
+          point_name: 'Bodega Central Bogotá',
+          point_address: 'Calle 123 #45-67',
+          arrival_time: null,
+          pickup: true
+        }
+      ]
     },
     {
       id: 2,
       vehicle_id: 2,
       created_at: '2025-10-14T10:30:00',
-      warehouse_id: 'WH-002',
-      warehouse_name: 'Bodega Norte Cali',
       state: 'in_transit',
       deliveries: 8,
       gmaps_metrics: '{"performed_shipment_count": 5, "total_duration": 120}',
-      country: 'Colombia'
+      country: 'Colombia',
+      waypoints: [
+        {
+          id: 2,
+          order_id: 2,
+          sequence: 0,
+          point_name: 'Bodega Norte Cali',
+          point_address: 'Carrera 10 #20-30',
+          arrival_time: null,
+          pickup: true
+        }
+      ]
     }
   ];
 
@@ -79,9 +97,15 @@ describe('RoutesService', () => {
         error: done.fail
       });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}?page=1`);
       expect(req.request.method).toBe('GET');
-      req.flush(mockApiRoutes);
+      req.flush({
+        routes: mockApiRoutes,
+        total: 2,
+        total_pages: 1,
+        page: 1,
+        page_size: 5
+      });
     });
 
     it('should handle empty routes array', (done) => {
@@ -94,8 +118,14 @@ describe('RoutesService', () => {
         error: done.fail
       });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
-      req.flush([]);
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}?page=1`);
+      req.flush({
+        routes: [],
+        total: 0,
+        total_pages: 1,
+        page: 1,
+        page_size: 5
+      });
     });
   });
 
@@ -114,8 +144,14 @@ describe('RoutesService', () => {
         error: done.fail
       });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
-      req.flush([testRoute]);
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}?page=1`);
+      req.flush({
+        routes: [testRoute],
+        total: 1,
+        total_pages: 1,
+        page: 1,
+        page_size: 5
+      });
     });
 
     it('should map "in_transit" to "in_progress"', (done) => {
@@ -132,8 +168,14 @@ describe('RoutesService', () => {
         error: done.fail
       });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
-      req.flush([testRoute]);
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}?page=1`);
+      req.flush({
+        routes: [testRoute],
+        total: 1,
+        total_pages: 1,
+        page: 1,
+        page_size: 5
+      });
     });
 
     it('should map "delivered" to "completed"', (done) => {
@@ -150,8 +192,14 @@ describe('RoutesService', () => {
         error: done.fail
       });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
-      req.flush([testRoute]);
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}?page=1`);
+      req.flush({
+        routes: [testRoute],
+        total: 1,
+        total_pages: 1,
+        page: 1,
+        page_size: 5
+      });
     });
   });
 
@@ -166,8 +214,14 @@ describe('RoutesService', () => {
         error: done.fail
       });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
-      req.flush(mockApiRoutes);
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}?page=1`);
+      req.flush({
+        routes: mockApiRoutes,
+        total: 2,
+        total_pages: 1,
+        page: 1,
+        page_size: 5
+      });
     });
 
     it('should map warehouse_name to originWarehouse', (done) => {
@@ -179,8 +233,14 @@ describe('RoutesService', () => {
         error: done.fail
       });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
-      req.flush(mockApiRoutes);
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}?page=1`);
+      req.flush({
+        routes: mockApiRoutes,
+        total: 2,
+        total_pages: 1,
+        page: 1,
+        page_size: 5
+      });
     });
 
     it('should map vehicle_id to assignedTruck with padding', (done) => {
@@ -192,8 +252,14 @@ describe('RoutesService', () => {
         error: done.fail
       });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
-      req.flush(mockApiRoutes);
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}?page=1`);
+      req.flush({
+        routes: mockApiRoutes,
+        total: 2,
+        total_pages: 1,
+        page: 1,
+        page_size: 5
+      });
     });
   });
 
@@ -212,8 +278,14 @@ describe('RoutesService', () => {
         error: done.fail
       });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
-      req.flush([testRoute]);
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}?page=1`);
+      req.flush({
+        routes: [testRoute],
+        total: 1,
+        total_pages: 1,
+        page: 1,
+        page_size: 5
+      });
     });
   });
 
@@ -221,17 +293,29 @@ describe('RoutesService', () => {
     it('should use correct URL from environment', () => {
       service.getRoutes().subscribe();
 
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
-      expect(req.request.url).toBe(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
-      req.flush([]);
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}?page=1`);
+      expect(req.request.url).toContain(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
+      req.flush({
+        routes: [],
+        total: 0,
+        total_pages: 1,
+        page: 1,
+        page_size: 5
+      });
     });
 
     it('should send GET request', () => {
       service.getRoutes().subscribe();
 
-      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}?page=1`);
       expect(req.request.method).toBe('GET');
-      req.flush([]);
+      req.flush({
+        routes: [],
+        total: 0,
+        total_pages: 1,
+        page: 1,
+        page_size: 5
+      });
     });
   });
 });
