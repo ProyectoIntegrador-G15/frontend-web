@@ -55,6 +55,7 @@ import {ProductsComponent} from './products/products.component';
 import {ProductInventoryComponent} from './product-inventory/product-inventory.component';
 import {RoutesListComponent} from './routes-list/routes-list.component';
 import {CreateRouteComponent} from './create-route/create-route.component';
+import {SellerDetailsComponent} from './seller-details/seller-details.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -117,6 +118,7 @@ const antdModule = [
     WarehouseInventoryComponent,
     RoutesListComponent,
     CreateRouteComponent,
+    SellerDetailsComponent,
   ],
   providers: [
     ThemeConstantService,

@@ -20,7 +20,7 @@ export const ROUTES: SideNavInterface[] = [
     submenu: []
   },
   {
-    path: '/dashboard/sellers',
+    path: '/dashboard/sellers/1',
     title: 'Vendedores',
     iconType: 'nzIcon',
     icon: 'dollar',
