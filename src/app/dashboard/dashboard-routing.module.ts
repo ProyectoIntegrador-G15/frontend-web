@@ -8,6 +8,7 @@ import {ProductsComponent} from './products/products.component';
 import {ProductInventoryComponent} from './product-inventory/product-inventory.component';
 import {RoutesListComponent} from './routes-list/routes-list.component';
 import {CreateRouteComponent} from './create-route/create-route.component';
+import {SellersListComponent} from './sellers-list/sellers-list.component';
 
 
 const routes: Routes = [
@@ -58,6 +59,13 @@ const routes: Routes = [
     component: CreateRouteComponent,
     data: {
       title: 'Generar ruta de entrega',
+    },
+  },
+  {
+    path: 'sellers',
+    component: SellersListComponent,
+    data: {
+      title: 'Vendedores',
     },
   },
 ];

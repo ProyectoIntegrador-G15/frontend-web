@@ -1,0 +1,83 @@
+<div class="sellers-list-container">
+  <!-- Header con título y botón crear vendedor -->
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="screen-title">Vendedores</h1>
+    <button class="btn-primary" (click)="createSeller()">
+      <span nz-icon nzType="plus" nzTheme="outline"></span>
+      Crear vendedor
+    </button>
+  </div>
+
+  <!-- Indicador de carga -->
+  <div *ngIf="loading" class="flex justify-center items-center py-12">
+    <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="error && !loading" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+    <p class="font-medium">{{ error }}</p>
+    <button class="mt-2 text-sm underline" (click)="loadSellers()">Reintentar</button>
+  </div>
+
+  <!-- Tabla de vendedores con estilos globales -->
+  <div *ngIf="!loading && !error && sellers.length > 0" class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Identificación</th>
+          <th>Estado</th>
+          <th>Email</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let seller of paginatedSellers">
+          <td>
+            <p class="font-medium">{{ seller.name }}</p>
+          </td>
+          <td>
+            <p>{{ seller.identification }}</p>
+          </td>
+          <td>
+            <nz-tag [nzColor]="getStatusColor(seller.status)">
+              {{ getStatusText(seller.status) }}
+            </nz-tag>
+          </td>
+          <td>
+            <p>{{ seller.email }}</p>
+          </td>
+          <td>
+            <button 
+              nz-button 
+              nzType="text" 
+              nzShape="circle" 
+              nzSize="small"
+              (click)="viewSeller(seller.id)"
+              class="action-button">
+              <span nz-icon nzType="eye" nzTheme="outline"></span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State - Sin vendedores -->
+  <div *ngIf="!loading && !error && sellers.length === 0" class="empty-state">
+    <div class="empty-state-content">
+      <span nz-icon nzType="team" nzTheme="outline" class="empty-icon"></span>
+      <h2 class="empty-title">No hay vendedores registrados</h2>
+      <p class="empty-description">
+        Aún no tienes vendedores en el sistema.
+      </p>
+    </div>
+  </div>
+
+  <!-- Paginador -->
+  <div *ngIf="sellers.length > 0" class="flex justify-center mt-6">
+    <nz-pagination [(nzPageIndex)]="currentPage" [nzTotal]="totalItems" [nzPageSize]="pageSize"
+      [nzShowSizeChanger]="false" [nzShowQuickJumper]="false">
+    </nz-pagination>
+  </div>
+</div>
