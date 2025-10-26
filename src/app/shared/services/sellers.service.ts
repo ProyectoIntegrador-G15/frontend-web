@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { Observable, throwError, forkJoin, of } from 'rxjs';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
-// Interfaz para la respuesta del backend
+// Interfaz para un vendedor en la respuesta del backend
 export interface SellerApiResponse {
   id: number;
   name: string;
@@ -18,6 +18,15 @@ export interface SellerApiResponse {
   entry_date: string;
   created_at: string;
   updated_at: string;
+}
+
+// Interfaz para la respuesta paginada del backend
+export interface SellerPaginatedApiResponse {
+  sellers: SellerApiResponse[];
+  total: number;
+  total_pages: number;
+  page: number;
+  page_size: number;
 }
 
 // Interfaz para el frontend
@@ -43,12 +52,61 @@ export class SellersService {
 
   /**
    * Gets all sellers from the backend
+   * Makes multiple requests to fetch all pages if needed
    */
   getSellers(): Observable<Seller[]> {
     const sellersUrl = `${environment.apiUrl}${environment.apiEndpoints.sellers}`;
-    return this.http.get<SellerApiResponse[]>(sellersUrl)
+    
+    // First, get the first page to know total pages
+    return this.http.get<SellerPaginatedApiResponse>(`${sellersUrl}?page=1`)
       .pipe(
-        map(sellers => sellers.map(seller => this.transformSeller(seller))),
+        switchMap(firstPageResponse => {
+          const allSellers = [...firstPageResponse.sellers];
+          const totalPages = firstPageResponse.total_pages;
+          
+          // If there's only one page, return the sellers
+          if (totalPages <= 1) {
+            return of(allSellers.map(seller => this.transformSeller(seller)));
+          }
+          
+          // If there are multiple pages, fetch them all
+          const pageRequests: Observable<SellerPaginatedApiResponse>[] = [];
+          for (let page = 2; page <= totalPages; page++) {
+            pageRequests.push(
+              this.http.get<SellerPaginatedApiResponse>(`${sellersUrl}?page=${page}`)
+            );
+          }
+          
+          // Wait for all page requests to complete
+          return forkJoin(pageRequests).pipe(
+            map(responses => {
+              // Combine all sellers from all pages
+              responses.forEach(response => {
+                allSellers.push(...response.sellers);
+              });
+              
+              return allSellers.map(seller => this.transformSeller(seller));
+            })
+          );
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * Gets sellers with pagination
+   */
+  getSellersPaginated(page: number = 1): Observable<{sellers: Seller[], total: number, totalPages: number, page: number}> {
+    const sellersUrl = `${environment.apiUrl}${environment.apiEndpoints.sellers}?page=${page}`;
+    
+    return this.http.get<SellerPaginatedApiResponse>(sellersUrl)
+      .pipe(
+        map(response => ({
+          sellers: response.sellers.map(seller => this.transformSeller(seller)),
+          total: response.total,
+          totalPages: response.total_pages,
+          page: response.page
+        })),
         catchError(this.handleError)
       );
   }
