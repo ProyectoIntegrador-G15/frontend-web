@@ -4,7 +4,7 @@ export interface Product {
   purchase_price: number;
   supplier: string;
   requires_cold_chain: boolean;
-  status: 'active' | 'inactive';
+  status: boolean;
   description?: string;
   storageInstructions?: string;
   category?: string;

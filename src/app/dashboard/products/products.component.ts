@@ -1,29 +1,20 @@
-import {Component, OnDestroy, OnInit, TemplateRef} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 import {ProductsService} from '../../shared/services/products.service';
 import {WarehousesService, Warehouse} from '../../shared/services/warehouses.service';
 import {Subscription} from 'rxjs';
 import {Router} from '@angular/router';
-import {NzModalService} from 'ng-zorro-antd/modal';
 import {NzNotificationService} from 'ng-zorro-antd/notification';
+import {NzMessageService} from 'ng-zorro-antd/message';
+import {NzUploadChangeParam, NzUploadFile} from 'ng-zorro-antd/upload';
 import {Product} from '../../shared/interfaces/product.type';
+import {debounceTime, distinctUntilChanged, Subject} from 'rxjs';
 
 @Component({
   selector: 'app-products',
   templateUrl: 'products.component.html',
-  styles: [`
-    .pagination-centered ::ng-deep .ant-pagination {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 24px;
-    }
-    
-    .pagination-centered ::ng-deep .ant-pagination .ant-pagination-options {
-      display: none;
-    }
-  `]
+  styleUrls: ['products.component.scss']
 })
 export class ProductsComponent implements OnInit, OnDestroy {
   products: Product[] = [];
@@ -33,12 +24,22 @@ export class ProductsComponent implements OnInit, OnDestroy {
   isProductModalVisible = false;
   isProductModalLoading = false;
 
+  // Modal de carga masiva
+  isBulkUploadModalVisible = false;
+  fileList: NzUploadFile[] = [];
+  isBulkUploadLoading = false;
+  bulkUploadErrors: string[] = [];
+
   // Paginación
   currentPage = 1;
-  pageSize = 10;
+  pageSize = 0;
   totalProducts = 0;
   statusFilter = true;
   hasNextPage = true;
+
+  // Búsqueda
+  searchTerm = '';
+  private searchSubject = new Subject<string>();
 
   // Bodegas
   warehouses: Warehouse[] = [];
@@ -54,9 +55,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private router: Router,
     private productsService: ProductsService,
     private warehousesService: WarehousesService,
-    private modalService: NzModalService,
     private fb: FormBuilder,
-    private notification: NzNotificationService
+    private notification: NzNotificationService,
+    private msg: NzMessageService
   ) {
   }
 
@@ -65,6 +66,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.getProducts();
     this.getWarehouses();
     this.initForm();
+    this.setupSearch();
   }
 
   ngOnDestroy(): void {
@@ -81,12 +83,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   getProducts(): void {
     this.isLoading = true;
-    const searchSubscription = this.productsService.getProductsPaginated(this.currentPage, this.statusFilter)
+    const searchSubscription = this.productsService.getProductsPaginated(this.currentPage, this.statusFilter, this.searchTerm)
       .subscribe({
         next: (response) => {
-          this.products = response.data;
+          this.products = response.products;
+          this.pageSize = response.page_size;
           this.totalProducts = response.total;
-          this.hasNextPage = response.hasNextPage;
+          this.hasNextPage = response.page < response.total_pages;
           this.isLoading = false;
         },
         error: (error) => {
@@ -255,7 +258,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
         this.isProductModalLoading = false;
         this.resetProductForm();
 
-        // Mostrar notificación de éxito
+        this.currentPage = 1;
+        this.getProducts();
+
         this.notification.create(
           'success',
           '¡Producto creado exitosamente!',
@@ -264,13 +269,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.isProductModalLoading = false;
-        this.errorMessage = 'Error al crear el producto. Por favor, inténtalo de nuevo.';
-
-        // Mostrar notificación de error
+        this.errorMessage = error.message;
         this.notification.create(
           'error',
           'Error al crear producto',
-          'No se pudo crear el producto. Por favor, verifica los datos e inténtalo de nuevo.'
+          error.message
         );
       }
     });
@@ -280,7 +283,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.validateForm.reset();
   }
 
-  // Métodos de paginación
   onPageIndexChange(page: number): void {
     this.currentPage = page;
     this.getProducts();
@@ -293,5 +295,188 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.getProducts();
   }
 
+  // Métodos de búsqueda
+  setupSearch(): void {
+    const searchSubscription = this.searchSubject
+      .pipe(
+        debounceTime(700),
+        distinctUntilChanged() // Solo emitir si el valor cambió
+      )
+      .subscribe(searchTerm => {
+        this.searchTerm = searchTerm;
+        this.currentPage = 1; // Reset to first page when searching
+        this.getProducts();
+      });
 
+    this.subscription.add(searchSubscription);
+  }
+
+  onSearchChange(searchTerm: string): void {
+    this.searchSubject.next(searchTerm);
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.searchSubject.next('');
+  }
+
+  // Método para carga masiva de productos
+  loadBulkProducts(): void {
+    this.isBulkUploadModalVisible = true;
+  }
+
+  handleBulkUploadModalCancel(): void {
+    this.isBulkUploadModalVisible = false;
+    this.isBulkUploadLoading = false;
+    this.bulkUploadErrors = [];
+    this.clearFileList();
+  }
+
+  private clearFileList(): void {
+    this.fileList = [];
+  }
+
+  downloadExcelTemplate(): void {
+    this.downloadStaticFile('assets/templates/productos-template.xlsx', 'productos-template.xlsx');
+  }
+
+  downloadCsvTemplate(): void {
+    this.downloadStaticFile('assets/templates/productos-template.csv', 'productos-template.csv');
+  }
+
+  private downloadStaticFile(filePath: string, filename: string): void {
+    const link = document.createElement('a');
+    link.href = filePath;
+    link.download = filename;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    this.msg.success(`Plantilla ${filename} descargada exitosamente`);
+  }
+
+
+  beforeUpload = (file: NzUploadFile): boolean => {
+    if (this.fileList.length > 0) {
+      this.msg.error('Solo se permite cargar un archivo a la vez. Elimina el archivo actual antes de cargar uno nuevo.');
+      return false;
+    }
+
+    const isValidType = file.type === 'text/csv' ||
+      file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+      file.name?.endsWith('.csv') ||
+      file.name?.endsWith('.xlsx');
+
+    if (!isValidType) {
+      this.msg.error('Solo se permiten archivos CSV (.csv) o Excel (.xlsx)');
+      return false;
+    }
+
+    const isLt10M = file.size! / 1024 / 1024 < 10;
+    if (!isLt10M) {
+      this.msg.error('El archivo debe ser menor a 10MB');
+      return false;
+    }
+
+    return true;
+  }
+
+  customRequest = (item: any): void => {
+    setTimeout(() => {
+      item.onSuccess({}, item.file);
+    }, 200);
+  }
+
+  handleFileChange({file, fileList}: NzUploadChangeParam): void {
+    const status = file.status;
+    if (status === 'done') {
+      this.msg.success(`${file.name} archivo subido exitosamente.`);
+    } else if (status === 'error') {
+      this.msg.error(`${file.name} falló la subida del archivo.`);
+    }
+    this.fileList = [...fileList];
+  }
+
+  onFileDownload = (file: NzUploadFile): void => {
+    if (file.originFileObj) {
+      this.downloadFile(file.originFileObj, file.name);
+    } else {
+      this.msg.error('No se puede descargar el archivo');
+    }
+  };
+
+  private downloadFile(file: File, filename: string): void {
+    const url = window.URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    this.msg.success(`Archivo ${filename} descargado exitosamente`);
+  }
+
+  loadFile(): void {
+    if (this.isBulkUploadLoading) {
+      return; // Prevenir múltiples clics
+    }
+
+    if (this.fileList.length === 0) {
+      this.msg.error('Por favor selecciona un archivo antes de cargar');
+      return;
+    }
+
+    const file = this.fileList[0];
+    if (!file.originFileObj) {
+      this.msg.error('No se puede procesar el archivo');
+      return;
+    }
+
+    this.uploadFileToBackend(file.originFileObj);
+  }
+
+  private uploadFileToBackend(file: File): void {
+    this.isBulkUploadLoading = true;
+    this.bulkUploadErrors = [];
+    this.msg.loading('Cargando archivo...', {nzDuration: 0});
+
+    const uploadSubscription = this.productsService.bulkUploadProducts(file)
+      .subscribe({
+        next: (data) => {
+          this.msg.remove();
+          this.isBulkUploadLoading = false;
+
+          if (data.success) {
+            this.msg.success(data.message);
+            this.msg.info(`Productos creados: ${data.created_products} de ${data.total_rows}`);
+
+            // Cerrar modal y limpiar archivos
+            this.handleBulkUploadModalCancel();
+
+            // Recargar la lista de productos
+            this.currentPage = 1;
+            this.getProducts();
+          } else {
+            // Mostrar errores en el modal
+            this.bulkUploadErrors = data.errors || [];
+            this.msg.error(data.message);
+          }
+        },
+        error: (error) => {
+          this.msg.remove();
+          this.isBulkUploadLoading = false;
+          console.error('Error al cargar archivo:', error);
+
+          // Mostrar solo el message del servicio
+          const errorMessage = error.message || 'Error al conectar con el servidor. Verifica que el backend esté ejecutándose.';
+          this.msg.error(errorMessage);
+
+          // NO hacer getProducts() si falla el request
+        }
+      });
+
+    this.subscription.add(uploadSubscription);
+  }
 }

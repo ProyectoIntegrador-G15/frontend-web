@@ -1,8 +1,9 @@
 import {Component, OnInit, OnDestroy} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {Subscription} from 'rxjs';
+import {Subscription, Subject} from 'rxjs';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {NzNotificationService} from 'ng-zorro-antd/notification';
+import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
 
 import {ProductsWarehouseService} from '../../shared/services/products-warehouse.service';
 import {ProductsService} from '../../shared/services/products.service';
@@ -27,9 +28,11 @@ export class WarehouseInventoryComponent implements OnInit, OnDestroy {
   inputClass = 'w-full rounded-[6px] text-[16px] dark:bg-white/10 px-[16px] py-[12px] min-h-[50px] outline-none';
 
   // Productos para el modal
-  allProducts: Product[] = [];
-  filteredProducts: Product[] = [];
+  products: Product[] = [];
   isLoadingProducts = false;
+
+  // Búsqueda de productos
+  private productSearchSubject = new Subject<string>();
 
   private subscription: Subscription = new Subscription();
 
@@ -50,6 +53,7 @@ export class WarehouseInventoryComponent implements OnInit, OnDestroy {
     });
     this.subscribeToProducts();
     this.initInventoryForm();
+    this.setupProductSearch();
     this.loadAllProducts();
   }
 
@@ -109,10 +113,10 @@ export class WarehouseInventoryComponent implements OnInit, OnDestroy {
 
   loadAllProducts(): void {
     this.isLoadingProducts = true;
-    this.productsServiceAll.getProducts().subscribe({
-      next: (products) => {
-        this.allProducts = products;
-        this.filteredProducts = products;
+    // Cargar productos iniciales sin filtro
+    this.productsServiceAll.getProductsPaginated(1, true, '').subscribe({
+      next: (response) => {
+        this.products = response.products || [];
         this.isLoadingProducts = false;
       },
       error: (error) => {
@@ -122,15 +126,36 @@ export class WarehouseInventoryComponent implements OnInit, OnDestroy {
     });
   }
 
-  onProductSearch(searchTerm: string): void {
-    if (!searchTerm || searchTerm.trim() === '') {
-      this.filteredProducts = this.allProducts;
-      return;
-    }
+  setupProductSearch(): void {
+    const searchSubscription = this.productSearchSubject
+      .pipe(
+        debounceTime(500),
+        distinctUntilChanged() // Solo emitir si el valor cambió
+      )
+      .subscribe(searchTerm => {
+        this.searchProducts(searchTerm);
+      });
 
-    this.filteredProducts = this.allProducts.filter(product =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    this.subscription.add(searchSubscription);
+  }
+
+  onProductSearch(searchTerm: string): void {
+    this.productSearchSubject.next(searchTerm);
+  }
+
+  searchProducts(searchTerm: string): void {
+    this.isLoadingProducts = true;
+
+    this.productsServiceAll.getProductsPaginated(1, true, searchTerm).subscribe({
+      next: (response) => {
+        this.products = response.products || [];
+        this.isLoadingProducts = false;
+      },
+      error: (error) => {
+        console.error('Error al buscar productos:', error);
+        this.isLoadingProducts = false;
+      }
+    });
   }
 
   showInventoryModal(): void {
