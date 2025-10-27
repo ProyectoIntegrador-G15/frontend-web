@@ -20,7 +20,7 @@
   </div>
 
   <!-- Tabla de rutas con estilos globales -->
-  <div *ngIf="!loading && !error" class="table-container">
+  <div *ngIf="!loading && !error && routes.length > 0" class="table-container">
     <table>
       <thead>
         <tr>
@@ -55,8 +55,19 @@
     </table>
   </div>
 
+  <!-- Empty State - Sin rutas -->
+  <div *ngIf="!loading && !error && routes.length === 0" class="empty-state">
+    <div class="empty-state-content">
+      <span nz-icon nzType="environment" nzTheme="outline" class="empty-icon"></span>
+      <h2 class="empty-title">No hay rutas registradas</h2>
+      <p class="empty-description">
+        Aún no hay rutas de entrega en el sistema.
+      </p>
+    </div>
+  </div>
+
   <!-- Paginador -->
-  <div class="flex justify-center mt-6">
+  <div *ngIf="routes.length > 0" class="flex justify-center mt-6">
     <nz-pagination [(nzPageIndex)]="currentPage" [nzTotal]="totalItems" [nzPageSize]="pageSize"
       [nzShowSizeChanger]="false" [nzShowQuickJumper]="false">
     </nz-pagination>
