@@ -20,7 +20,6 @@ export class Login1Component {
 
   submitForm(): void {
     if (this.validateForm.valid) {
-      console.log('submit', this.validateForm.value);
       this.router.navigate(['/dashboard/blank-page']).then(() => {
         window.location.reload();
       });

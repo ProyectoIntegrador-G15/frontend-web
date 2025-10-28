@@ -4,6 +4,7 @@ import { Location } from '@angular/common';
 import { OrdersService, Order } from '../../shared/services/orders.service';
 import { RoutesService, CreateRouteRequest } from '../../shared/services/routes.service';
 import { SnackService } from '../../shared/services/snack.service';
+import { TranslateService } from '@ngx-translate/core';
 
 // Interfaz para órdenes con selección
 export interface SelectableOrder extends Order {
@@ -16,7 +17,7 @@ export interface SelectableOrder extends Order {
   styleUrls: ['./create-route.component.scss']
 })
 export class CreateRouteComponent implements OnInit {
-  
+
   // Pedidos pendientes para la tabla
   pendingOrders: SelectableOrder[] = [];
 
@@ -40,7 +41,8 @@ export class CreateRouteComponent implements OnInit {
     private location: Location,
     private ordersService: OrdersService,
     private routesService: RoutesService,
-    private snackService: SnackService
+    private snackService: SnackService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -79,7 +81,7 @@ export class CreateRouteComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading orders:', error);
-        this.error = 'No se pudieron cargar los pedidos pendientes. Por favor, intente nuevamente.';
+        this.error = this.translateService.instant('createRoute.loadingError');
         this.isLoading = false;
         this.showContent = false;
       }
@@ -116,16 +118,16 @@ export class CreateRouteComponent implements OnInit {
 
   generateRoute(): void {
     const selectedOrders = this.pendingOrders.filter(order => order.selected);
-    
+
     // Validar que haya al menos un pedido seleccionado
     if (selectedOrders.length === 0) {
-      alert('Por favor, selecciona al menos un pedido para generar la ruta.');
+      alert(this.translateService.instant('createRoute.selectOrdersError'));
       return;
     }
 
     // Validar que haya una fecha seleccionada
     if (!this.selectedDate) {
-      alert('Por favor, selecciona una fecha para la ruta.');
+      alert(this.translateService.instant('createRoute.selectDateError'));
       return;
     }
 
@@ -142,19 +144,18 @@ export class CreateRouteComponent implements OnInit {
     // Llamar al servicio para crear la ruta
     this.routesService.createRoute(routeData).subscribe({
       next: (response) => {
-        console.log('Ruta creada exitosamente:', response);
         this.isLoading = false;
         // Mostrar snack de éxito con el ID de la ruta
-        this.snackService.success(`¡Ruta #${response.id} generada exitosamente!`);
+        this.snackService.success(this.translateService.instant('createRoute.routeCreatedSuccess', { id: response.id }));
         // Redirigir a la lista de rutas
         this.router.navigate(['/dashboard/routes']);
       },
       error: (error) => {
         console.error('Error al crear la ruta:', error);
-        this.error = error.message || 'No se pudo generar la ruta. Por favor, intente nuevamente.';
+        this.error = error.message || this.translateService.instant('createRoute.routeCreatedError');
         this.isLoading = false;
         // Mostrar snack de error
-        this.snackService.error('Error al generar la ruta: ' + this.error);
+        this.snackService.error(this.translateService.instant('createRoute.routeError', { error: this.error }));
       }
     });
   }
@@ -180,7 +181,7 @@ export class CreateRouteComponent implements OnInit {
     // Obtener la fecha de hoy sin la hora
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     // Deshabilitar si la fecha es anterior a hoy
     return current < today;
   }
