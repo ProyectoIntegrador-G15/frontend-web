@@ -1,22 +1,23 @@
-import { Component } from '@angular/core'
-import { FormBuilder, FormGroup, UntypedFormGroup, Validators } from '@angular/forms';
-import  socialIcons  from './../../../assets/data/pages/social-items.json';
-import { Router } from '@angular/router';
-import { Location } from '@angular/common';
+import {Component} from '@angular/core'
+import {FormBuilder, FormGroup, UntypedFormGroup, Validators} from '@angular/forms';
+import {Router} from '@angular/router';
+import {Location} from '@angular/common';
 
 @Component({
-    templateUrl: './login-1.component.html'
+  templateUrl: './login-1.component.html'
 })
 
 export class Login1Component {
-  loginForm: FormGroup;
   isLoading = false;
   error = false;
-  socialMediaButtons = socialIcons.socialMediaButtons;
+
+  passwordVisible = false;
+  password?: string;
 
   validateForm!: UntypedFormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router, private location: Location) {}
+  constructor(private fb: FormBuilder, private router: Router, private location: Location) {
+  }
 
   submitForm(): void {
     if (this.validateForm.valid) {
@@ -27,21 +28,11 @@ export class Login1Component {
       Object.values(this.validateForm.controls).forEach((control) => {
         if (control.invalid) {
           control.markAsDirty();
-          control.updateValueAndValidity({ onlySelf: true });
+          control.updateValueAndValidity({onlySelf: true});
         }
       });
     }
   }
-
-  updateConfirmValidator(): void {
-    /** wait for refresh value */
-    Promise.resolve().then(() =>
-      this.validateForm.controls.checkPassword.updateValueAndValidity()
-    );
-  }
-
-  passwordVisible = false;
-  password?: string;
 
   ngOnInit(): void {
     this.validateForm = this.fb.group({
