@@ -1,0 +1,119 @@
+.language-selector {
+  position: relative;
+  display: inline-block;
+}
+
+.language-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  min-width: 200px;
+  width: 100%;
+}
+
+.language-btn:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.flag-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.flag-image {
+  width: 24px;
+  height: 18px;
+  object-fit: contain;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #fff;
+}
+
+.language-name {
+  font-weight: 500;
+  text-align: left;
+}
+
+.dropdown-arrow {
+  font-size: 10px;
+  transition: transform 0.2s ease;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 240px;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.language-option:hover {
+  background-color: #f5f5f5;
+}
+
+.language-option.active {
+  background-color: #e6f7ff;
+  color: #1890ff;
+}
+
+.check-icon {
+  font-size: 14px;
+  color: #1890ff;
+  flex-shrink: 0;
+}
+
+/* Dark mode support */
+:host-context(.dark) .language-btn {
+  background: #1f1f1f;
+  border-color: #434343;
+  color: #fff;
+}
+
+:host-context(.dark) .dropdown-menu {
+  background: #1f1f1f;
+  border-color: #434343;
+}
+
+:host-context(.dark) .language-option:hover {
+  background-color: #2f2f2f;
+}
+
+:host-context(.dark) .language-option.active {
+  background-color: #111b26;
+}

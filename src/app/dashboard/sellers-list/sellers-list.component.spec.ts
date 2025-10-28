@@ -1,18 +1,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { SellersListComponent } from './sellers-list.component';
 import { SellersService, Seller } from '../../shared/services/sellers.service';
+
+// Mock pipe for customTranslate
+@Pipe({ name: 'customTranslate' })
+class MockCustomTranslatePipe implements PipeTransform {
+  transform(key: string): string {
+    return key; // Return the key as the translation for testing
+  }
+}
 
 describe('SellersListComponent', () => {
   let component: SellersListComponent;
   let fixture: ComponentFixture<SellersListComponent>;
   let sellersService: jasmine.SpyObj<SellersService>;
   let router: Router;
+  let mockTranslateService: jasmine.SpyObj<TranslateService>;
 
   const mockSellers: Seller[] = [
     {
@@ -55,21 +65,27 @@ describe('SellersListComponent', () => {
 
   beforeEach(async () => {
     const sellersServiceSpy = jasmine.createSpyObj('SellersService', ['getSellers']);
+    const translateServiceSpy = jasmine.createSpyObj('TranslateService', ['instant']);
+
+    // Mock translateService.instant to return the key as the translation
+    translateServiceSpy.instant.and.callFake((key: string) => key);
 
     await TestBed.configureTestingModule({
-      declarations: [ SellersListComponent ],
+      declarations: [ SellersListComponent, MockCustomTranslatePipe ],
       imports: [
         RouterTestingModule,
         HttpClientTestingModule
       ],
       providers: [
-        { provide: SellersService, useValue: sellersServiceSpy }
+        { provide: SellersService, useValue: sellersServiceSpy },
+        { provide: TranslateService, useValue: translateServiceSpy }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
     sellersService = TestBed.inject(SellersService) as jasmine.SpyObj<SellersService>;
     router = TestBed.inject(Router);
+    mockTranslateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
 
     fixture = TestBed.createComponent(SellersListComponent);
     component = fixture.componentInstance;
@@ -128,7 +144,7 @@ describe('SellersListComponent', () => {
       component.loadSellers();
 
       expect(component.loading).toBe(false);
-      expect(component.error).toBe('No se pudieron cargar los vendedores. Por favor, intente nuevamente.');
+      expect(component.error).toBe('sellers.loadingError');
       expect(component.sellers).toEqual([]);
     });
 
@@ -239,19 +255,19 @@ describe('SellersListComponent', () => {
 
     describe('getStatusText', () => {
       it('should return "Activo" for active status', () => {
-        expect(component.getStatusText('active')).toBe('Activo');
+        expect(component.getStatusText('active')).toBe('sellers.statusActive');
       });
 
       it('should return "Inactivo" for inactive status', () => {
-        expect(component.getStatusText('inactive')).toBe('Inactivo');
+        expect(component.getStatusText('inactive')).toBe('sellers.statusInactive');
       });
 
       it('should return "Suspendido" for suspended status', () => {
-        expect(component.getStatusText('suspended')).toBe('Suspendido');
+        expect(component.getStatusText('suspended')).toBe('sellers.statusSuspended');
       });
 
       it('should return "Desconocido" for unknown status', () => {
-        expect(component.getStatusText('unknown')).toBe('Desconocido');
+        expect(component.getStatusText('unknown')).toBe('sellers.statusUnknown');
       });
     });
   });

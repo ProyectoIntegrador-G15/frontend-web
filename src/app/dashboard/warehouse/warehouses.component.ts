@@ -1,12 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-warehouses',
   templateUrl: 'warehouses.component.html',
 })
 export class WarehousesComponent implements OnInit {
-  constructor(private router: Router) {}
+  constructor(private router: Router, private translateService: TranslateService) {}
 
   listOfData: any[] = [
     {
@@ -74,11 +75,11 @@ export class WarehousesComponent implements OnInit {
   getStatusText(status: string): string {
     switch (status.toLowerCase()) {
       case 'operativa':
-        return 'Operativa';
+        return this.translateService.instant('warehouses.statusOperative');
       case 'mantenimiento':
-        return 'Mantenimiento';
+        return this.translateService.instant('warehouses.statusMaintenance');
       case 'cerrada':
-        return 'Cerrada';
+        return this.translateService.instant('warehouses.statusClosed');
       default:
         return status;
     }

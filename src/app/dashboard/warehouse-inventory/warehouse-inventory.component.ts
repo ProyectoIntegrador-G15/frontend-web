@@ -188,9 +188,6 @@ export class WarehouseInventoryComponent implements OnInit, OnDestroy {
   addInventoryToProduct(productId: string, inventoryData: any): void {
     this.productsServiceAll.addInventoryToProduct(productId, inventoryData).subscribe({
       next: (response) => {
-        console.log('=== INVENTARIO AGREGADO EXITOSAMENTE ===');
-        console.log('Respuesta del servidor:', response);
-
         this.isInventoryModalLoading = false;
         this.isInventoryModalVisible = false;
         this.resetInventoryForm();
