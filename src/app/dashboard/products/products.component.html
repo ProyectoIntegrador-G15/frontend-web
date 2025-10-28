@@ -7,15 +7,14 @@
   (nzOnCancel)="handleProductModalCancel()"
   nzWidth="75%"
 >
-  <ng-template #productModalTitle>Nuevo Producto</ng-template>
+  <ng-template #productModalTitle>{{ 'products.newProduct' | customTranslate }}</ng-template>
 
   <ng-template #productModalContent>
     <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="handleProductModalOk()">
       <nz-form-item>
         <nz-form-control [nzValidateStatus]="getFieldStatus('name')" [nzErrorTip]="getFieldError('name')">
-          <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">Nombre
-            del producto: <span class="text-red-500">*</span></nz-form-label>
-          <input class="{{inputClass}}" type="text" nz-input placeholder="Nombre del producto" formControlName="name">
+          <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">{{ 'products.productName' | customTranslate }}: <span class="text-red-500">*</span></nz-form-label>
+          <input class="{{inputClass}}" type="text" nz-input [placeholder]="'products.productNamePlaceholder' | customTranslate" formControlName="name">
         </nz-form-control>
       </nz-form-item>
 
@@ -105,12 +104,10 @@
 
   <ng-template #productModalFooter>
     <div class="flex justify-center gap-3 w-full">
-      <button class="btn-secondary" (click)="handleProductModalCancel()">
-        Cancelar
-      </button>
+      <button class="btn-secondary" (click)="handleProductModalCancel()">{{ 'common.cancel' | customTranslate }}</button>
       <button class="btn-primary" (click)="handleProductModalOk()" [nzLoading]="isProductModalLoading">
         <span nz-icon nzType="plus" nzTheme="outline"></span>
-        Crear Producto
+        {{ 'products.createProduct' | customTranslate }}
       </button>
     </div>
   </ng-template>
@@ -234,7 +231,7 @@
   </ng-template>
 </nz-modal>
 
-<h1 class="screen-title mb-6">Productos</h1>
+<h1 class="screen-title mb-6">{{ 'products.title' | customTranslate }}</h1>
 
 <div class="mb-[25px] mt-[4px]">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">

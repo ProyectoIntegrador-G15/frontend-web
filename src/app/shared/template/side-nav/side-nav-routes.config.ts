@@ -5,7 +5,7 @@ import {
 export const ROUTES: SideNavInterface[] = [
   {
     path: '/providers',
-    title: 'Proveedores',
+    title: 'navigation.providers',
     iconType: 'nzIcon',
     icon: 'car',
     iconTheme: 'outline',
@@ -13,7 +13,7 @@ export const ROUTES: SideNavInterface[] = [
   },
   {
     path: '/dashboard/products',
-    title: 'Productos',
+    title: 'navigation.products',
     iconType: 'nzIcon',
     icon: 'shop',
     iconTheme: 'outline',
@@ -21,7 +21,7 @@ export const ROUTES: SideNavInterface[] = [
   },
   {
     path: '/dashboard/sellers',
-    title: 'Vendedores',
+    title: 'navigation.sellers',
     iconType: 'nzIcon',
     icon: 'dollar',
     iconTheme: 'outline',
@@ -29,7 +29,7 @@ export const ROUTES: SideNavInterface[] = [
   },
   {
     path: '/dashboard/reports',
-    title: 'Reportes',
+    title: 'navigation.reports',
     iconType: 'nzIcon',
     icon: 'bar-chart',
     iconTheme: 'outline',
@@ -37,7 +37,7 @@ export const ROUTES: SideNavInterface[] = [
   },
   {
     path: '/dashboard/warehouses',
-    title: 'Bodegas',
+    title: 'navigation.warehouses',
     iconType: 'nzIcon',
     icon: 'home',
     iconTheme: 'outline',
@@ -45,7 +45,7 @@ export const ROUTES: SideNavInterface[] = [
   },
   {
     path: '/dashboard/routes',
-    title: 'Rutas de Entrega',
+    title: 'navigation.routes',
     iconType: 'nzIcon',
     icon: 'environment',
     iconTheme: 'outline',
@@ -53,13 +53,13 @@ export const ROUTES: SideNavInterface[] = [
   },
   {
     path: '',
-    title: 'Dashboard',
+    title: 'navigation.dashboard',
     iconType: 'nzIcon',
     iconTheme: 'outline',
     icon: 'appstore-add',
     submenu: [{
       path: '/dashboard/blank-page',
-      title: 'Blank Page',
+      title: 'navigation.blankPage',
       iconType: '',
       icon: '',
       iconTheme: '',
@@ -69,13 +69,13 @@ export const ROUTES: SideNavInterface[] = [
   },
   {
     path: '',
-    title: 'Authentication',
+    title: 'navigation.authentication',
     iconType: 'nzIcon',
     iconTheme: 'outline',
     icon: 'lock',
     submenu: [{
       path: '/authentication/login-1',
-      title: 'Log In',
+      title: 'navigation.login',
       iconType: '',
       icon: '',
 
@@ -84,7 +84,7 @@ export const ROUTES: SideNavInterface[] = [
     },
       {
         path: '/authentication/sign-up-1',
-        title: 'Sign Up',
+        title: 'navigation.signup',
         iconType: '',
         icon: '',
 
@@ -93,7 +93,7 @@ export const ROUTES: SideNavInterface[] = [
       },
       {
         path: '/authentication/forget-pass',
-        title: 'Forget password',
+        title: 'navigation.forgotPassword',
         iconType: '',
         icon: '',
         iconTheme: '',

@@ -78,33 +78,7 @@
           </nz-dropdown-menu>
         </li>
         <li>
-          <a class="flex items-center" nz-dropdown [nzDropdownMenu]="popLanguage">
-            <nz-badge>
-              <img class="min-w-[20px] min-h-[20px]" src="assets/images/others/flags/english.png" alt="">
-            </nz-badge>
-          </a>
-          <nz-dropdown-menu #popLanguage="nzDropdownMenu">
-            <ul class="block bg-white dark:bg-[#1b1d2a] rounded-6">
-              <li class="bg-white dark:bg-white/10 hover:bg-primary/10 dark:hover:bg-primary/10">
-                <button class="flex items-center px-3 py-1.5 text-sm text-dark dark:text-white/60">
-                  <img class="w-3.5 h-3.5 me-2" src="assets/images/others/flags/english.png" alt="english">
-                  <span>English</span>
-                </button>
-              </li>
-              <li class="bg-white dark:bg-white/10 hover:bg-primary/10 dark:hover:bg-primary/10">
-                <button class="flex items-center px-3 py-1.5 text-sm text-dark dark:text-white/60">
-                  <img class="w-3.5 h-3.5 me-2" src="assets/images/others/flags/spanish.png" alt="spanish">
-                  <span>Spanish</span>
-                </button>
-              </li>
-              <li class="bg-white dark:bg-white/10 hover:bg-primary/10 dark:hover:bg-primary/10">
-                <button class="flex items-center px-3 py-1.5 text-sm text-dark dark:text-white/60">
-                  <img class="w-3.5 h-3.5 me-2" src="assets/images/others/flags/arabic.png" alt="arabic">
-                  <span>Arabic</span>
-                </button>
-              </li>
-            </ul>
-          </nz-dropdown-menu>
+          <app-language-selector></app-language-selector>
         </li>
         <li>
           <span class="flex items-center cursor-pointer text-light whitespace-nowrap" nz-dropdown [nzDropdownMenu]="profile">
