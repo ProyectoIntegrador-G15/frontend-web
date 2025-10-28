@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SellersService, Seller } from '../../shared/services/sellers.service';
+import { TranslateService } from '@ngx-translate/core';
 
 export interface SellerItem {
   id: string;
@@ -36,7 +37,8 @@ export class SellersListComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private sellersService: SellersService
+    private sellersService: SellersService,
+    private translateService: TranslateService
   ) { }
 
   ngOnInit(): void {
@@ -58,7 +60,7 @@ export class SellersListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading sellers:', error);
-        this.error = 'No se pudieron cargar los vendedores. Por favor, intente nuevamente.';
+        this.error = this.translateService.instant('sellers.loadingError');
         this.loading = false;
       }
     });
@@ -87,13 +89,13 @@ export class SellersListComponent implements OnInit {
   getStatusText(status: string): string {
     switch (status) {
       case 'active':
-        return 'Activo';
+        return this.translateService.instant('sellers.statusActive');
       case 'inactive':
-        return 'Inactivo';
+        return this.translateService.instant('sellers.statusInactive');
       case 'suspended':
-        return 'Suspendido';
+        return this.translateService.instant('sellers.statusSuspended');
       default:
-        return 'Desconocido';
+        return this.translateService.instant('sellers.statusUnknown');
     }
   }
 
