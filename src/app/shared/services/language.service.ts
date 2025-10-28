@@ -6,21 +6,62 @@ export interface Language {
   code: string;
   name: string;
   flag: string;
+  country: string;
+  locale: string;
+  flagImage: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class LanguageService {
-  private currentLanguageSubject = new BehaviorSubject<string>('es');
+  private currentLanguageSubject = new BehaviorSubject<string>('es-CO');
   public currentLanguage$ = this.currentLanguageSubject.asObservable();
 
   private readonly LANG_KEY = 'medisupply-language';
-  private readonly DEFAULT_LANG = 'es';
+  private readonly DEFAULT_LANG = 'es-CO';
 
   public readonly languages: Language[] = [
-    { code: 'es', name: 'Español', flag: '🇪🇸' },
-    { code: 'en', name: 'English', flag: '🇺🇸' }
+    { 
+      code: 'en-US', 
+      name: 'English', 
+      flag: '🇺🇸', 
+      country: 'Estados Unidos', 
+      locale: 'en-US',
+      flagImage: 'assets/images/others/flags/usa.svg'
+    },
+    { 
+      code: 'es-CO', 
+      name: 'Español', 
+      flag: '🇨🇴', 
+      country: 'Colombia', 
+      locale: 'es-CO',
+      flagImage: 'assets/images/others/flags/colombia.svg'
+    },
+    { 
+      code: 'es-PE', 
+      name: 'Español', 
+      flag: '🇵🇪', 
+      country: 'Perú', 
+      locale: 'es-PE',
+      flagImage: 'assets/images/others/flags/peru.svg'
+    },
+    { 
+      code: 'es-EC', 
+      name: 'Español', 
+      flag: '🇪🇨', 
+      country: 'Ecuador', 
+      locale: 'es-EC',
+      flagImage: 'assets/images/others/flags/ecuador.svg'
+    },
+    { 
+      code: 'es-MX', 
+      name: 'Español', 
+      flag: '🇲🇽', 
+      country: 'México', 
+      locale: 'es-MX',
+      flagImage: 'assets/images/others/flags/mexico.svg'
+    }
   ];
 
   constructor(private translateService: TranslateService) {
@@ -42,14 +83,20 @@ export class LanguageService {
 
   private getBrowserLanguage(): string {
     const browserLang = navigator.language || navigator.languages[0];
-
+    
     // Mapear idiomas del navegador a nuestros códigos
-    if (browserLang.startsWith('es')) {
-      return 'es';
-    } else if (browserLang.startsWith('en')) {
-      return 'en';
+    if (browserLang.startsWith('en')) {
+      return 'en-US';
+    } else if (browserLang.startsWith('es')) {
+      // Detectar país específico si es posible
+      if (browserLang.includes('CO')) return 'es-CO';
+      if (browserLang.includes('PE')) return 'es-PE';
+      if (browserLang.includes('EC')) return 'es-EC';
+      if (browserLang.includes('MX')) return 'es-MX';
+      // Por defecto Colombia si es español genérico
+      return 'es-CO';
     }
-
+    
     return this.DEFAULT_LANG;
   }
 
@@ -88,7 +135,8 @@ export class LanguageService {
 
   public toggleLanguage(): void {
     const currentLang = this.getCurrentLanguage();
-    const newLang = currentLang === 'es' ? 'en' : 'es';
-    this.setLanguage(newLang);
+    const currentIndex = this.languages.findIndex(lang => lang.code === currentLang);
+    const nextIndex = (currentIndex + 1) % this.languages.length;
+    this.setLanguage(this.languages[nextIndex].code);
   }
 }

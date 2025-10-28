@@ -64,7 +64,7 @@ registerLocaleData(es);
                         useFactory: HttpLoaderFactory,
                         deps: [HttpClient]
                     },
-                    defaultLanguage: 'es',
+                    defaultLanguage: 'es-CO',
                     useDefaultLang: true
                 })
     ],
