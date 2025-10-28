@@ -11,6 +11,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ThemeConstantService } from './services/theme-constant.service';
 import { SearchPipe } from './pipes/search.pipe';
 import { CustomTranslatePipe } from './pipes/custom-translate.pipe';
+import { CurrencyFormatPipe } from './pipes/currency.pipe';
+import { CurrencyPlaceholderPipe } from './pipes/currency-placeholder.pipe';
 import { LanguageSelectorComponent } from './components/language-selector/language-selector.component';
 
 @NgModule({
@@ -25,6 +27,8 @@ import { LanguageSelectorComponent } from './components/language-selector/langua
         TranslateModule,
         SearchPipe,
         CustomTranslatePipe,
+        CurrencyFormatPipe,
+        CurrencyPlaceholderPipe,
         LanguageSelectorComponent
     ],
     imports: [
@@ -39,6 +43,8 @@ import { LanguageSelectorComponent } from './components/language-selector/langua
     declarations: [
         SearchPipe,
         CustomTranslatePipe,
+        CurrencyFormatPipe,
+        CurrencyPlaceholderPipe,
         LanguageSelectorComponent
     ],
     providers: [

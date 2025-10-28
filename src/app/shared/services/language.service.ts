@@ -9,6 +9,11 @@ export interface Language {
   country: string;
   locale: string;
   flagImage: string;
+  currency: {
+    code: string;
+    symbol: string;
+    name: string;
+  };
 }
 
 @Injectable({
@@ -28,7 +33,12 @@ export class LanguageService {
       flag: '🇺🇸', 
       country: 'Estados Unidos', 
       locale: 'en-US',
-      flagImage: 'assets/images/others/flags/usa.svg'
+      flagImage: 'assets/images/others/flags/usa.svg',
+      currency: {
+        code: 'USD',
+        symbol: '$',
+        name: 'Dólar estadounidense'
+      }
     },
     { 
       code: 'es-CO', 
@@ -36,7 +46,12 @@ export class LanguageService {
       flag: '🇨🇴', 
       country: 'Colombia', 
       locale: 'es-CO',
-      flagImage: 'assets/images/others/flags/colombia.svg'
+      flagImage: 'assets/images/others/flags/colombia.svg',
+      currency: {
+        code: 'COP',
+        symbol: '$',
+        name: 'Peso colombiano'
+      }
     },
     { 
       code: 'es-PE', 
@@ -44,7 +59,12 @@ export class LanguageService {
       flag: '🇵🇪', 
       country: 'Perú', 
       locale: 'es-PE',
-      flagImage: 'assets/images/others/flags/peru.svg'
+      flagImage: 'assets/images/others/flags/peru.svg',
+      currency: {
+        code: 'PEN',
+        symbol: 'S/',
+        name: 'Sol peruano'
+      }
     },
     { 
       code: 'es-EC', 
@@ -52,7 +72,12 @@ export class LanguageService {
       flag: '🇪🇨', 
       country: 'Ecuador', 
       locale: 'es-EC',
-      flagImage: 'assets/images/others/flags/ecuador.svg'
+      flagImage: 'assets/images/others/flags/ecuador.svg',
+      currency: {
+        code: 'USD',
+        symbol: '$',
+        name: 'Dólar estadounidense'
+      }
     },
     { 
       code: 'es-MX', 
@@ -60,7 +85,12 @@ export class LanguageService {
       flag: '🇲🇽', 
       country: 'México', 
       locale: 'es-MX',
-      flagImage: 'assets/images/others/flags/mexico.svg'
+      flagImage: 'assets/images/others/flags/mexico.svg',
+      currency: {
+        code: 'MXN',
+        symbol: '$',
+        name: 'Peso mexicano'
+      }
     }
   ];
 
@@ -108,6 +138,11 @@ export class LanguageService {
 
       // Actualizar también el locale de ng-zorro
       this.updateNgZorroLocale(languageCode);
+      
+      // Forzar detección de cambios para pipes impuros
+      setTimeout(() => {
+        // Esto fuerza a Angular a detectar cambios en pipes impuros
+      }, 0);
     }
   }
 
@@ -131,6 +166,31 @@ export class LanguageService {
 
   public getAvailableLanguages(): Language[] {
     return [...this.languages];
+  }
+
+  public getCurrentCurrency(): { code: string; symbol: string; name: string } {
+    const currentLanguageInfo = this.getCurrentLanguageInfo();
+    return currentLanguageInfo.currency;
+  }
+
+  public formatPrice(price: number): string {
+    const currency = this.getCurrentCurrency();
+    const formattedPrice = new Intl.NumberFormat(this.getCurrentLanguageInfo().locale, {
+      style: 'currency',
+      currency: currency.code,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    }).format(price);
+    
+    return formattedPrice;
+  }
+
+  public getCurrencySymbol(): string {
+    return this.getCurrentCurrency().symbol;
+  }
+
+  public getCurrencyCode(): string {
+    return this.getCurrentCurrency().code;
   }
 
   public toggleLanguage(): void {

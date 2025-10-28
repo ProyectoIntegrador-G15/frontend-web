@@ -43,7 +43,12 @@ export class LanguageSelectorComponent implements OnInit {
     flag: '🇨🇴', 
     country: 'Colombia', 
     locale: 'es-CO',
-    flagImage: 'assets/images/others/flags/colombia.svg'
+    flagImage: 'assets/images/others/flags/colombia.svg',
+    currency: {
+      code: 'COP',
+      symbol: '$',
+      name: 'Peso colombiano'
+    }
   };
   currentLanguageCode: string = 'es-CO';
   availableLanguages: Language[] = [];

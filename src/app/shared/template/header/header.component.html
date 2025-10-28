@@ -56,28 +56,6 @@
     <ng-template #myTemplate>
       <ul class="flex items-center justify-end flex-auto mb-0 list-none ps-0 nav-right sm:gap-x-[25px] max-sm:gap-x-[15px] gap-y-[15px]">
         <li>
-          <a class="flex items-center" nz-dropdown [nzDropdownMenu]="popSettings">
-            <nz-badge>
-              <svg-icon src="assets/images/svg/settings.svg"></svg-icon>
-            </nz-badge>
-          </a>
-          <nz-dropdown-menu #popSettings="nzDropdownMenu">
-            <perfect-scrollbar class="lg:w-[700px] md:w-[300px] max-md:w-[230px] px-[15px] py-[12px] bg-white dark:bg-[#1b1e2b] shadow-[0_2px_8px_rgba(0,0,0,.15)] dark:shadow-[0_5px_30px_rgba(1,4,19,.60)] rounded-4">
-              <ul class="flex flex-wrap items-center md:[&>li]:flex-[50%] max-md:[&>li]:flex-[100%] max-h-[251px]">
-                <li *ngFor="let settings of appSettings">
-                  <figure class="flex items-start px-4 py-5 mb-0 hover:shadow-action dark:hover:shadow-[0_5px_30px_rgba(1,4,19,.60)]">
-                    <img class="h-fit me-4" src="assets/images/others/settings/{{ settings.source }}.png" alt="{{ settings.source }}">
-                    <figcaption>
-                      <h1 class="mb-0.5 -mt-1 text-[15px] font-medium capitalize text-dark dark:text-white/[.87]">{{ settings.label }}</h1>
-                      <p class="mb-0 text-theme-gray dark:text-white/60">{{ settings.des }} </p>
-                    </figcaption>
-                  </figure>
-                </li>
-              </ul>
-            </perfect-scrollbar>
-          </nz-dropdown-menu>
-        </li>
-        <li>
           <app-language-selector></app-language-selector>
         </li>
         <li>
