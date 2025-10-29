@@ -1,11 +1,13 @@
 import {Component, OnInit, OnDestroy} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Subscription} from 'rxjs';
+import {TranslateService} from '@ngx-translate/core';
 
 export interface Report {
   id: string;
   createdAt: string;
   reportMonth: string;
+  reportMonthNumber?: number;
   reportYear: number;
   generatedBy: string;
   status: 'completed' | 'processing' | 'failed';
@@ -19,19 +21,18 @@ export interface Report {
 })
 export class ReportsComponent implements OnInit, OnDestroy {
   reports: Report[] = [];
+  rawReportsData: any[] = [];
   isLoading = false;
   errorMessage = '';
 
-  // Paginación
   currentPage = 1;
   pageSize = 10;
   totalReports = 0;
 
-  // Modal de generar reporte
   isGenerateReportModalVisible = false;
   isGenerateReportModalLoading = false;
   generateReportForm: FormGroup;
-  
+
   availableYears: number[] = [];
   availableMonths: { value: number; label: string }[] = [];
   currentYear = new Date().getFullYear();
@@ -40,7 +41,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private translateService: TranslateService
   ) {
   }
 
@@ -49,6 +51,13 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this.generateAvailableYears();
     this.generateAvailableMonths(this.currentYear);
     this.initGenerateReportForm();
+
+    this.subscription.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.updateReportsTranslations();
+        this.generateAvailableMonths(this.currentYear);
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -57,13 +66,12 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
   private loadReports(): void {
     this.isLoading = true;
-    
-    // Datos mock para los reportes
-    const mockReports: Report[] = [
+
+    this.rawReportsData = [
       {
         id: 'RPT-001',
         createdAt: '2024-01-15T10:30:00Z',
-        reportMonth: 'Enero',
+        reportMonthNumber: 1, // Enero
         reportYear: 2024,
         generatedBy: 'Juan Pérez',
         status: 'completed',
@@ -72,7 +80,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       {
         id: 'RPT-002',
         createdAt: '2024-01-20T14:45:00Z',
-        reportMonth: 'Enero',
+        reportMonthNumber: 1, // Enero
         reportYear: 2024,
         generatedBy: 'María García',
         status: 'completed',
@@ -81,7 +89,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       {
         id: 'RPT-003',
         createdAt: '2024-02-01T09:15:00Z',
-        reportMonth: 'Febrero',
+        reportMonthNumber: 2, // Febrero
         reportYear: 2024,
         generatedBy: 'Carlos López',
         status: 'processing'
@@ -89,7 +97,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       {
         id: 'RPT-004',
         createdAt: '2024-02-05T16:20:00Z',
-        reportMonth: 'Febrero',
+        reportMonthNumber: 2, // Febrero
         reportYear: 2024,
         generatedBy: 'Ana Martínez',
         status: 'failed'
@@ -97,7 +105,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       {
         id: 'RPT-005',
         createdAt: '2024-02-10T11:30:00Z',
-        reportMonth: 'Febrero',
+        reportMonthNumber: 2, // Febrero
         reportYear: 2024,
         generatedBy: 'Luis Rodríguez',
         status: 'completed',
@@ -106,7 +114,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       {
         id: 'RPT-006',
         createdAt: '2024-02-15T13:45:00Z',
-        reportMonth: 'Febrero',
+        reportMonthNumber: 2, // Febrero
         reportYear: 2024,
         generatedBy: 'Sofia Herrera',
         status: 'completed',
@@ -115,7 +123,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       {
         id: 'RPT-007',
         createdAt: '2024-02-20T08:30:00Z',
-        reportMonth: 'Febrero',
+        reportMonthNumber: 2, // Febrero
         reportYear: 2024,
         generatedBy: 'Diego Morales',
         status: 'processing'
@@ -123,7 +131,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       {
         id: 'RPT-008',
         createdAt: '2024-02-25T15:10:00Z',
-        reportMonth: 'Febrero',
+        reportMonthNumber: 2, // Febrero
         reportYear: 2024,
         generatedBy: 'Elena Vargas',
         status: 'completed',
@@ -132,7 +140,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       {
         id: 'RPT-009',
         createdAt: '2024-03-01T12:00:00Z',
-        reportMonth: 'Marzo',
+        reportMonthNumber: 3, // Marzo
         reportYear: 2024,
         generatedBy: 'Roberto Silva',
         status: 'completed',
@@ -141,19 +149,31 @@ export class ReportsComponent implements OnInit, OnDestroy {
       {
         id: 'RPT-010',
         createdAt: '2024-03-05T17:30:00Z',
-        reportMonth: 'Marzo',
+        reportMonthNumber: 3, // Marzo
         reportYear: 2024,
         generatedBy: 'Carmen Ruiz',
         status: 'processing'
       }
     ];
 
-    // Simular carga asíncrona
     setTimeout(() => {
-      this.reports = mockReports;
-      this.totalReports = mockReports.length;
+      this.updateReportsTranslations();
+      this.totalReports = this.reports.length;
       this.isLoading = false;
     }, 1000);
+  }
+
+  private updateReportsTranslations(): void {
+    const monthKeys = [
+      'reports.months.january', 'reports.months.february', 'reports.months.march', 'reports.months.april',
+      'reports.months.may', 'reports.months.june', 'reports.months.july', 'reports.months.august',
+      'reports.months.september', 'reports.months.october', 'reports.months.november', 'reports.months.december'
+    ];
+
+    this.reports = this.rawReportsData.map(item => ({
+      ...item,
+      reportMonth: this.translateService.instant(monthKeys[item.reportMonthNumber - 1])
+    }));
   }
 
   onPageIndexChange(page: number): void {
@@ -173,34 +193,33 @@ export class ReportsComponent implements OnInit, OnDestroy {
   }
 
   generateAvailableMonths(selectedYear: number): void {
-    const monthNames = [
-      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    const monthKeys = [
+      'reports.months.january', 'reports.months.february', 'reports.months.march', 'reports.months.april',
+      'reports.months.may', 'reports.months.june', 'reports.months.july', 'reports.months.august',
+      'reports.months.september', 'reports.months.october', 'reports.months.november', 'reports.months.december'
     ];
 
     this.availableMonths = [];
-    
+
     const maxMonth = selectedYear === this.currentYear ? this.currentMonth : 12;
-    
+
     for (let i = 1; i <= maxMonth; i++) {
       this.availableMonths.push({
         value: i,
-        label: monthNames[i - 1]
+        label: this.translateService.instant(monthKeys[i - 1])
       });
     }
   }
 
   initGenerateReportForm(): void {
     this.generateReportForm = this.fb.group({
-      month: [this.currentMonth, [Validators.required]], 
+      month: [this.currentMonth, [Validators.required]],
       year: [this.currentYear, [Validators.required]]
     });
 
-    // Suscribirse a cambios en el año para actualizar los meses disponibles
     this.generateReportForm.get('year')?.valueChanges.subscribe((year) => {
       if (year) {
         this.generateAvailableMonths(year);
-        // Limpiar el mes seleccionado si ya no está disponible
         const currentMonth = this.generateReportForm.get('month')?.value;
         if (currentMonth && !this.availableMonths.some(m => m.value === currentMonth)) {
           this.generateReportForm.get('month')?.setValue(null);
@@ -217,7 +236,6 @@ export class ReportsComponent implements OnInit, OnDestroy {
   }
 
   handleGenerateReportModalOk(): void {
-    // Validar el formulario antes de proceder
     if (!this.validateGenerateReportFormFields()) {
       this.isGenerateReportModalLoading = false;
       return;
@@ -226,36 +244,37 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this.isGenerateReportModalLoading = true;
 
     const formData = this.generateReportForm.value;
-    const monthNames = [
-      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    const monthKeys = [
+      'reports.months.january', 'reports.months.february', 'reports.months.march', 'reports.months.april',
+      'reports.months.may', 'reports.months.june', 'reports.months.july', 'reports.months.august',
+      'reports.months.september', 'reports.months.october', 'reports.months.november', 'reports.months.december'
     ];
 
     const reportData = {
-      month: monthNames[formData.month - 1],
+      month: this.translateService.instant(monthKeys[formData.month - 1]),
       year: formData.year
     };
 
-    // Simular generación de reporte
     setTimeout(() => {
       this.isGenerateReportModalLoading = false;
       this.isGenerateReportModalVisible = false;
       this.resetGenerateReportForm();
 
       // Agregar nuevo reporte a la lista
-      const newReport: Report = {
+      const newReportData = {
         id: `RPT-${String(this.reports.length + 1).padStart(3, '0')}`,
         createdAt: new Date().toISOString(),
-        reportMonth: reportData.month,
-        reportYear: parseInt(reportData.year),
+        reportMonthNumber: formData.month,
+        reportYear: parseInt(formData.year),
         generatedBy: 'Usuario Actual', // TODO: Obtener del servicio de autenticación
         status: 'processing'
       };
 
-      this.reports.unshift(newReport);
+      this.rawReportsData.unshift(newReportData);
+      this.updateReportsTranslations();
       this.totalReports = this.reports.length;
 
-      alert(`Reporte generado para ${reportData.month} ${reportData.year}. El reporte está siendo procesado.`);
+      alert(this.translateService.instant('reports.reportGeneratedSuccess', { month: reportData.month, year: reportData.year }));
     }, 2000);
   }
 
@@ -286,7 +305,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
     const field = this.generateReportForm.get(fieldName);
     if (field && field.errors) {
       if (field.errors.required) {
-        return 'Este campo es obligatorio';
+        return this.translateService.instant('reports.requiredField');
       }
     }
     return '';
@@ -297,7 +316,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       // Simular descarga
       console.log(`Descargando reporte ${report.id}...`);
       // Aquí iría la lógica real de descarga
-      alert(`Descargando reporte ${report.id}`);
+      alert(this.translateService.instant('reports.downloadingReport', { id: report.id }));
     }
   }
 
@@ -317,13 +336,13 @@ export class ReportsComponent implements OnInit, OnDestroy {
   getStatusText(status: string): string {
     switch (status) {
       case 'completed':
-        return 'Completado';
+        return this.translateService.instant('reports.statusCompleted');
       case 'processing':
-        return 'Procesando';
+        return this.translateService.instant('reports.statusProcessing');
       case 'failed':
-        return 'Fallido';
+        return this.translateService.instant('reports.statusFailed');
       default:
-        return 'Desconocido';
+        return this.translateService.instant('reports.statusUnknown');
     }
   }
 
