@@ -664,10 +664,19 @@ describe('ProductsComponent - Specific Methods', () => {
 
   describe('downloadExcelTemplate', () => {
     it('should trigger download and show success message', () => {
-      spyOn(document, 'createElement').and.callThrough();
+      // Mock document.createElement para prevenir descargas reales
+      const mockLink = document.createElement('a') as HTMLAnchorElement;
+      const clickSpy = spyOn(mockLink, 'click').and.stub();
+      spyOn(document, 'createElement').and.returnValue(mockLink);
+      spyOn(document.body, 'appendChild').and.stub();
+      spyOn(document.body, 'removeChild').and.stub();
       
       component.downloadExcelTemplate();
 
+      expect(document.createElement).toHaveBeenCalledWith('a');
+      expect(mockLink.href).toContain('productos-template.xlsx');
+      expect(mockLink.download).toBe('productos-template.xlsx');
+      expect(clickSpy).toHaveBeenCalled();
       expect(messageService.success).toHaveBeenCalledWith(
         jasmine.stringContaining('productos-template.xlsx')
       );
@@ -676,8 +685,19 @@ describe('ProductsComponent - Specific Methods', () => {
 
   describe('downloadCsvTemplate', () => {
     it('should trigger download and show success message', () => {
+      // Mock document.createElement para prevenir descargas reales
+      const mockLink = document.createElement('a') as HTMLAnchorElement;
+      const clickSpy = spyOn(mockLink, 'click').and.stub();
+      spyOn(document, 'createElement').and.returnValue(mockLink);
+      spyOn(document.body, 'appendChild').and.stub();
+      spyOn(document.body, 'removeChild').and.stub();
+
       component.downloadCsvTemplate();
 
+      expect(document.createElement).toHaveBeenCalledWith('a');
+      expect(mockLink.href).toContain('productos-template.csv');
+      expect(mockLink.download).toBe('productos-template.csv');
+      expect(clickSpy).toHaveBeenCalled();
       expect(messageService.success).toHaveBeenCalledWith(
         jasmine.stringContaining('productos-template.csv')
       );
