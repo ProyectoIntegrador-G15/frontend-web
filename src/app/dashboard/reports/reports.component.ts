@@ -30,6 +30,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
   currentMonth = new Date().getMonth() + 1;
 
   private subscription: Subscription = new Subscription();
+  private reloadTimer: any = null;
 
   constructor(
     private fb: FormBuilder,
@@ -54,9 +55,13 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    if (this.reloadTimer) {
+      clearTimeout(this.reloadTimer);
+      this.reloadTimer = null;
+    }
   }
 
-  private loadReports(): void {
+  private loadReports(showSuccess: boolean = false): void {
     this.isLoading = true;
     this.errorMessage = '';
 
@@ -71,10 +76,16 @@ export class ReportsComponent implements OnInit, OnDestroy {
           this.totalReports = response.total;
           this.pageSize = response.page_size;
           this.isLoading = false;
+          if (showSuccess) {
+            this.notification.success(
+              this.translateService.instant('common.success'),
+              this.translateService.instant('reports.refreshSuccess')
+            );
+          }
         },
         error: (error) => {
           console.error('Error loading reports:', error);
-          this.errorMessage = 'Error al cargar los reportes.';
+          this.errorMessage = this.translateService.instant('reports.loadingError');
           this.isLoading = false;
           this.notification.error(
             this.translateService.instant('common.error'),
@@ -94,8 +105,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       reportMonthNumber: apiReport.month,
       reportYear: apiReport.year,
       generatedBy: `User ${apiReport.created_by}`,
-      status: this.mapStatus(apiReport.status),
-      downloadUrl: apiReport.report_url || undefined
+      status: this.mapStatus(apiReport.status)
     };
   }
 
@@ -116,6 +126,10 @@ export class ReportsComponent implements OnInit, OnDestroy {
   onPageIndexChange(page: number): void {
     this.currentPage = page;
     this.loadReports();
+  }
+
+  refreshReports(): void {
+    this.loadReports(true);
   }
 
   generateReport(): void {
@@ -187,7 +201,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
     const formData = this.generateReportForm.value;
     const reportData = {
       month: formData.month,
-      year: formData.year
+      year: formData.year,
+      created_by: 1,
     };
 
     const createReportSubscription = this.reportsService.createReport(reportData)
@@ -196,16 +211,23 @@ export class ReportsComponent implements OnInit, OnDestroy {
           this.isGenerateReportModalLoading = false;
           this.isGenerateReportModalVisible = false;
           this.resetGenerateReportForm();
-
-          // Recargar la lista de reportes
           this.loadReports();
+
+          if (this.reloadTimer) {
+            clearTimeout(this.reloadTimer);
+          }
+
+          this.reloadTimer = setTimeout(() => {
+            this.loadReports();
+            this.reloadTimer = null;
+          }, 3000);
 
           const monthName = this.getTranslatedMonthName(formData.month);
           this.notification.success(
             this.translateService.instant('common.success'),
-            this.translateService.instant('reports.reportGeneratedSuccess', { 
-              month: monthName, 
-              year: formData.year 
+            this.translateService.instant('reports.reportGeneratedSuccess', {
+              month: monthName,
+              year: formData.year
             })
           );
         },
@@ -266,19 +288,36 @@ export class ReportsComponent implements OnInit, OnDestroy {
   }
 
   downloadReport(report: Report): void {
-    if (report.status === 'completed' && report.downloadUrl) {
-      // Abrir la URL del reporte en una nueva pestaña
-      window.open(report.downloadUrl, '_blank');
-      this.notification.success(
-        'Descarga iniciada',
-        `Descargando reporte ${report.id}...`
-      );
-    } else {
+    if (report.status !== 'completed') {
       this.notification.warning(
-        'No disponible',
-        'El reporte aún no está disponible para descarga.'
+        this.translateService.instant('common.warning'),
+        this.translateService.instant('reports.notAvailableDownload')
       );
+      return;
     }
+
+    this.reportsService.getReportDownloadUrl(Number(report.id)).subscribe({
+      next: (resp) => {
+        if (resp && resp.download_url) {
+          window.open(resp.download_url, '_blank');
+          this.notification.success(
+            this.translateService.instant('common.success'),
+            this.translateService.instant('reports.downloadStarted')
+          );
+        } else {
+          this.notification.error(
+            this.translateService.instant('common.error'),
+            this.translateService.instant('reports.downloadUrlError')
+          );
+        }
+      },
+      error: () => {
+        this.notification.error(
+          this.translateService.instant('common.error'),
+          this.translateService.instant('reports.generateDownloadUrlError')
+        );
+      }
+    });
   }
 
   getStatusColor(status: string): string {
@@ -326,14 +365,47 @@ export class ReportsComponent implements OnInit, OnDestroy {
     }
   }
 
+  private getLocaleTimeZone(locale: string): string {
+    const map: Record<string, string> = {
+      'es-CO': 'America/Bogota',
+      'es-MX': 'America/Mexico_City',
+      'es-PE': 'America/Lima',
+      'es-EC': 'America/Guayaquil',
+      'en-US': 'America/New_York'
+    };
+    return map[locale] || 'UTC';
+  }
+
+  private ensureUtcDate(dateString: string): Date {
+    const hasZone = /Z$|[\+\-]\d{2}:?\d{2}$/.test(dateString);
+    const isoString = hasZone ? dateString : `${dateString}Z`;
+    return new Date(isoString);
+  }
+
   formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-CO', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    const locale = this.translateService.currentLang || 'es-CO';
+    const timeZone = this.getLocaleTimeZone(locale);
+    const date = this.ensureUtcDate(dateString);
+
+    try {
+      const formatter = new Intl.DateTimeFormat(locale, {
+        timeZone,
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      return formatter.format(date);
+    } catch (_) {
+      // Fallback
+      return date.toLocaleDateString(locale, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
   }
 }

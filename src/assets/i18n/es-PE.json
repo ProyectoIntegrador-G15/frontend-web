@@ -13,7 +13,8 @@
     "yes": "Sí",
     "no": "No",
     "active": "Activo",
-    "inactive": "Inactivo"
+    "inactive": "Inactivo",
+    "warning": "Advertencia"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -184,7 +185,13 @@
     "reportGeneratedSuccess": "Reporte generado para {{month}} {{year}}. El reporte está siendo procesado.",
     "reportCreatedError": "No se pudo generar el reporte. Por favor, inténtalo de nuevo.",
     "loadingError": "No se pudieron cargar los reportes. Por favor, inténtalo de nuevo.",
-    "downloadingReport": "Descargando reporte {{id}}",
+    "refresh": "Refrescar",
+    "refreshList": "Actualizar lista",
+    "refreshSuccess": "Lista de reportes actualizada",
+    "downloadingReport": "Descargando reporte...",
+    "downloadStarted": "Descarga iniciada",
+    "downloadUrlError": "No se pudo obtener la URL de descarga.",
+    "generateDownloadUrlError": "No se pudo generar la URL de descarga.",
     "months": {
       "january": "Enero",
       "february": "Febrero",

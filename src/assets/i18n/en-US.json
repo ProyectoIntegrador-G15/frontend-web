@@ -13,7 +13,8 @@
     "yes": "Yes",
     "no": "No",
     "active": "Active",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "warning": "Warning"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -184,7 +185,13 @@
     "reportGeneratedSuccess": "Report generated for {{month}} {{year}}. The report is being processed.",
     "reportCreatedError": "Could not generate the report. Please try again.",
     "loadingError": "Could not load reports. Please try again.",
-    "downloadingReport": "Downloading report {{id}}",
+    "refresh": "Refresh",
+    "refreshList": "Refresh list",
+    "refreshSuccess": "Reports list updated",
+    "downloadingReport": "Downloading report...",
+    "downloadStarted": "Download started",
+    "downloadUrlError": "Could not get the download URL.",
+    "generateDownloadUrlError": "Could not generate the download URL.",
     "months": {
       "january": "January",
       "february": "February",

@@ -1,6 +1,6 @@
 import {Injectable, inject} from '@angular/core';
 import {Observable, BehaviorSubject} from 'rxjs';
-import {map, catchError} from 'rxjs/operators';
+import {catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 
 import {ApiService} from './api/api.service';
@@ -13,9 +13,8 @@ export interface ReportApiResponse {
   year: number;
   created_by: number;
   status: string;
-  report_url: string | null;
   created_at: string;
-  updated_at: string;
+  completed_at?: string | null;
 }
 
 export interface Report {
@@ -57,15 +56,11 @@ export class ReportsService {
       .pipe(catchError(this.handleError));
   }
 
-  createReport(reportData: { month: number; year: number }): Observable<ReportApiResponse> {
-    return this.apiService.postDirect<ReportApiResponse>(this.endpointsService.getEndpointPath('reports'), reportData)
-      .pipe(
-        map(response => {
-          this.refreshReports();
-          return response;
-        }),
-        catchError(this.handleError)
-      );
+  createReport(reportData: { month: number; year: number; created_by: number }): Observable<ReportApiResponse> {
+    reportData.created_by = 1;
+    return this.apiService.postDirect<ReportApiResponse>(
+      `${this.endpointsService.getEndpointPath('reports')}/orders-by-seller`, reportData)
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -79,9 +74,14 @@ export class ReportsService {
       reportMonthNumber: apiReport.month,
       reportYear: apiReport.year,
       generatedBy: `User ${apiReport.created_by}`,
-      status: this.mapStatus(apiReport.status),
-      downloadUrl: apiReport.report_url || undefined
+      status: this.mapStatus(apiReport.status)
     };
+  }
+
+  getReportDownloadUrl(reportId: number): Observable<{ download_url: string; expires_in_minutes: number; report_id: number }>{
+    const url = `${this.endpointsService.getEndpointPath('reports')}/${reportId}/download`;
+    return this.apiService.getDirect<{ download_url: string; expires_in_minutes: number; report_id: number }>(url)
+      .pipe(catchError(this.handleError));
   }
 
   /**

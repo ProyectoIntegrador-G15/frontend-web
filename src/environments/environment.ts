@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'https://medisupply.hectorfranco.dev',
+  apiUrl: 'http://localhost:3006',
   apiEndpoints: {
     orders: '/orders',
     customers: '/customers',
