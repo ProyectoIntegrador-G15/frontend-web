@@ -173,6 +173,7 @@
     "statusCompleted": "Completed",
     "statusProcessing": "Processing",
     "statusFailed": "Failed",
+    "statusPending": "Pending",
     "statusUnknown": "Unknown",
     "monthReport": "Report Month",
     "yearReport": "Report Year",
@@ -181,6 +182,8 @@
     "cancel": "Cancel",
     "requiredField": "This field is required",
     "reportGeneratedSuccess": "Report generated for {{month}} {{year}}. The report is being processed.",
+    "reportCreatedError": "Could not generate the report. Please try again.",
+    "loadingError": "Could not load reports. Please try again.",
     "downloadingReport": "Downloading report {{id}}",
     "months": {
       "january": "January",

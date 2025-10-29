@@ -20,12 +20,12 @@
               </nz-form-label>
               <nz-select
                 class="w-full"
-                [nzPlaceHolder]="'reports.selectMonth' | customTranslate" 
-                nzAllowClear 
+                [nzPlaceHolder]="'reports.selectMonth' | customTranslate"
+                nzAllowClear
                 formControlName="month">
-                <nz-option 
-                  *ngFor="let month of availableMonths" 
-                  [nzValue]="month.value" 
+                <nz-option
+                  *ngFor="let month of availableMonths"
+                  [nzValue]="month.value"
                   [nzLabel]="month.label">
                 </nz-option>
               </nz-select>
@@ -40,12 +40,12 @@
               </nz-form-label>
               <nz-select
                 class="w-full"
-                [nzPlaceHolder]="'reports.selectYear' | customTranslate" 
-                nzAllowClear 
+                [nzPlaceHolder]="'reports.selectYear' | customTranslate"
+                nzAllowClear
                 formControlName="year">
-                <nz-option 
-                  *ngFor="let year of availableYears" 
-                  [nzValue]="year" 
+                <nz-option
+                  *ngFor="let year of availableYears"
+                  [nzValue]="year"
                   [nzLabel]="year.toString()">
                 </nz-option>
               </nz-select>
@@ -58,8 +58,11 @@
 
   <ng-template #generateReportModalFooter>
     <div class="flex justify-center gap-3 w-full">
-      <button class="btn-secondary-sm" (click)="handleGenerateReportModalCancel()">{{ 'reports.cancel' | customTranslate }}</button>
-      <button class="btn-primary-sm" (click)="handleGenerateReportModalOk()" [nzLoading]="isGenerateReportModalLoading">
+      <button class="btn-secondary-sm"
+              (click)="handleGenerateReportModalCancel()">{{ 'reports.cancel' | customTranslate }}
+      </button>
+      <button class="btn-primary-sm" (click)="handleGenerateReportModalOk()" [nzLoading]="isGenerateReportModalLoading"
+              [disabled]="isGenerateReportModalLoading">
         <span nz-icon nzType="file-text" nzTheme="outline"></span>
         {{ 'reports.generateReport' | customTranslate }}
       </button>
