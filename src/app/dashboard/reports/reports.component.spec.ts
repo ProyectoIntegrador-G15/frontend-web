@@ -73,15 +73,14 @@ describe('ReportsComponent', () => {
 
     const reportsServiceSpy = jasmine.createSpyObj('ReportsService', [
       'getReportsPaginated',
-      'createReport',
-      'getReportDownloadUrl'
+      'createReport'
     ]);
 
     const notificationSpy = jasmine.createSpyObj('NzNotificationService', ['success', 'error', 'warning']);
 
     // Mock window.open para prevenir descargas reales durante los tests
     windowOpenSpy = spyOn(window, 'open').and.returnValue(null);
-    
+
     // Mock document.createElement para prevenir descargas de archivos estáticos
     // Esto previene que métodos como downloadStaticFile de otros componentes ejecuten descargas reales
     const originalCreateElement = document.createElement.bind(document);
@@ -96,7 +95,7 @@ describe('ReportsComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      declarations: [ 
+      declarations: [
         ReportsComponent,
         MockCustomTranslatePipe
       ],
@@ -155,11 +154,11 @@ describe('ReportsComponent', () => {
   describe('ngOnDestroy', () => {
     it('should clean up subscriptions and timer', () => {
       (component as any).reloadTimer = setTimeout(() => {}, 1000);
-      spyOn(component['subscription'], 'unsubscribe');
+      spyOn((component as any).subscription, 'unsubscribe');
 
       component.ngOnDestroy();
 
-      expect(component['subscription'].unsubscribe).toHaveBeenCalled();
+      expect((component as any).subscription.unsubscribe).toHaveBeenCalled();
       expect((component as any).reloadTimer).toBeNull();
     });
 
@@ -341,7 +340,7 @@ describe('ReportsComponent', () => {
     it('should return translated month name', () => {
       mockTranslateService.instant.and.returnValue('Octubre');
 
-      const result = component['getTranslatedMonthName'](10);
+      const result = (component as any).getTranslatedMonthName(10);
 
       expect(result).toBe('Octubre');
       expect(mockTranslateService.instant).toHaveBeenCalledWith('reports.months.october');
@@ -433,45 +432,23 @@ describe('ReportsComponent', () => {
       component.downloadReport(report);
 
       expect(mockNotificationService.warning).toHaveBeenCalled();
-      expect(mockReportsService.getReportDownloadUrl).not.toHaveBeenCalled();
+      expect(windowOpenSpy).not.toHaveBeenCalled();
     });
 
-    it('should download report successfully', () => {
-      const mockDownloadResponse = {
-        download_url: 'https://storage.googleapis.com/bucket/reports/1/file.csv?signature=xyz',
-        expires_in_minutes: 60,
-        report_id: 1
-      };
+    it('should download report successfully using public URL', () => {
+      const report: Report = { ...mockReport, downloadUrl: 'https://storage.googleapis.com/bucket/reports/1/file.csv' };
 
-      mockReportsService.getReportDownloadUrl.and.returnValue(of(mockDownloadResponse));
+      component.downloadReport(report);
 
-      component.downloadReport(mockReport);
-
-      expect(mockReportsService.getReportDownloadUrl).toHaveBeenCalledWith(1);
-      // Verificar que window.open fue llamado con la URL correcta
-      // El spy está configurado para retornar null, evitando descargas reales
-      expect(windowOpenSpy).toHaveBeenCalledWith(mockDownloadResponse.download_url, '_blank');
+      expect(windowOpenSpy).toHaveBeenCalledWith(report.downloadUrl, '_blank');
       expect(windowOpenSpy.calls.first().returnValue).toBeNull();
       expect(mockNotificationService.success).toHaveBeenCalled();
     });
 
-    it('should handle error when download URL is empty', () => {
-      mockReportsService.getReportDownloadUrl.and.returnValue(
-        of({ download_url: '', expires_in_minutes: 0, report_id: 1 })
-      );
+    it('should handle error when download URL is missing', () => {
+      const report: Report = { ...mockReport, downloadUrl: undefined };
 
-      component.downloadReport(mockReport);
-
-      expect(mockNotificationService.error).toHaveBeenCalled();
-      expect(windowOpenSpy).not.toHaveBeenCalled();
-    });
-
-    it('should handle error when getting download URL fails', () => {
-      mockReportsService.getReportDownloadUrl.and.returnValue(
-        throwError(() => new Error('Network error'))
-      );
-
-      component.downloadReport(mockReport);
+      component.downloadReport(report);
 
       expect(mockNotificationService.error).toHaveBeenCalled();
       expect(windowOpenSpy).not.toHaveBeenCalled();
@@ -509,10 +486,10 @@ describe('ReportsComponent', () => {
     it('should return translated status text', () => {
     mockTranslateService.instant.and.returnValue('Completado');
 
-      const result = component.getStatusText('completed');
+    const result = component.getStatusText('completed');
 
-      expect(result).toBe('Completado');
-      expect(mockTranslateService.instant).toHaveBeenCalledWith('reports.statusCompleted');
+    expect(result).toBe('Completado');
+    expect(mockTranslateService.instant).toHaveBeenCalledWith('reports.statusCompleted');
     });
   });
 
@@ -577,31 +554,31 @@ describe('ReportsComponent', () => {
 
   describe('getLocaleTimeZone', () => {
     it('should return correct timezone for es-CO', () => {
-      expect(component['getLocaleTimeZone']('es-CO')).toBe('America/Bogota');
+      expect((component as any).getLocaleTimeZone('es-CO')).toBe('America/Bogota');
     });
 
     it('should return correct timezone for es-MX', () => {
-      expect(component['getLocaleTimeZone']('es-MX')).toBe('America/Mexico_City');
+      expect((component as any).getLocaleTimeZone('es-MX')).toBe('America/Mexico_City');
     });
 
     it('should return UTC for unknown locale', () => {
-      expect(component['getLocaleTimeZone']('unknown')).toBe('UTC');
+      expect((component as any).getLocaleTimeZone('unknown')).toBe('UTC');
     });
   });
 
   describe('ensureUtcDate', () => {
     it('should preserve date with timezone', () => {
-      const date = component['ensureUtcDate']('2025-10-30T10:00:00Z');
+      const date = (component as any).ensureUtcDate('2025-10-30T10:00:00Z');
       expect(date).toBeInstanceOf(Date);
     });
 
     it('should add Z to date without timezone', () => {
-      const date = component['ensureUtcDate']('2025-10-30T10:00:00');
+      const date = (component as any).ensureUtcDate('2025-10-30T10:00:00');
       expect(date).toBeInstanceOf(Date);
     });
 
     it('should handle date with offset', () => {
-      const date = component['ensureUtcDate']('2025-10-30T10:00:00+05:00');
+      const date = (component as any).ensureUtcDate('2025-10-30T10:00:00+05:00');
       expect(date).toBeInstanceOf(Date);
     });
   });
