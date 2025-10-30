@@ -1,5 +1,6 @@
 
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthTokenInterceptor } from './shared/interceptors/auth-token.interceptor';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -77,7 +78,12 @@ registerLocaleData(es);
             provide: LocationStrategy,
             useClass: PathLocationStrategy
         },
-        ThemeConstantService
+        ThemeConstantService,
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthTokenInterceptor,
+            multi: true
+        }
     ],
     bootstrap: [AppComponent]
 })

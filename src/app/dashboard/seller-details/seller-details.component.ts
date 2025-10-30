@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
+import {SellersService} from '../../shared/services/sellers.service';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-seller-details',
@@ -28,15 +30,22 @@ export class SellerDetailsComponent implements OnInit {
     updated_at: "2024-12-01T00:00:00.000Z"
   };
 
+  sellerIdParam: string | null = null;
+
+  // Fecha actual
+  currentYear = new Date().getFullYear();
+  currentMonth = new Date().getMonth() + 1;
+
   // Datos de desempeño
   performanceData = {
-    startDate: new Date('2025-09-01'),
-    endDate: new Date('2025-10-01'),
+    startDate: new Date(),
+    endDate: new Date(),
     kpis: {
-      sales: 120000,
-      orders: 85,
-      clients: 62,
-      fulfillment: 95
+      total_revenue: 0,
+      total_orders: 0,
+      total_visits: 0,
+      units_compliance: 0,
+      revenue_compliance: 0,
     },
     topProducts: [
       {name: 'Mascarillas quirúrgicas', quantity: 320},
@@ -107,52 +116,74 @@ export class SellerDetailsComponent implements OnInit {
     ]
   };
 
-  constructor(private router: Router) {
+  loadingPerformance = false;
+
+  constructor(private router: Router, private sellersService: SellersService, private route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      this.sellerIdParam = params.get('id');
+      if (this.activeTab === 'desempeno') {
+        this.fetchPerformance();
+      }
+    });
+    // Inicializar inicio al primer día del mes actual y fin al mes actual
+    this.performanceData.startDate = new Date(this.currentYear, this.currentMonth - 1, 1);
+    this.performanceData.endDate = new Date(this.currentYear, this.currentMonth - 1, 1);
+    if (this.activeTab === 'desempeno') {
+      this.fetchPerformance();
+    }
   }
 
   switchTab(tab: string): void {
     this.activeTab = tab;
+    if (tab === 'desempeno') {
+      this.fetchPerformance();
+    }
   }
 
   goBack(): void {
-    this.router.navigate(['/dashboard/routes']);
+    this.router.navigate(['/dashboard/sellers']);
   }
 
   onStartDateChange(date: Date): void {
     this.performanceData.startDate = date;
-    // Aquí se podría hacer una llamada al backend para actualizar los datos
+    if (this.isMonthAfter(this.performanceData.startDate, this.performanceData.endDate)) {
+      this.performanceData.endDate = new Date(this.performanceData.startDate);
+    }
+    if (this.activeTab === 'desempeno') {
+      this.fetchPerformance();
+    }
   }
 
   onEndDateChange(date: Date): void {
     this.performanceData.endDate = date;
-    // Aquí se podría hacer una llamada al backend para actualizar los datos
+    if (this.isMonthAfter(this.performanceData.startDate, this.performanceData.endDate)) {
+      this.performanceData.startDate = new Date(this.performanceData.endDate);
+    }
+    if (this.activeTab === 'desempeno') {
+      this.fetchPerformance();
+    }
   }
 
   viewAllProducts(): void {
-    // Navegar a vista de todos los productos
     console.log('Ver todos los productos');
   }
 
   exportOrders(): void {
-    // Exportar pedidos a CSV/PDF
     console.log('Exportar pedidos');
   }
 
   onMonthChange(month: string): void {
     this.salesPlanData.selectedMonth = month;
-    // Aquí se podría hacer una llamada al backend para filtrar los planes por mes
   }
 
   createPlan(): void {
-    // Abrir modal o navegar para crear nuevo plan
     console.log('Crear nuevo plan de ventas');
   }
 
   generateRoute(): void {
-    // Navegar a generar nueva ruta
     this.router.navigate(['/dashboard/routes/create-route']);
   }
 
@@ -182,4 +213,66 @@ export class SellerDetailsComponent implements OnInit {
     }
   }
 
+  // Deshabilitar meses futuros en el DatePicker (modo mes)
+  disableFutureMonths = (current: Date): boolean => {
+    if (!current) return false;
+    const now = new Date();
+    const y = current.getFullYear();
+    const m = current.getMonth();
+    if (y > now.getFullYear()) return true;
+    if (y === now.getFullYear() && m > now.getMonth()) return true;
+    return false;
+  }
+
+  private formatDateYYYYMMDD(date: Date): string {
+    const d = new Date(date);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  private firstDayOfMonth(date: Date): Date {
+    const d = new Date(date);
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  }
+
+  private lastDayOfMonth(date: Date): Date {
+    const d = new Date(date);
+    return new Date(d.getFullYear(), d.getMonth() + 1, 0);
+  }
+
+  private isMonthAfter(a: Date, b: Date): boolean {
+    const ay = a.getFullYear();
+    const by = b.getFullYear();
+    const am = a.getMonth();
+    const bm = b.getMonth();
+    return ay > by || (ay === by && am > bm);
+  }
+
+  private fetchPerformance(): void {
+    const sellerId = this.sellerIdParam ?? this.sellerData.id;
+    const startMonthFirst = this.firstDayOfMonth(this.performanceData.startDate);
+    const endMonthLast = this.lastDayOfMonth(this.performanceData.endDate);
+    const start = this.formatDateYYYYMMDD(startMonthFirst);
+    const end = this.formatDateYYYYMMDD(endMonthLast);
+
+    this.loadingPerformance = true;
+    this.sellersService.getSellerPerformance(sellerId as any, start, end).subscribe({
+      next: (resp) => {
+        this.performanceData.kpis = {
+          total_revenue: resp.total_revenue ?? 0,
+          total_orders: resp.total_orders ?? 0,
+          total_visits: resp.total_visits ?? 0,
+          units_compliance: resp.units_compliance ?? 0,
+          revenue_compliance: resp.revenue_compliance ?? 0,
+        };
+        this.loadingPerformance = false;
+      },
+      error: (err) => {
+        console.error('Error fetching seller performance', err);
+        this.loadingPerformance = false;
+      }
+    });
+  }
 }

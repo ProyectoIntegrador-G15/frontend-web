@@ -123,27 +123,31 @@
 
         <!-- Tab Desempeño -->
         <div *ngIf="activeTab === 'desempeno'">
-          <h2 class="text-lg font-semibold mb-6 text-dark dark:text-white/[.87]">Desempeño de {{sellerData.name}}</h2>
+          <h2 class="text-lg font-semibold mb-6 text-dark dark:text-white/[.87]">{{ 'performance.title' | customTranslate }} {{sellerData.name}}</h2>
           
           <!-- Selectores de fecha -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div class="space-y-2">
-              <label class="text-sm font-medium text-dark dark:text-white/[.87]">Fecha de inicio</label>
+              <label class="text-sm font-medium text-dark dark:text-white/[.87]">{{ 'performance.startDate' | customTranslate }}</label>
               <nz-date-picker
                 [(ngModel)]="performanceData.startDate"
                 (ngModelChange)="onStartDateChange($event)"
-                nzFormat="dd/MM/yyyy"
-                nzPlaceHolder="Seleccionar fecha"
+                nzMode="month"
+                nzFormat="MM/yyyy"
+                [nzDisabledDate]="disableFutureMonths"
+                nzPlaceHolder="Seleccionar mes/año"
                 class="w-full">
               </nz-date-picker>
             </div>
             <div class="space-y-2">
-              <label class="text-sm font-medium text-dark dark:text-white/[.87]">Fecha de fin</label>
+              <label class="text-sm font-medium text-dark dark:text-white/[.87]">{{ 'performance.endDate' | customTranslate }}</label>
               <nz-date-picker
                 [(ngModel)]="performanceData.endDate"
                 (ngModelChange)="onEndDateChange($event)"
-                nzFormat="dd/MM/yyyy"
-                nzPlaceHolder="Seleccionar fecha"
+                nzMode="month"
+                nzFormat="MM/yyyy"
+                [nzDisabledDate]="disableFutureMonths"
+                nzPlaceHolder="Seleccionar mes/año"
                 class="w-full">
               </nz-date-picker>
             </div>
@@ -151,30 +155,61 @@
 
           <!-- KPIs -->
           <div class="mb-6">
-            <h3 class="text-md font-semibold mb-4 text-dark dark:text-white/[.87]">KPIs</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <h3 class="text-md font-semibold mb-4 text-dark dark:text-white/[.87]">{{ 'performance.kpis' | customTranslate }}</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <!-- Ventas realizadas -->
-              <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-                <h4 class="text-sm font-medium text-light dark:text-white/60 mb-2">Ventas realizadas</h4>
-                <p class="text-2xl font-bold text-dark dark:text-white/[.87]">${{performanceData.kpis.sales | number}}</p>
+              <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600 flex flex-col">
+                <h4 class="text-sm font-medium text-light dark:text-white/60 mb-2">{{ 'performance.salesDone' | customTranslate }}</h4>
+                <ng-container *ngIf="!loadingPerformance; else loadingKpi">
+                  <p class="text-2xl font-bold text-dark dark:text-white/[.87] mt-auto">${{performanceData.kpis.total_revenue | number:'1.0-0'}}</p>
+                </ng-container>
+                <ng-template #loadingKpi>
+                  <nz-skeleton class="mt-auto" [nzActive]="true" [nzTitle]="false" [nzParagraph]="{rows: 1, width: '80%'}"></nz-skeleton>
+                </ng-template>
               </div>
-              
-              <!-- Pedidos generados -->
-              <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-                <h4 class="text-sm font-medium text-light dark:text-white/60 mb-2">Pedidos generados</h4>
-                <p class="text-2xl font-bold text-dark dark:text-white/[.87]">{{performanceData.kpis.orders}}</p>
+
+              <!-- Órdenes generadas -->
+              <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600 flex flex-col">
+                <h4 class="text-sm font-medium text-light dark:text-white/60 mb-2">{{ 'performance.ordersGenerated' | customTranslate }}</h4>
+                <ng-container *ngIf="!loadingPerformance; else loadingKpi2">
+                  <p class="text-2xl font-bold text-dark dark:text-white/[.87] mt-auto">{{performanceData.kpis.total_orders}}</p>
+                </ng-container>
+                <ng-template #loadingKpi2>
+                  <nz-skeleton class="mt-auto" [nzActive]="true" [nzTitle]="false" [nzParagraph]="{rows: 1, width: '60%'}"></nz-skeleton>
+                </ng-template>
               </div>
-              
-              <!-- Clientes atendidos -->
-              <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-                <h4 class="text-sm font-medium text-light dark:text-white/60 mb-2">Clientes atendidos</h4>
-                <p class="text-2xl font-bold text-dark dark:text-white/[.87]">{{performanceData.kpis.clients}}</p>
+
+              <!-- Visitas realizadas -->
+              <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600 flex flex-col">
+                <h4 class="text-sm font-medium text-light dark:text-white/60 mb-2">{{ 'performance.visitsDone' | customTranslate }}</h4>
+                <ng-container *ngIf="!loadingPerformance; else loadingKpi3">
+                  <p class="text-2xl font-bold text-dark dark:text-white/[.87] mt-auto">{{performanceData.kpis.total_visits}}</p>
+                </ng-container>
+                <ng-template #loadingKpi3>
+                  <nz-skeleton class="mt-auto" [nzActive]="true" [nzTitle]="false" [nzParagraph]="{rows: 1, width: '60%'}"></nz-skeleton>
+                </ng-template>
               </div>
-              
-              <!-- % de cumplimiento -->
-              <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-                <h4 class="text-sm font-medium text-light dark:text-white/60 mb-2">% de cumplimiento</h4>
-                <p class="text-2xl font-bold text-dark dark:text-white/[.87]">{{performanceData.kpis.fulfillment}}%</p>
+
+              <!-- % cumplimiento unidades -->
+              <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600 flex flex-col">
+                <h4 class="text-sm font-medium text-light dark:text-white/60 mb-2">{{ 'performance.unitsCompliance' | customTranslate }}</h4>
+                <ng-container *ngIf="!loadingPerformance; else loadingKpi4">
+                  <p class="text-2xl font-bold text-dark dark:text-white/[.87] mt-auto">{{performanceData.kpis.units_compliance}}%</p>
+                </ng-container>
+                <ng-template #loadingKpi4>
+                  <nz-skeleton class="mt-auto" [nzActive]="true" [nzTitle]="false" [nzParagraph]="{rows: 1, width: '70%'}"></nz-skeleton>
+                </ng-template>
+              </div>
+
+              <!-- % cumplimiento ingresos -->
+              <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600 flex flex-col">
+                <h4 class="text-sm font-medium text-light dark:text-white/60 mb-2">{{ 'performance.revenueCompliance' | customTranslate }}</h4>
+                <ng-container *ngIf="!loadingPerformance; else loadingKpi5">
+                  <p class="text-2xl font-bold text-dark dark:text-white/[.87] mt-auto">{{performanceData.kpis.revenue_compliance}}%</p>
+                </ng-container>
+                <ng-template #loadingKpi5>
+                  <nz-skeleton class="mt-auto" [nzActive]="true" [nzTitle]="false" [nzParagraph]="{rows: 1, width: '70%'}"></nz-skeleton>
+                </ng-template>
               </div>
             </div>
           </div>
@@ -182,11 +217,11 @@
           <!-- Productos más vendidos -->
           <div class="mb-6">
             <div class="flex justify-between items-center mb-4">
-              <h3 class="text-md font-semibold text-dark dark:text-white/[.87]">Productos más vendidos</h3>
+              <h3 class="text-md font-semibold text-dark dark:text-white/[.87]">{{ 'performance.topProducts' | customTranslate }}</h3>
               <button 
                 (click)="viewAllProducts()"
                 class="px-4 py-2 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors duration-200">
-                Ver todos los productos
+                {{ 'performance.viewAllProducts' | customTranslate }}
               </button>
             </div>
             <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
@@ -202,23 +237,6 @@
                   <span class="text-sm text-light dark:text-white/60">{{product.quantity}} unidades</span>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <!-- Detalle de pedidos -->
-          <div>
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-md font-semibold text-dark dark:text-white/[.87]">Detalle de pedidos</h3>
-              <button 
-                (click)="exportOrders()"
-                class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors duration-200">
-                Exportar CSV/PDF
-              </button>
-            </div>
-            <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-              <p class="text-light dark:text-white/60 text-center py-8">
-                Aquí se mostrará la tabla detallada de pedidos
-              </p>
             </div>
           </div>
         </div>

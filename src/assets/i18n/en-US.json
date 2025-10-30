@@ -162,5 +162,20 @@
     "spanish": "Spanish",
     "english": "English",
     "selectLanguage": "Select language"
+  },
+  "performance": {
+    "title": "Performance of",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "kpis": "KPIs",
+    "salesDone": "Sales",
+    "ordersGenerated": "Orders generated",
+    "visitsDone": "Visits",
+    "unitsCompliance": "% units compliance",
+    "revenueCompliance": "% revenue compliance",
+    "topProducts": "Top products",
+    "viewAllProducts": "View all products",
+    "ordersDetail": "Orders detail",
+    "export": "Export CSV/PDF"
   }
 }
