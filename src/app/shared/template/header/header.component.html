@@ -1,9 +1,9 @@
 
 <div class="border-b header border-[#edf2f9] dark:border-none bg-white dark:bg-[#323540] min-h-[72px] fixed top-0 w-full z-[1000] flex">
-  <div class="border-r border-[#edf2f9] dark:border-transparent logo logo-dark transition duration-200 ease-in-out items-center h-[71px]">
-    <a class="block text-center" href="">
-      <img id="logo-img" class="ps-[30px]" src="assets/images/logo/logo-dark.png" alt="Logo">
-      <img id="logo-fold-img" class="p-[24px] logo-fold" src="assets/images/logo/logo-fold.png" alt="Logo">
+  <div class="border-r border-[#edf2f9] dark:border-transparent logo logo-dark transition duration-200 ease-in-out flex items-center justify-center h-[71px]">
+    <a class="block" href="">
+      <img id="logo-img" style="width: 160px; height: 34px; object-fit: contain;" src="assets/images/logo/logo-dark.svg" alt="Logo">
+      <img id="logo-fold-img" class="logo-fold" style="width: 34px; height: 34px;" src="assets/images/logo/logo-fold.svg" alt="Logo">
     </a>
   </div>
   <div class="flex flex-1 nav-wrap md:ps-[20px] md:pe-[30px] ps-[10px] pe-[15px] bg-white dark:bg-[#1b1d2a]">
@@ -56,67 +56,19 @@
     <ng-template #myTemplate>
       <ul class="flex items-center justify-end flex-auto mb-0 list-none ps-0 nav-right sm:gap-x-[25px] max-sm:gap-x-[15px] gap-y-[15px]">
         <li>
-          <a class="flex items-center" nz-dropdown [nzDropdownMenu]="popSettings">
-            <nz-badge>
-              <svg-icon src="assets/images/svg/settings.svg"></svg-icon>
-            </nz-badge>
-          </a>
-          <nz-dropdown-menu #popSettings="nzDropdownMenu">
-            <perfect-scrollbar class="lg:w-[700px] md:w-[300px] max-md:w-[230px] px-[15px] py-[12px] bg-white dark:bg-[#1b1e2b] shadow-[0_2px_8px_rgba(0,0,0,.15)] dark:shadow-[0_5px_30px_rgba(1,4,19,.60)] rounded-4">
-              <ul class="flex flex-wrap items-center md:[&>li]:flex-[50%] max-md:[&>li]:flex-[100%] max-h-[251px]">
-                <li *ngFor="let settings of appSettings">
-                  <figure class="flex items-start px-4 py-5 mb-0 hover:shadow-action dark:hover:shadow-[0_5px_30px_rgba(1,4,19,.60)]">
-                    <img class="h-fit me-4" src="assets/images/others/settings/{{ settings.source }}.png" alt="{{ settings.source }}">
-                    <figcaption>
-                      <h1 class="mb-0.5 -mt-1 text-[15px] font-medium capitalize text-dark dark:text-white/[.87]">{{ settings.label }}</h1>
-                      <p class="mb-0 text-theme-gray dark:text-white/60">{{ settings.des }} </p>
-                    </figcaption>
-                  </figure>
-                </li>
-              </ul>
-            </perfect-scrollbar>
-          </nz-dropdown-menu>
-        </li>
-        <li>
-          <a class="flex items-center" nz-dropdown [nzDropdownMenu]="popLanguage">
-            <nz-badge>
-              <img class="min-w-[20px] min-h-[20px]" src="assets/images/others/flags/english.png" alt="">
-            </nz-badge>
-          </a>
-          <nz-dropdown-menu #popLanguage="nzDropdownMenu">
-            <ul class="block bg-white dark:bg-[#1b1d2a] rounded-6">
-              <li class="bg-white dark:bg-white/10 hover:bg-primary/10 dark:hover:bg-primary/10">
-                <button class="flex items-center px-3 py-1.5 text-sm text-dark dark:text-white/60">
-                  <img class="w-3.5 h-3.5 me-2" src="assets/images/others/flags/english.png" alt="english">
-                  <span>English</span>
-                </button>
-              </li>
-              <li class="bg-white dark:bg-white/10 hover:bg-primary/10 dark:hover:bg-primary/10">
-                <button class="flex items-center px-3 py-1.5 text-sm text-dark dark:text-white/60">
-                  <img class="w-3.5 h-3.5 me-2" src="assets/images/others/flags/spanish.png" alt="spanish">
-                  <span>Spanish</span>
-                </button>
-              </li>
-              <li class="bg-white dark:bg-white/10 hover:bg-primary/10 dark:hover:bg-primary/10">
-                <button class="flex items-center px-3 py-1.5 text-sm text-dark dark:text-white/60">
-                  <img class="w-3.5 h-3.5 me-2" src="assets/images/others/flags/arabic.png" alt="arabic">
-                  <span>Arabic</span>
-                </button>
-              </li>
-            </ul>
-          </nz-dropdown-menu>
+          <app-language-selector></app-language-selector>
         </li>
         <li>
           <span class="flex items-center cursor-pointer text-light whitespace-nowrap" nz-dropdown [nzDropdownMenu]="profile">
-            <nz-avatar [nzIcon]="'user'" nzSrc="assets/images/avatars/thumbs.png"></nz-avatar>
+            <div class="custom-avatar-circle">M</div>
             <span class="me-1.5 ms-2.5 text-body dark:text-white/60 text-sm font-medium max-md:hidden">Md. Rafiq</span>
             <span class="[&>svg]:w-[10px] [&>svg]:h-[10px] [&>svg]:max-md:ms-[5px]" nz-icon nzType="down" nzTheme="outline"></span>
           </span>
           <nz-dropdown-menu #profile="nzDropdownMenu">
-            <div class="min-w-[310px] max-sm:min-w-full pt-4 px-[15px] py-[12px] bg-white dark:bg-[#1b1e2b] shadow-[0_2px_8px_rgba(0,0,0,.15)] dark:shadow-[0_5px_30px_rgba(1,4,19,.60)] rounded-4">
+            <div class="min-w-[310px] max-sm:min-w-full pt-4 px-[15px] py-[12px] bg-white dark:bg-[#1b1e2b] rounded-[12px]">
               <figure
                 class="flex items-center text-sm rounded-[8px] bg-section dark:bg-white/10 py-[20px] px-[25px] mb-[12px]">
-                <nz-avatar [nzIcon]="'user'" nzSrc="assets/images/avatars/thumbs.png" class="me-4"></nz-avatar>
+                <div class="custom-avatar-circle me-4">M</div>
                 <figcaption>
                   <h1 class="text-dark dark:text-white/[.87] mb-0.5 text-sm">Md. Rafiq</h1>
                   <p class="mb-0 text-xs text-body dark:text-white/60">UI Expert</p>
@@ -131,7 +83,7 @@
                   </li>
               </ul>
               <a
-                class="flex items-center justify-center text-sm font-medium bg-[#f4f5f7] dark:bg-[#32333f] h-[50px] text-light hover:text-primary dark:hover:text-white/60 dark:text-white/[.87] mx-[-15px] mb-[-15px] rounded-b-6"
+                class="flex items-center justify-center text-sm font-medium bg-[#f4f5f7] dark:bg-[#32333f] h-[50px] text-light hover:text-primary dark:hover:text-white/60 dark:text-white/[.87] mx-[-15px] mb-[-15px] rounded-b-[12px]"
                 href="#" (click)="signOut()">
                 <i class="facebook"></i> Sign Out</a>
             </div>
@@ -145,7 +97,7 @@
       <span nz-icon nzType="more" nzTheme="outline"></span>
     </a>
     <nz-dropdown-menu #menu="nzDropdownMenu">
-      <div class="bg-white dark:bg-[#1b1c29] px-[20px] py-[6px] rounded-6 hidden max-xl:block">
+      <div class="bg-white dark:bg-[#1b1c29] px-[20px] py-[10px] rounded-6 hidden max-xl:block">
         <ng-container *ngTemplateOutlet="myTemplate"></ng-container>
       </div>
     </nz-dropdown-menu>

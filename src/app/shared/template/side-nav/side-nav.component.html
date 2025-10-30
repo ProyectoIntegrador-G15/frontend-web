@@ -12,13 +12,13 @@
           <a class="ant-menu-submenu-title" *ngIf="item.submenu.length > 0">
               <i *ngIf="item.iconType == 'nzIcon'" nz-icon [nzType]="item.icon" [theme]="item.iconTheme"></i>
               <i *ngIf="item.iconType == 'fontawesome'" class="me-[10px]" [ngClass]="[item.iconTheme , item.icon]"></i>
-              <span>{{item.title}}</span>
+              <span>{{item.title | customTranslate}}</span>
               <i class="ant-menu-submenu-arrow"></i>
           </a>
           <a [routerLink]="item.path" (click)="closeMobileMenu()" *ngIf="item.submenu.length === 0">
               <i *ngIf="item.iconType == 'nzIcon'" nz-icon [nzType]="item.icon" [theme]="item.iconTheme"></i>
               <i *ngIf="item.iconType == 'fontawesome'" class="me-[10px]" [ngClass]="[item.iconTheme , item.icon]"></i>
-              <span>{{item.title}}</span>
+              <span>{{item.title | customTranslate}}</span>
           </a>
           <!-- Second Level -->
           <ul class="ant-menu ant-menu-inline ant-menu-sub dropdown-menu" *ngIf="item.submenu.length > 0">
@@ -29,13 +29,13 @@
                   <a class="ant-menu-submenu-title" *ngIf="subItem.submenu.length > 0">
                       <i *ngIf="subItem.iconType == 'nzIcon'" nz-icon [nzType]="subItem.icon" [theme]="subItem.iconTheme"></i>
                       <i *ngIf="subItem.iconType == 'fontawesome'" class="me-[10px]" [ngClass]="[subItem.iconTheme , subItem.icon]"></i>
-                      <span>{{subItem.title}}</span>
+                      <span>{{subItem.title | customTranslate}}</span>
                       <i class="ant-menu-submenu-arrow"></i>
                   </a>
                   <a [routerLink]="subItem.path" (click)="closeMobileMenu()" *ngIf="subItem.submenu.length === 0">
                       <i *ngIf="subItem.iconType == 'nzIcon'" nz-icon [nzType]="subItem.icon" [theme]="subItem.iconTheme"></i>
                       <i *ngIf="subItem.iconType == 'fontawesome'" class="me-[10px]" [ngClass]="[subItem.iconTheme , subItem.icon]"></i>
-                      <span>{{subItem.title}}</span>
+                      <span>{{subItem.title | customTranslate}}</span>
                   </a>
 
                   <!-- Third Level -->
@@ -46,13 +46,13 @@
                           <a class="ant-menu-submenu-title" *ngIf="subItem.submenu.length > 0">
                               <i *ngIf="subItem.iconType == 'nzIcon'" nz-icon [nzType]="subItem.icon" [theme]="subItem.iconTheme"></i>
                               <i *ngIf="subItem.iconType == 'fontawesome'" class="me-[10px]" [ngClass]="[subItem.iconTheme , subItem.icon]"></i>
-                              <span>{{subItem.title}}</span>
+                              <span>{{subItem.title | customTranslate}}</span>
                               <i class="ant-menu-submenu-arrow"></i>
                           </a>
                           <a [routerLink]="subItem.path" (click)="closeMobileMenu()" *ngIf="subItem.submenu.length === 0">
                               <i *ngIf="subItem.iconType == 'nzIcon'" nz-icon [nzType]="subItem.icon" [theme]="subItem.iconTheme"></i>
                               <i *ngIf="subItem.iconType == 'fontawesome'" class="me-[10px]" [ngClass]="[subItem.iconTheme , subItem.icon]"></i>
-                              <span>{{subItem.title}}</span>
+                              <span>{{subItem.title | customTranslate}}</span>
                           </a>
                       </li>
                   </ul>

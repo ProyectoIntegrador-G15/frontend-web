@@ -15,7 +15,8 @@ export const environment = {
     logistics: '/logistics',
     health: '/health',
     inventory: '/inventory',
-    authentication: '/auth'
+    authentication: '/auth',
+    sellers: '/sellers'
   }
 };
 

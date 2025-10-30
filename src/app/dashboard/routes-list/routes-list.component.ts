@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { RoutesService, Route } from '../../shared/services/routes.service';
+import { TranslateService } from '@ngx-translate/core';
 
 export interface RouteItem {
   id: string;
@@ -28,7 +29,8 @@ export class RoutesListComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private routesService: RoutesService
+    private routesService: RoutesService,
+    private translateService: TranslateService
   ) { }
 
   ngOnInit(): void {
@@ -50,7 +52,7 @@ export class RoutesListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar las rutas:', error);
-        this.error = 'No se pudieron cargar las rutas. Por favor, intente nuevamente.';
+        this.error = this.translateService.instant('routes.loadingError');
         this.loading = false;
       }
     });
@@ -81,13 +83,13 @@ export class RoutesListComponent implements OnInit {
   getStatusText(status: string): string {
     switch (status) {
       case 'planned':
-        return 'Planificada';
+        return this.translateService.instant('routes.statusPlanned');
       case 'in_progress':
-        return 'En curso';
+        return this.translateService.instant('routes.statusInProgress');
       case 'with_incidents':
-        return 'Con incidencias';
+        return this.translateService.instant('routes.statusWithIncidents');
       case 'completed':
-        return 'Completada';
+        return this.translateService.instant('routes.statusCompleted');
       default:
         return status;
     }
