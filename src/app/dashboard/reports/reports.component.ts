@@ -98,6 +98,17 @@ export class ReportsComponent implements OnInit, OnDestroy {
   }
 
   private transformReport(apiReport: any): Report {
+    let downloadUrl: string | undefined;
+    if (apiReport.report_url) {
+      const url: string = apiReport.report_url as string;
+      if (url.startsWith('gs://')) {
+        const path = url.substring(5); // remove gs://
+        downloadUrl = `https://storage.googleapis.com/${path}`;
+      } else {
+        downloadUrl = url;
+      }
+    }
+
     return {
       id: apiReport.id.toString(),
       createdAt: apiReport.created_at,
@@ -105,7 +116,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
       reportMonthNumber: apiReport.month,
       reportYear: apiReport.year,
       generatedBy: `User ${apiReport.created_by}`,
-      status: this.mapStatus(apiReport.status)
+      status: this.mapStatus(apiReport.status),
+      downloadUrl
     };
   }
 
@@ -296,28 +308,19 @@ export class ReportsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.reportsService.getReportDownloadUrl(Number(report.id)).subscribe({
-      next: (resp) => {
-        if (resp && resp.download_url) {
-          window.open(resp.download_url, '_blank');
-          this.notification.success(
-            this.translateService.instant('common.success'),
-            this.translateService.instant('reports.downloadStarted')
-          );
-        } else {
-          this.notification.error(
-            this.translateService.instant('common.error'),
-            this.translateService.instant('reports.downloadUrlError')
-          );
-        }
-      },
-      error: () => {
-        this.notification.error(
-          this.translateService.instant('common.error'),
-          this.translateService.instant('reports.generateDownloadUrlError')
-        );
-      }
-    });
+    const url = report.downloadUrl;
+    if (url) {
+      window.open(url, '_blank');
+      this.notification.success(
+        this.translateService.instant('common.success'),
+        this.translateService.instant('reports.downloadStarted')
+      );
+    } else {
+      this.notification.error(
+        this.translateService.instant('common.error'),
+        this.translateService.instant('reports.downloadUrlError')
+      );
+    }
   }
 
   getStatusColor(status: string): string {

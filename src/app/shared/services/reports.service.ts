@@ -15,6 +15,7 @@ export interface ReportApiResponse {
   status: string;
   created_at: string;
   completed_at?: string | null;
+  report_url?: string | null;
 }
 
 export interface Report {
@@ -74,14 +75,9 @@ export class ReportsService {
       reportMonthNumber: apiReport.month,
       reportYear: apiReport.year,
       generatedBy: `User ${apiReport.created_by}`,
-      status: this.mapStatus(apiReport.status)
+      status: this.mapStatus(apiReport.status),
+      downloadUrl: apiReport.report_url ?? undefined
     };
-  }
-
-  getReportDownloadUrl(reportId: number): Observable<{ download_url: string; expires_in_minutes: number; report_id: number }>{
-    const url = `${this.endpointsService.getEndpointPath('reports')}/${reportId}/download`;
-    return this.apiService.getDirect<{ download_url: string; expires_in_minutes: number; report_id: number }>(url)
-      .pipe(catchError(this.handleError));
   }
 
   /**
