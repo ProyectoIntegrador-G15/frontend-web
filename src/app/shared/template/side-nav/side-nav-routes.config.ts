@@ -50,55 +50,5 @@ export const ROUTES: SideNavInterface[] = [
     icon: 'environment',
     iconTheme: 'outline',
     submenu: []
-  },
-  {
-    path: '',
-    title: 'navigation.dashboard',
-    iconType: 'nzIcon',
-    iconTheme: 'outline',
-    icon: 'appstore-add',
-    submenu: [{
-      path: '/dashboard/blank-page',
-      title: 'navigation.blankPage',
-      iconType: '',
-      icon: '',
-      iconTheme: '',
-      submenu: []
-    },
-    ]
-  },
-  {
-    path: '',
-    title: 'navigation.authentication',
-    iconType: 'nzIcon',
-    iconTheme: 'outline',
-    icon: 'lock',
-    submenu: [{
-      path: '/authentication/login-1',
-      title: 'navigation.login',
-      iconType: '',
-      icon: '',
-
-      iconTheme: '',
-      submenu: []
-    },
-      {
-        path: '/authentication/sign-up-1',
-        title: 'navigation.signup',
-        iconType: '',
-        icon: '',
-
-        iconTheme: '',
-        submenu: []
-      },
-      {
-        path: '/authentication/forget-pass',
-        title: 'navigation.forgotPassword',
-        iconType: '',
-        icon: '',
-        iconTheme: '',
-        submenu: []
-      }
-    ]
   }
 ];

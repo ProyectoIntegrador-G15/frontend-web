@@ -1,7 +1,6 @@
 import {NgModule} from '@angular/core';
 import {Routes, RouterModule} from '@angular/router';
 
-import {BlankPageComponent} from './blank-page/blank-page.component';
 import {WarehousesComponent} from './warehouse/warehouses.component';
 import {WarehouseInventoryComponent} from './warehouse-inventory/warehouse-inventory.component';
 import {ProductsComponent} from './products/products.component';
@@ -13,13 +12,6 @@ import {SellerDetailsComponent} from './seller-details/seller-details.component'
 
 
 const routes: Routes = [
-  {
-    path: 'blank-page',
-    component: BlankPageComponent,
-    data: {
-      title: 'Blank Page',
-    },
-  },
   {
     path: 'products',
     component: ProductsComponent,

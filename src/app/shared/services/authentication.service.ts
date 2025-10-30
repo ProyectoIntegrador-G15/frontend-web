@@ -29,6 +29,11 @@ export class AuthenticationService {
 
   logout(): void {
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('idToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('tokenExpiryAt');
+    localStorage.removeItem('authEmail');
+    this.apiService.removeAuthToken();
     this.currentUserSubject.next(null);
   }
 
