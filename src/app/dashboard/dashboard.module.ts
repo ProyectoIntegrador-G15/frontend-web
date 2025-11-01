@@ -56,6 +56,10 @@ import {ProductInventoryComponent} from './product-inventory/product-inventory.c
 import {RoutesListComponent} from './routes-list/routes-list.component';
 import {CreateRouteComponent} from './create-route/create-route.component';
 import {SellersListComponent} from './sellers-list/sellers-list.component';
+import {SellerDetailComponent} from './seller-detail/seller-detail.component';
+import {CreateVisitRouteComponent} from './create-visit-route/create-visit-route.component';
+import {TabsComponent} from '../shared/components/tabs/tabs.component';
+import {BackButtonComponent} from '../shared/components/back-button/back-button.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -107,6 +111,8 @@ const antdModule = [
     CommonModule,
     SharedModule,
     DashboardRoutingModule,
+    TabsComponent,
+    BackButtonComponent,
     ...antdModule
   ],
   exports: [],
@@ -119,6 +125,8 @@ const antdModule = [
     RoutesListComponent,
     CreateRouteComponent,
     SellersListComponent,
+    SellerDetailComponent,
+    CreateVisitRouteComponent,
   ],
   providers: [
     ThemeConstantService,

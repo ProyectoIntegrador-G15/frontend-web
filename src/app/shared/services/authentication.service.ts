@@ -23,7 +23,7 @@ export class AuthenticationService {
     }
 
     login(username: string, password: string) {
-        return this.apiService.post<any>(this.endpointsService.getEndpointPath('authentication'), { username, password })
+        return this.apiService.postDirect<User>(this.endpointsService.getEndpointPath('authentication'), { username, password })
         .pipe(map(user => {
             if (user && user.token) {
                 localStorage.setItem('currentUser', JSON.stringify(user));

@@ -1,0 +1,176 @@
+<!-- Header outside container -->
+<div class="seller-header">
+  <app-back-button (backClick)="goBack()"></app-back-button>
+  <h1 class="screen-title">Perfil del vendedor</h1>
+</div>
+
+<!-- Loading State -->
+<div *ngIf="loading" class="loading-container">
+  <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
+  <p>Cargando información del vendedor...</p>
+</div>
+
+<!-- Error State -->
+<div *ngIf="!loading && error" class="error-container">
+  <span nz-icon nzType="exclamation-circle" nzTheme="outline" class="error-icon"></span>
+  <p>{{ error }}</p>
+  <button class="btn-primary" (click)="goBack()">Volver a vendedores</button>
+</div>
+
+<!-- Content -->
+<div *ngIf="!loading && !error && seller" class="seller-detail-container">
+  <!-- Subtitle inside white container -->
+  <p class="subtitle">Consulta el desempeño y plan de ventas de cada vendedor</p>
+  
+  <!-- Tabs -->
+  <app-tabs
+    [tabs]="tabs"
+    [activeTabId]="activeTab"
+    (tabChange)="onTabChange($event)">
+  </app-tabs>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+      <!-- Información Tab -->
+      <div *ngIf="activeTab === 'information'" class="information-tab">
+        <!-- Profile Section -->
+        <div class="profile-section">
+          <div class="profile-card">
+            <div class="profile-picture">
+              <span nz-icon nzType="user" nzTheme="outline"></span>
+            </div>
+            
+            <h2 class="seller-name">{{ seller.name }}</h2>
+            <span class="seller-status" [ngClass]="getStatusColor()">
+              {{ getStatusText() }}
+            </span>
+
+            <button class="btn-primary view-clients-btn">
+              Ver clientes
+            </button>
+          </div>
+        </div>
+
+        <!-- Details Section -->
+        <div class="details-section">
+          <!-- Información Personal -->
+          <div class="detail-card">
+            <h3 class="detail-card-title">
+              <span nz-icon nzType="idcard" nzTheme="outline"></span>
+              Información Personal
+            </h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="detail-label">Identificación</span>
+                <span class="detail-value">{{ seller.identification }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Email</span>
+                <span class="detail-value">{{ seller.email }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Teléfono</span>
+                <span class="detail-value">{{ seller.phone }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Dirección</span>
+                <span class="detail-value">{{ seller.address || 'No especificada' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Fecha de Ingreso</span>
+                <span class="detail-value">{{ seller.entryDate }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información Comercial -->
+          <div class="detail-card">
+            <h3 class="detail-card-title">
+              <span nz-icon nzType="dollar" nzTheme="outline"></span>
+              Información Comercial
+            </h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="detail-label">Comisión</span>
+                <span class="detail-value highlight">{{ seller.commission ? seller.commission + '%' : 'No definida' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Meta de Ventas</span>
+                <span class="detail-value highlight">{{ seller.salesTarget ? formatCurrency(seller.salesTarget) : 'No definida' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desempeño Tab -->
+      <div *ngIf="activeTab === 'performance'" class="performance-tab">
+        <div class="empty-state">
+          <span nz-icon nzType="bar-chart" nzTheme="outline" class="empty-icon"></span>
+          <h3>Desempeño del vendedor</h3>
+          <p>Esta sección mostrará las métricas de desempeño del vendedor.</p>
+        </div>
+      </div>
+
+      <!-- Plan de ventas Tab -->
+      <div *ngIf="activeTab === 'sales-plan'" class="sales-plan-tab">
+        <div class="empty-state">
+          <span nz-icon nzType="dollar" nzTheme="outline" class="empty-icon"></span>
+          <h3>Plan de ventas</h3>
+          <p>Esta sección mostrará el plan de ventas asignado al vendedor.</p>
+        </div>
+      </div>
+
+      <!-- Rutas de visita Tab -->
+      <div *ngIf="activeTab === 'visit-routes'" class="visit-routes-tab">
+        <!-- Header con botón -->
+        <div class="visits-header">
+          <h3 class="visits-title">Rutas de visita programadas</h3>
+          <button class="btn-primary" (click)="createVisitRoute()">
+            <span nz-icon nzType="plus" nzTheme="outline"></span>
+            Generar ruta de visita
+          </button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Cliente</th>
+                <th>Estado</th>
+                <th>Observaciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let visit of mockVisits">
+                <td>
+                  <p class="font-medium">#{{ visit.id }}</p>
+                </td>
+                <td>
+                  <p>{{ visit.visitDate }}</p>
+                </td>
+                <td>
+                  <p>{{ visit.visitTime }}</p>
+                </td>
+                <td>
+                  <p class="font-medium">{{ visit.clientName }}</p>
+                </td>
+                <td>
+                  <nz-tag [nzColor]="visit.status === 'completed' ? 'green' : visit.status === 'pending' ? 'blue' : 'orange'">
+                    {{ visit.status === 'completed' ? 'Completada' : visit.status === 'pending' ? 'Pendiente' : 'En progreso' }}
+                  </nz-tag>
+                </td>
+                <td>
+                  <p class="observations-cell">{{ visit.observations }}</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+  </div>
+</div>
+

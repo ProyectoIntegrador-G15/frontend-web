@@ -9,6 +9,8 @@ import {ProductInventoryComponent} from './product-inventory/product-inventory.c
 import {RoutesListComponent} from './routes-list/routes-list.component';
 import {CreateRouteComponent} from './create-route/create-route.component';
 import {SellersListComponent} from './sellers-list/sellers-list.component';
+import {SellerDetailComponent} from './seller-detail/seller-detail.component';
+import {CreateVisitRouteComponent} from './create-visit-route/create-visit-route.component';
 
 
 const routes: Routes = [
@@ -66,6 +68,20 @@ const routes: Routes = [
     component: SellersListComponent,
     data: {
       title: 'Vendedores',
+    },
+  },
+  {
+    path: 'sellers/:id',
+    component: SellerDetailComponent,
+    data: {
+      title: 'Perfil del vendedor',
+    },
+  },
+  {
+    path: 'visit-routes/create',
+    component: CreateVisitRouteComponent,
+    data: {
+      title: 'Generar ruta de visita',
     },
   },
 ];

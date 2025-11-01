@@ -1,13 +1,7 @@
 <div class="delivery-routes-container">
   <!-- Header con botón de regresar y título -->
   <div class="flex items-center mb-6">
-    <button 
-      nz-button
-      nzType="text"
-      (click)="goBack()"
-      class="mr-4 p-2 hover:bg-gray-100 rounded-md">
-      <span class="text-[16px]" nz-icon nzType="arrow-left" nzTheme="outline"></span>
-    </button>
+    <app-back-button (backClick)="goBack()" class="mr-4"></app-back-button>
     <h1 class="screen-title">Generar ruta de entrega</h1>
   </div>
 

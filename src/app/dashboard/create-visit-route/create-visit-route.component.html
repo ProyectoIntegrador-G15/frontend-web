@@ -1,0 +1,93 @@
+<div class="visit-route-container">
+  <!-- Header con botón de regresar y título -->
+  <div class="flex items-center mb-6">
+    <app-back-button (backClick)="goBack()" class="mr-4"></app-back-button>
+    <h1 class="screen-title">Generar ruta de visita</h1>
+  </div>
+
+  <!-- Card principal -->
+  <div class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
+    <div class="p-[25px]">
+      <!-- Campo de Fecha -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+          Fecha de la ruta de visita
+        </label>
+        <nz-date-picker
+          [(ngModel)]="selectedDate"
+          [nzDisabledDate]="disabledDate"
+          [nzFormat]="'dd-MM-yyyy'"
+          [nzPlaceHolder]="'Selecciona la fecha'"
+          class="w-full">
+        </nz-date-picker>
+      </div>
+
+      <!-- Tabla de clientes -->
+      <div class="mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-dark dark:text-white">
+            Clientes para visitar
+          </h3>
+          <span class="text-sm text-gray-500">
+            {{ selectedClients.length }} cliente(s) seleccionado(s)
+          </span>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Seleccionar</th>
+                <th>Cliente</th>
+                <th>Dirección</th>
+                <th>Fecha de Ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let client of paginatedClients">
+                <td class="text-center">
+                  <label nz-checkbox 
+                    [(ngModel)]="client.selected"
+                    (ngModelChange)="toggleClientSelection(client)">
+                  </label>
+                </td>
+                <td>
+                  <p class="font-medium">{{ client.name }}</p>
+                </td>
+                <td>
+                  <p>{{ client.address }}</p>
+                </td>
+                <td>
+                  <p>{{ client.entryDate }}</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginador -->
+        <div class="flex justify-center mt-4">
+          <nz-pagination
+            [(nzPageIndex)]="currentPage"
+            [nzTotal]="totalClients"
+            [nzPageSize]="pageSize"
+            [nzShowSizeChanger]="false"
+            [nzShowQuickJumper]="false">
+          </nz-pagination>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="flex justify-end gap-4 mt-8">
+        <button class="btn-secondary" (click)="goBack()">
+          Cancelar
+        </button>
+        <button class="btn-primary" (click)="generateVisitRoute()">
+          Generar ruta de visita
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
