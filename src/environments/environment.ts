@@ -16,7 +16,8 @@ export const environment = {
     health: '/health',
     inventory: '/inventory',
     authentication: '/auth',
-    sellers: '/sellers'
+    sellers: '/sellers',
+    reports: '/reports'
   }
 };
 
