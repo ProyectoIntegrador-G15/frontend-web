@@ -88,6 +88,13 @@ export class EndpointsService {
   }
 
   /**
+   * Obtener endpoint completo para reportes
+   */
+  getReportsEndpoint(): string {
+    return `${this.apiUrl}${this.endpoints.reports}`;
+  }
+
+  /**
    * Obtener solo el path del endpoint (sin URL base)
    */
   getEndpointPath(endpointName: keyof typeof environment.apiEndpoints): string {
