@@ -12,6 +12,9 @@ export const environment = {
     health: '/health',
     inventory: '/inventory',
     authentication: '/auth',
-    sellers: '/sellers'
-  }
+    sellers: '/sellers',
+    reports: '/reports'
+  },
+  firebaseApiKey: 'AIzaSyAEcWSpsJOLVQ9lVH5tP1m8XaSq7zIpk5Q',
+  firebaseAuthBase: 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword',
 };

@@ -29,6 +29,14 @@ export interface SellerPaginatedApiResponse {
   page_size: number;
 }
 
+export interface SellerPerformanceResponse {
+  total_orders: number;
+  total_revenue: number;
+  total_visits: number;
+  units_compliance: number;
+  revenue_compliance: number;
+}
+
 // Interfaz para el frontend
 export interface Seller {
   id: string;
@@ -119,6 +127,18 @@ export class SellersService {
     return this.http.get<SellerApiResponse>(sellersUrl)
       .pipe(
         map(seller => this.transformSeller(seller)),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * Gets performance data for a seller within a date range
+   */
+  getSellerPerformance(sellerId: string | number, startDate: string, endDate: string): Observable<SellerPerformanceResponse> {
+    const url = `${environment.apiUrl}${environment.apiEndpoints.sellers}/${sellerId}/performance`;
+    const fullUrl = `${url}?start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}`;
+    return this.http.get<SellerPerformanceResponse>(fullUrl)
+      .pipe(
         catchError(this.handleError)
       );
   }

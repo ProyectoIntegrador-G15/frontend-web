@@ -1,8 +1,14 @@
 <div class="delivery-routes-container">
   <!-- Header con botón de regresar y título -->
   <div class="flex items-center mb-6">
-    <app-back-button (backClick)="goBack()" class="mr-4"></app-back-button>
-    <h1 class="screen-title">Generar ruta de entrega</h1>
+    <button 
+      nz-button
+      nzType="text"
+      (click)="goBack()"
+      class="mr-4 p-2 hover:bg-gray-100 rounded-md">
+      <span class="text-[16px]" nz-icon nzType="arrow-left" nzTheme="outline"></span>
+    </button>
+    <h1 class="screen-title">{{ 'createRoute.title' | customTranslate }}</h1>
   </div>
 
   <!-- Card principal -->
@@ -11,24 +17,24 @@
       <!-- Campo de Fecha -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-dark dark:text-white mb-2">
-          Fecha de la ruta
+          {{ 'createRoute.routeDate' | customTranslate }}
         </label>
         <nz-date-picker
           [(ngModel)]="selectedDate"
           [nzDisabledDate]="disabledDate"
           nzFormat="dd/MM/yyyy"
           class="w-full"
-          nzPlaceHolder="Seleccionar fecha">
+          [nzPlaceHolder]="'createRoute.selectDate' | customTranslate">
         </nz-date-picker>
-        <p class="text-xs text-gray-500 mt-1">Solo se pueden seleccionar fechas desde hoy en adelante</p>
+        <p class="text-xs text-gray-500 mt-1">{{ 'createRoute.dateHelper' | customTranslate }}</p>
       </div>
 
       <!-- Tabla de pedidos pendientes -->
       <div class="mb-6">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-semibold text-dark dark:text-white">Pedidos pendientes</h2>
+          <h2 class="text-lg font-semibold text-dark dark:text-white">{{ 'createRoute.pendingOrders' | customTranslate }}</h2>
           <span *ngIf="pendingOrders.length > 0" class="text-sm text-gray-500">
-            {{ getSelectedOrdersCount() }} de {{ pendingOrders.length }} seleccionados
+            {{ getSelectedOrdersCount() }} {{ 'createRoute.selectedCount' | customTranslate }} {{ pendingOrders.length }}
           </span>
         </div>
         
@@ -40,14 +46,14 @@
         <!-- Error State -->
         <div *ngIf="error && !isLoading" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
           <p class="font-medium">{{ error }}</p>
-          <button class="mt-2 text-sm underline" (click)="loadData()">Reintentar</button>
+          <button class="mt-2 text-sm underline" (click)="loadData()">{{ 'createRoute.retry' | customTranslate }}</button>
         </div>
         
         <!-- Empty State -->
         <div *ngIf="!isLoading && !error && pendingOrders.length === 0" class="text-center py-12">
           <span nz-icon nzType="inbox" nzTheme="outline" class="text-6xl text-gray-300 mb-4"></span>
-          <p class="text-gray-500 text-lg">No hay pedidos pendientes</p>
-          <p class="text-gray-400 text-sm">Todos los pedidos han sido procesados</p>
+          <p class="text-gray-500 text-lg">{{ 'createRoute.noOrders' | customTranslate }}</p>
+          <p class="text-gray-400 text-sm">{{ 'createRoute.noOrdersDescription' | customTranslate }}</p>
         </div>
 
         <!-- Table -->
@@ -55,12 +61,12 @@
           <table>
             <thead>
               <tr>
-                <th>Selección</th>
-                <th>ID Pedido</th>
-                <th>Cliente</th>
-                <th>Dirección</th>
-                <th>Fecha de ingreso</th>
-                <th>Monto Total</th>
+                <th>{{ 'createRoute.selection' | customTranslate }}</th>
+                <th>{{ 'createRoute.orderId' | customTranslate }}</th>
+                <th>{{ 'createRoute.client' | customTranslate }}</th>
+                <th>{{ 'createRoute.address' | customTranslate }}</th>
+                <th>{{ 'createRoute.entryDate' | customTranslate }}</th>
+                <th>{{ 'createRoute.totalAmount' | customTranslate }}</th>
               </tr>
             </thead>
             <tbody>
@@ -75,7 +81,7 @@
                 <td>{{ order.clientName }}</td>
                 <td>{{ order.clientAddress }}</td>
                 <td>{{ formatDate(order.createdAt) }}</td>
-                <td><strong>{{ formatCurrency(order.totalAmount) }}</strong></td>
+                <td><strong>{{ order.totalAmount | currencyFormat }}</strong></td>
               </tr>
             </tbody>
           </table>
@@ -96,26 +102,26 @@
       <!-- Campo Vehículo/Conductor -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-dark dark:text-white mb-2">
-          Vehículo/Conductor
+          {{ 'createRoute.vehicleDriver' | customTranslate }}
         </label>
         <nz-select
           [(ngModel)]="selectedVehicle"
           class="w-full"
-          nzPlaceHolder="Seleccionar vehículo">
-          <nz-option [nzValue]="1" nzLabel="Asignación automática"></nz-option>
+          [nzPlaceHolder]="'createRoute.selectVehicle' | customTranslate">
+          <nz-option [nzValue]="1" [nzLabel]="'createRoute.autoAssignment' | customTranslate"></nz-option>
           <nz-option [nzValue]="2" nzLabel="Vehículo 002"></nz-option>
           <nz-option [nzValue]="3" nzLabel="Vehículo 003"></nz-option>
           <nz-option [nzValue]="4" nzLabel="Vehículo 004"></nz-option>
           <nz-option [nzValue]="5" nzLabel="Vehículo 005"></nz-option>
         </nz-select>
-        <p class="text-xs text-gray-500 mt-1">Por defecto: Asignación automática</p>
+        <p class="text-xs text-gray-500 mt-1">{{ 'createRoute.defaultHelper' | customTranslate }}</p>
       </div>
 
       <!-- Botón de generar ruta -->
       <div class="flex justify-center">
         <button class="btn-primary" (click)="generateRoute()">
           <span nz-icon nzType="plus" nzTheme="outline"></span>
-          Generar ruta automática
+          {{ 'createRoute.generateRoute' | customTranslate }}
         </button>
       </div>
     </div>

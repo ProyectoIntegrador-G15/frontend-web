@@ -1,7 +1,6 @@
 import {NgModule} from '@angular/core';
 import {Routes, RouterModule} from '@angular/router';
 
-import {BlankPageComponent} from './blank-page/blank-page.component';
 import {WarehousesComponent} from './warehouse/warehouses.component';
 import {WarehouseInventoryComponent} from './warehouse-inventory/warehouse-inventory.component';
 import {ProductsComponent} from './products/products.component';
@@ -11,16 +10,10 @@ import {CreateRouteComponent} from './create-route/create-route.component';
 import {SellersListComponent} from './sellers-list/sellers-list.component';
 import {SellerDetailComponent} from './seller-detail/seller-detail.component';
 import {CreateVisitRouteComponent} from './create-visit-route/create-visit-route.component';
+import {ReportsComponent} from './reports/reports.component';
 
 
 const routes: Routes = [
-  {
-    path: 'blank-page',
-    component: BlankPageComponent,
-    data: {
-      title: 'Blank Page',
-    },
-  },
   {
     path: 'products',
     component: ProductsComponent,
@@ -82,6 +75,13 @@ const routes: Routes = [
     component: CreateVisitRouteComponent,
     data: {
       title: 'Generar ruta de visita',
+    },
+  },
+  {
+    path: 'reports',
+    component: ReportsComponent,
+    data: {
+      title: 'Reportes',
     },
   },
 ];

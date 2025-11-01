@@ -1,54 +1,47 @@
-import { Component } from '@angular/core';
-import { ThemeConstantService } from '../../services/theme-constant.service';
-import messages from '../../../../assets/data/global/header/messages.json';
-import notification from '../../../../assets/data/global/header/notification.json';
+import {Component} from '@angular/core';
+import {ThemeConstantService} from '../../services/theme-constant.service';
 import authorMenu from '../../../../assets/data/global/header/author-menu.json';
-import settings from '../../../../assets/data/global/header/settings.json';
+import {AuthenticationService} from '../../services/authentication.service';
+import {Router} from '@angular/router';
 
 @Component({
-    selector: 'app-header',
-    templateUrl: './header.component.html'
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrls: ['./top-menu.scss']
 })
 
-export class HeaderComponent{
+export class HeaderComponent {
 
-    searchVisible : boolean = false;
-    quickViewVisible : boolean = false;
-    isFolded : boolean;
-    isExpand : boolean;
-    appMessages = messages.appMessages;
-    appNotification = notification.appNotification;
-    appAuthorMenu = authorMenu.appAuthorMenu;
-    appSettings = settings.appSettings;
+  searchVisible = false;
+  quickViewVisible = false;
+  isFolded: boolean;
+  isExpand: boolean;
+  appAuthorMenu = authorMenu.appAuthorMenu;
 
-    constructor( private themeService: ThemeConstantService) {}
+  constructor(private themeService: ThemeConstantService, private auth: AuthenticationService, private router: Router) {
+  }
 
-    signOut(): void {
-      console.log('User signed out!');
-    }
+  signOut(): void {
+    this.auth.logout();
+  }
 
-    ngOnInit(): void {
-        this.themeService.isMenuFoldedChanges.subscribe(isFolded => this.isFolded = isFolded);
-        this.themeService.isExpandChanges.subscribe(isExpand => this.isExpand = isExpand);
-    }
+  toggleFold(): void {
+    this.isFolded = !this.isFolded;
+    this.themeService.toggleFold(this.isFolded);
+  }
 
-    toggleFold() {
-        this.isFolded = !this.isFolded;
-        this.themeService.toggleFold(this.isFolded);
-    }
+  toggleExpand(): void {
+    this.isFolded = false;
+    this.isExpand = !this.isExpand;
+    this.themeService.toggleExpand(this.isExpand);
+    this.themeService.toggleFold(this.isFolded);
+  }
 
-    toggleExpand() {
-        this.isFolded = false;
-        this.isExpand = !this.isExpand;
-        this.themeService.toggleExpand(this.isExpand);
-        this.themeService.toggleFold(this.isFolded);
-    }
+  searchToggle(): void {
+    this.searchVisible = !this.searchVisible;
+  }
 
-    searchToggle(): void {
-        this.searchVisible = !this.searchVisible;
-    }
-
-    quickViewToggle(): void {
-        this.quickViewVisible = !this.quickViewVisible;
-    }
+  quickViewToggle(): void {
+    this.quickViewVisible = !this.quickViewVisible;
+  }
 }

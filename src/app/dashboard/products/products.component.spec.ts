@@ -1,5 +1,6 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
 import { ProductsComponent } from './products.component';
 import { ProductsService } from '../../shared/services/products.service';
 import { WarehousesService } from '../../shared/services/warehouses.service';
@@ -8,6 +9,31 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzUploadFile } from 'ng-zorro-antd/upload';
 import { of, throwError, BehaviorSubject, Subscription } from 'rxjs';
+import { Pipe, PipeTransform } from '@angular/core';
+
+// Mock pipe for customTranslate
+@Pipe({ name: 'customTranslate' })
+class MockCustomTranslatePipe implements PipeTransform {
+  transform(key: string): string {
+    return key; // Return the key as the translation for testing
+  }
+}
+
+// Mock pipe for currencyFormat
+@Pipe({ name: 'currencyFormat' })
+class MockCurrencyFormatPipe implements PipeTransform {
+  transform(value: number | string): string {
+    return value ? `$${value}` : '';
+  }
+}
+
+// Mock pipe for currencyPlaceholder
+@Pipe({ name: 'currencyPlaceholder' })
+class MockCurrencyPlaceholderPipe implements PipeTransform {
+  transform(value: string): string {
+    return value ? `$${value}` : '';
+  }
+}
 
 describe('ProductsComponent - Specific Methods', () => {
   let component: ProductsComponent;
@@ -17,6 +43,7 @@ describe('ProductsComponent - Specific Methods', () => {
   let notificationService: jasmine.SpyObj<NzNotificationService>;
   let router: jasmine.SpyObj<Router>;
   let formBuilder: FormBuilder;
+  let mockTranslateService: jasmine.SpyObj<TranslateService>;
 
   const mockProducts$ = new BehaviorSubject<any[]>([]);
   const mockWarehouses = [
@@ -64,8 +91,13 @@ describe('ProductsComponent - Specific Methods', () => {
     
     const notificationServiceSpy = jasmine.createSpyObj('NzNotificationService', ['create']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    const translateServiceSpy = jasmine.createSpyObj('TranslateService', ['instant']);
+
+    // Mock translateService.instant to return the key as the translation
+    translateServiceSpy.instant.and.callFake((key: string) => key);
 
     TestBed.configureTestingModule({
+      declarations: [MockCustomTranslatePipe, MockCurrencyFormatPipe, MockCurrencyPlaceholderPipe],
       providers: [
         ProductsComponent,
         FormBuilder,
@@ -73,7 +105,8 @@ describe('ProductsComponent - Specific Methods', () => {
         { provide: WarehousesService, useValue: warehousesServiceSpy },
         { provide: NzMessageService, useValue: messageServiceSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: NzNotificationService, useValue: notificationServiceSpy }
+        { provide: NzNotificationService, useValue: notificationServiceSpy },
+        { provide: TranslateService, useValue: translateServiceSpy }
       ]
     });
 
@@ -83,6 +116,7 @@ describe('ProductsComponent - Specific Methods', () => {
     notificationService = TestBed.inject(NzNotificationService) as jasmine.SpyObj<NzNotificationService>;
     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     formBuilder = TestBed.inject(FormBuilder);
+    mockTranslateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
     
     component = TestBed.inject(ProductsComponent);
   });
@@ -630,10 +664,19 @@ describe('ProductsComponent - Specific Methods', () => {
 
   describe('downloadExcelTemplate', () => {
     it('should trigger download and show success message', () => {
-      spyOn(document, 'createElement').and.callThrough();
+      // Mock document.createElement para prevenir descargas reales
+      const mockLink = document.createElement('a') as HTMLAnchorElement;
+      const clickSpy = spyOn(mockLink, 'click').and.stub();
+      spyOn(document, 'createElement').and.returnValue(mockLink);
+      spyOn(document.body, 'appendChild').and.stub();
+      spyOn(document.body, 'removeChild').and.stub();
       
       component.downloadExcelTemplate();
 
+      expect(document.createElement).toHaveBeenCalledWith('a');
+      expect(mockLink.href).toContain('productos-template.xlsx');
+      expect(mockLink.download).toBe('productos-template.xlsx');
+      expect(clickSpy).toHaveBeenCalled();
       expect(messageService.success).toHaveBeenCalledWith(
         jasmine.stringContaining('productos-template.xlsx')
       );
@@ -642,8 +685,19 @@ describe('ProductsComponent - Specific Methods', () => {
 
   describe('downloadCsvTemplate', () => {
     it('should trigger download and show success message', () => {
+      // Mock document.createElement para prevenir descargas reales
+      const mockLink = document.createElement('a') as HTMLAnchorElement;
+      const clickSpy = spyOn(mockLink, 'click').and.stub();
+      spyOn(document, 'createElement').and.returnValue(mockLink);
+      spyOn(document.body, 'appendChild').and.stub();
+      spyOn(document.body, 'removeChild').and.stub();
+
       component.downloadCsvTemplate();
 
+      expect(document.createElement).toHaveBeenCalledWith('a');
+      expect(mockLink.href).toContain('productos-template.csv');
+      expect(mockLink.download).toBe('productos-template.csv');
+      expect(clickSpy).toHaveBeenCalled();
       expect(messageService.success).toHaveBeenCalledWith(
         jasmine.stringContaining('productos-template.csv')
       );

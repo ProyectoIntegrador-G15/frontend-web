@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from "@angular/common";
-import { RouterModule  } from "@angular/router";
+import { CommonModule } from '@angular/common';
+import { RouterModule  } from '@angular/router';
 import { SharedModule } from '../shared.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularSvgIconModule } from 'angular-svg-icon';
@@ -24,12 +24,12 @@ import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 
-import { HeaderComponent } from "./header/header.component";
+import { HeaderComponent } from './header/header.component';
 import { QuickViewComponent } from './quick-view/quick-view.component';
-import { SideNavComponent } from "./side-nav/side-nav.component";
-import { FooterComponent } from "./footer/footer.component";
+import { SideNavComponent } from './side-nav/side-nav.component';
+import { FooterComponent } from './footer/footer.component';
 
-import { SideNavDirective } from "../directives/side-nav.directive";
+import { SideNavDirective } from '../directives/side-nav.directive';
 import { ThemeConstantService } from '../services/theme-constant.service';
 import { MenuComponent } from './header/top-menu';
 
@@ -55,7 +55,7 @@ const antdModule = [
     NzMenuModule,
     NzLayoutModule,
     NzIconModule,
-]
+];
 
 @NgModule({
     exports: [
@@ -65,7 +65,7 @@ const antdModule = [
         SideNavComponent,
         SideNavDirective,
         FooterComponent,
-        MenuComponent,
+        MenuComponent
     ],
     imports: [
         RouterModule,

@@ -1,5 +1,5 @@
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -9,16 +9,19 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 import { registerLocaleData, PathLocationStrategy, LocationStrategy } from '@angular/common';
 import en from '@angular/common/locales/en';
+import es from '@angular/common/locales/es';
 
-import { JwtInterceptor } from './shared/interceptor/token.interceptor';
-import { AuthenticationService } from './shared/services/authentication.service';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+
+import { AuthTokenInterceptor } from './shared/interceptors/auth-token.interceptor';
 
 import { AppRoutingModule } from './app-routing.module';
 import { TemplateModule } from './shared/template/template.module';
 import { SharedModule } from './shared/shared.module';
 
 import { BaseChartDirective } from 'ng2-charts';
-import { NgApexchartsModule } from "ng-apexcharts";
+import { NgApexchartsModule } from 'ng-apexcharts';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { FullCalendarModule } from '@fullcalendar/angular';
 
@@ -28,7 +31,13 @@ import { FullLayoutComponent } from './layouts/full-layout/full-layout.component
 import { ThemeConstantService } from './shared/services/theme-constant.service';
 import { SnackContainerComponent } from './shared/components/snack-container/snack-container.component';
 
+// Función para cargar archivos de traducción
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
+
 registerLocaleData(en);
+registerLocaleData(es);
 
 @NgModule({
     declarations: [
@@ -39,6 +48,7 @@ registerLocaleData(en);
     imports: [
         BrowserModule,
         BrowserAnimationsModule,
+        HttpClientModule,
         AppRoutingModule,
         TemplateModule,
         SharedModule,
@@ -47,9 +57,17 @@ registerLocaleData(en);
         BaseChartDirective,
         NgApexchartsModule,
         FullCalendarModule,
-        HttpClientModule,
         AngularSvgIconModule.forRoot(),
-        SnackContainerComponent
+        SnackContainerComponent,
+        TranslateModule.forRoot({
+            loader: {
+                provide: TranslateLoader,
+                useFactory: HttpLoaderFactory,
+                deps: [HttpClient]
+            },
+            defaultLanguage: 'es-CO',
+            useDefaultLang: true
+        })
     ],
     providers: [
         {
@@ -60,13 +78,12 @@ registerLocaleData(en);
             provide: LocationStrategy,
             useClass: PathLocationStrategy
         },
+        ThemeConstantService,
         {
             provide: HTTP_INTERCEPTORS,
-            useClass: JwtInterceptor,
+            useClass: AuthTokenInterceptor,
             multi: true
-        },
-        ThemeConstantService,
-        AuthenticationService
+        }
     ],
     bootstrap: [AppComponent]
 })

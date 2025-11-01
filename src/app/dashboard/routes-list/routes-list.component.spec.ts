@@ -1,15 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { RoutesListComponent, RouteItem } from './routes-list.component';
 import { RoutesService, Route } from '../../shared/services/routes.service';
 import { of, throwError } from 'rxjs';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
+
+// Mock pipe for customTranslate
+@Pipe({ name: 'customTranslate' })
+class MockCustomTranslatePipe implements PipeTransform {
+  transform(key: string): string {
+    return key; // Return the key as the translation for testing
+  }
+}
 
 describe('RoutesListComponent', () => {
   let component: RoutesListComponent;
   let fixture: ComponentFixture<RoutesListComponent>;
   let mockRoutesService: jasmine.SpyObj<RoutesService>;
   let mockRouter: jasmine.SpyObj<Router>;
+  let mockTranslateService: jasmine.SpyObj<TranslateService>;
 
   const mockRoutes: Route[] = [
     {
@@ -41,18 +51,24 @@ describe('RoutesListComponent', () => {
   beforeEach(async () => {
     const routesServiceSpy = jasmine.createSpyObj('RoutesService', ['getRoutes']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    const translateServiceSpy = jasmine.createSpyObj('TranslateService', ['instant']);
+
+    // Mock translateService.instant to return the key as the translation
+    translateServiceSpy.instant.and.callFake((key: string) => key);
 
     await TestBed.configureTestingModule({
-      declarations: [RoutesListComponent],
+      declarations: [RoutesListComponent, MockCustomTranslatePipe],
       providers: [
         { provide: RoutesService, useValue: routesServiceSpy },
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        { provide: TranslateService, useValue: translateServiceSpy }
       ],
       schemas: [NO_ERRORS_SCHEMA] // Para ignorar componentes de Ant Design en tests
     }).compileComponents();
 
     mockRoutesService = TestBed.inject(RoutesService) as jasmine.SpyObj<RoutesService>;
     mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    mockTranslateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
   });
 
   beforeEach(() => {
@@ -145,7 +161,7 @@ describe('RoutesListComponent', () => {
       component.loadRoutes();
 
       expect(component.loading).toBe(false);
-      expect(component.error).toBe('No se pudieron cargar las rutas. Por favor, intente nuevamente.');
+      expect(component.error).toBe('routes.loadingError');
       expect(console.error).toHaveBeenCalledWith('Error al cargar las rutas:', jasmine.any(Error));
     });
 
@@ -222,19 +238,19 @@ describe('RoutesListComponent', () => {
 
   describe('getStatusText', () => {
     it('should return "Planificada" for planned status', () => {
-      expect(component.getStatusText('planned')).toBe('Planificada');
+      expect(component.getStatusText('planned')).toBe('routes.statusPlanned');
     });
 
     it('should return "En curso" for in_progress status', () => {
-      expect(component.getStatusText('in_progress')).toBe('En curso');
+      expect(component.getStatusText('in_progress')).toBe('routes.statusInProgress');
     });
 
     it('should return "Con incidencias" for with_incidents status', () => {
-      expect(component.getStatusText('with_incidents')).toBe('Con incidencias');
+      expect(component.getStatusText('with_incidents')).toBe('routes.statusWithIncidents');
     });
 
     it('should return "Completada" for completed status', () => {
-      expect(component.getStatusText('completed')).toBe('Completada');
+      expect(component.getStatusText('completed')).toBe('routes.statusCompleted');
     });
 
     it('should return original status for unknown status', () => {
@@ -284,7 +300,7 @@ describe('RoutesListComponent', () => {
 
       component.loadRoutes();
 
-      expect(component.error).toBe('No se pudieron cargar las rutas. Por favor, intente nuevamente.');
+      expect(component.error).toBe('routes.loadingError');
       expect(component.loading).toBe(false);
     });
 
@@ -323,13 +339,13 @@ describe('RoutesListComponent', () => {
       component.loadRoutes();
 
       expect(component.getStatusColor(component.routes[0].status)).toBe('blue');
-      expect(component.getStatusText(component.routes[0].status)).toBe('Planificada');
+      expect(component.getStatusText(component.routes[0].status)).toBe('routes.statusPlanned');
 
       expect(component.getStatusColor(component.routes[1].status)).toBe('green');
-      expect(component.getStatusText(component.routes[1].status)).toBe('En curso');
+      expect(component.getStatusText(component.routes[1].status)).toBe('routes.statusInProgress');
 
       expect(component.getStatusColor(component.routes[2].status)).toBe('default');
-      expect(component.getStatusText(component.routes[2].status)).toBe('Completada');
+      expect(component.getStatusText(component.routes[2].status)).toBe('routes.statusCompleted');
     });
 
     it('should handle full user flow: load routes then create new route', () => {
@@ -569,10 +585,10 @@ describe('RoutesListComponent', () => {
 
     it('should have matching color and text for each status', () => {
       const statusMap = [
-        { status: 'planned', color: 'blue', text: 'Planificada' },
-        { status: 'in_progress', color: 'green', text: 'En curso' },
-        { status: 'with_incidents', color: 'orange', text: 'Con incidencias' },
-        { status: 'completed', color: 'default', text: 'Completada' }
+        { status: 'planned', color: 'blue', text: 'routes.statusPlanned' },
+        { status: 'in_progress', color: 'green', text: 'routes.statusInProgress' },
+        { status: 'with_incidents', color: 'orange', text: 'routes.statusWithIncidents' },
+        { status: 'completed', color: 'default', text: 'routes.statusCompleted' }
       ];
 
       statusMap.forEach(({ status, color, text }) => {
@@ -691,7 +707,7 @@ describe('RoutesListComponent', () => {
 
       expect(component.routes).toEqual([]);
       expect(component.loading).toBe(false);
-      expect(component.error).toBe('No se pudieron cargar las rutas. Por favor, intente nuevamente.');
+      expect(component.error).toBe('routes.loadingError');
     });
   });
 });

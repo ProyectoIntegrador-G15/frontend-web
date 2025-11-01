@@ -64,8 +64,8 @@ export class QuickViewComponent implements OnInit {
       body.classList.add('dark');
       const logoImg = document.getElementById('logo-img') as HTMLImageElement;
       const logoFoldImg = document.getElementById('logo-fold-img') as HTMLImageElement;
-      logoImg.src = 'assets/images/logo/logo-white.png';
-      logoFoldImg.src = 'assets/images/logo/logo-fold.png';
+      logoImg.src = 'assets/images/logo/logo-white.svg';
+      logoFoldImg.src = 'assets/images/logo/logo-fold.svg';
     }
 
     if (isListClassEnabled === 'true') {
@@ -89,11 +89,11 @@ export class QuickViewComponent implements OnInit {
     const logoFoldImg = document.getElementById('logo-fold-img') as HTMLImageElement;
 
     if (isDarkModeEnabled) {
-      logoImg.src = 'assets/images/logo/logo-white.png';
-      logoFoldImg.src = 'assets/images/logo/logo-fold.png';
+      logoImg.src = 'assets/images/logo/logo-white.svg';
+      logoFoldImg.src = 'assets/images/logo/logo-fold.svg';
     } else {
-      logoImg.src = 'assets/images/logo/logo-dark.png';
-      logoFoldImg.src = 'assets/images/logo/logo-fold.png';
+      logoImg.src = 'assets/images/logo/logo-dark.svg';
+      logoFoldImg.src = 'assets/images/logo/logo-fold.svg';
     }
 
     this.isDarkMode = isDarkModeEnabled;

@@ -1,10 +1,10 @@
 <div class="sellers-list-container">
   <!-- Header con título y botón crear vendedor -->
   <div class="flex items-center justify-between mb-6">
-    <h1 class="screen-title">Vendedores</h1>
+    <h1 class="screen-title">{{ 'sellers.title' | customTranslate }}</h1>
     <button class="btn-primary" (click)="createSeller()">
       <span nz-icon nzType="plus" nzTheme="outline"></span>
-      Crear vendedor
+      {{ 'sellers.createSeller' | customTranslate }}
     </button>
   </div>
 
@@ -16,7 +16,7 @@
   <!-- Mensaje de error -->
   <div *ngIf="error && !loading" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
     <p class="font-medium">{{ error }}</p>
-    <button class="mt-2 text-sm underline" (click)="loadSellers()">Reintentar</button>
+    <button class="mt-2 text-sm underline" (click)="loadSellers()">{{ 'sellers.retry' | customTranslate }}</button>
   </div>
 
   <!-- Tabla de vendedores con estilos globales -->
@@ -24,11 +24,11 @@
     <table>
       <thead>
         <tr>
-          <th>Nombre</th>
-          <th>Identificación</th>
-          <th>Estado</th>
-          <th>Email</th>
-          <th>Acciones</th>
+          <th>{{ 'sellers.name' | customTranslate }}</th>
+          <th>{{ 'sellers.identification' | customTranslate }}</th>
+          <th>{{ 'sellers.status' | customTranslate }}</th>
+          <th>{{ 'sellers.email' | customTranslate }}</th>
+          <th>{{ 'sellers.actions' | customTranslate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -67,9 +67,9 @@
   <div *ngIf="!loading && !error && sellers.length === 0" class="empty-state">
     <div class="empty-state-content">
       <span nz-icon nzType="team" nzTheme="outline" class="empty-icon"></span>
-      <h2 class="empty-title">No hay vendedores registrados</h2>
+      <h2 class="empty-title">{{ 'sellers.noSellers' | customTranslate }}</h2>
       <p class="empty-description">
-        Aún no tienes vendedores en el sistema.
+        {{ 'sellers.noSellersDescription' | customTranslate }}
       </p>
     </div>
   </div>
