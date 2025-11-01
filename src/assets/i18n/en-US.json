@@ -174,8 +174,18 @@
     "unitsCompliance": "% units compliance",
     "revenueCompliance": "% revenue compliance",
     "topProducts": "Top products",
-    "viewAllProducts": "View all products",
     "ordersDetail": "Orders detail",
-    "export": "Export CSV/PDF"
+    "export": "Export CSV/PDF",
+    "selectMonthYear": "Select month/year",
+    "product": "Product",
+    "quantity": "Quantity",
+    "amount": "Amount",
+    "units": "units",
+    "noProductsMessage": "No products sold for this seller in the selected period.",
+    "productsChart": "Products sold chart",
+    "noChartData": "No data available to display the chart.",
+    "quantitySoldLabel": "Quantity sold (units)",
+    "productsLabel": "Products",
+    "quantitySoldSeries": "Quantity sold"
   }
 }
