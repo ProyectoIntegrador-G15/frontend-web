@@ -9,6 +9,7 @@ import {RoutesListComponent} from './routes-list/routes-list.component';
 import {CreateRouteComponent} from './create-route/create-route.component';
 import {SellersListComponent} from './sellers-list/sellers-list.component';
 import {SellerDetailsComponent} from './seller-details/seller-details.component';
+import {ReportsComponent} from './reports/reports.component';
 
 
 const routes: Routes = [
@@ -66,6 +67,13 @@ const routes: Routes = [
     component: SellerDetailsComponent,
     data: {
       title: 'Detalles del Vendedor',
+    },
+  },
+  {
+    path: 'reports',
+    component: ReportsComponent,
+    data: {
+      title: 'Reportes',
     },
   },
 ];

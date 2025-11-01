@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
-import {CommonModule} from "@angular/common";
+import {CommonModule} from '@angular/common';
 import {SharedModule} from '../shared/shared.module';
-import {DashboardRoutingModule} from "./dashboard-routing.module";
+import {DashboardRoutingModule} from './dashboard-routing.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DatePipe} from '@angular/common'; // Import DatePipe
 import {DecimalPipe} from '@angular/common';
@@ -56,6 +56,7 @@ import {RoutesListComponent} from './routes-list/routes-list.component';
 import {CreateRouteComponent} from './create-route/create-route.component';
 import {SellersListComponent} from './sellers-list/sellers-list.component';
 import {SellerDetailsComponent} from './seller-details/seller-details.component';
+import {ReportsComponent} from './reports/reports.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -119,6 +120,7 @@ const antdModule = [
     CreateRouteComponent,
     SellersListComponent,
     SellerDetailsComponent,
+    ReportsComponent,
   ],
   providers: [
     ThemeConstantService,
