@@ -46,7 +46,6 @@ import {PERFECT_SCROLLBAR_CONFIG} from 'ngx-om-perfect-scrollbar';
 import {PerfectScrollbarConfigInterface} from 'ngx-om-perfect-scrollbar';
 import {FullCalendarModule} from '@fullcalendar/angular';
 
-import {BlankPageComponent} from './blank-page/blank-page.component';
 import {WarehousesComponent} from './warehouse/warehouses.component';
 import {WarehouseInventoryComponent} from './warehouse-inventory/warehouse-inventory.component';
 
@@ -56,6 +55,7 @@ import {ProductInventoryComponent} from './product-inventory/product-inventory.c
 import {RoutesListComponent} from './routes-list/routes-list.component';
 import {CreateRouteComponent} from './create-route/create-route.component';
 import {SellersListComponent} from './sellers-list/sellers-list.component';
+import {SellerDetailsComponent} from './seller-details/seller-details.component';
 import {ReportsComponent} from './reports/reports.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
@@ -112,7 +112,6 @@ const antdModule = [
   ],
   exports: [],
   declarations: [
-    BlankPageComponent,
     ProductsComponent,
     ProductInventoryComponent,
     WarehousesComponent,
@@ -120,6 +119,7 @@ const antdModule = [
     RoutesListComponent,
     CreateRouteComponent,
     SellersListComponent,
+    SellerDetailsComponent,
     ReportsComponent,
   ],
   providers: [

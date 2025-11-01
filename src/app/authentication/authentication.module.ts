@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from "@angular/common";
+import { CommonModule } from '@angular/common';
 import { SharedModule } from '../shared/shared.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthenticationRoutingModule } from './authentication-routing.module';
@@ -12,18 +12,16 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 
 import { AngularSvgIconModule } from 'angular-svg-icon';
 
-import { Login1Component } from './login-1/login-1.component';
-import { SignUp1Component } from './sign-up-1/sign-up-1.component';
-import { ForgetPassComponent } from './forget-pass/forget-pass.component';
+import { LoginComponent } from './login/login.component';
 
-const antdModule= [
+const antdModule = [
     NzFormModule,
     NzInputModule,
     NzButtonModule,
     NzCardModule,
     NzCheckboxModule,
     AngularSvgIconModule.forRoot(),
-]
+];
 
 @NgModule({
     imports: [
@@ -34,9 +32,7 @@ const antdModule= [
         ...antdModule
     ],
     declarations: [
-        Login1Component,
-        SignUp1Component,
-        ForgetPassComponent
+        LoginComponent,
     ]
 })
 

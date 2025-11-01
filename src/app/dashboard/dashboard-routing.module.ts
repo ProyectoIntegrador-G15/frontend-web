@@ -1,7 +1,6 @@
 import {NgModule} from '@angular/core';
 import {Routes, RouterModule} from '@angular/router';
 
-import {BlankPageComponent} from './blank-page/blank-page.component';
 import {WarehousesComponent} from './warehouse/warehouses.component';
 import {WarehouseInventoryComponent} from './warehouse-inventory/warehouse-inventory.component';
 import {ProductsComponent} from './products/products.component';
@@ -9,17 +8,11 @@ import {ProductInventoryComponent} from './product-inventory/product-inventory.c
 import {RoutesListComponent} from './routes-list/routes-list.component';
 import {CreateRouteComponent} from './create-route/create-route.component';
 import {SellersListComponent} from './sellers-list/sellers-list.component';
+import {SellerDetailsComponent} from './seller-details/seller-details.component';
 import {ReportsComponent} from './reports/reports.component';
 
 
 const routes: Routes = [
-  {
-    path: 'blank-page',
-    component: BlankPageComponent,
-    data: {
-      title: 'Blank Page',
-    },
-  },
   {
     path: 'products',
     component: ProductsComponent,
@@ -67,6 +60,13 @@ const routes: Routes = [
     component: SellersListComponent,
     data: {
       title: 'Vendedores',
+    },
+  },
+  {
+    path: 'sellers/:id',
+    component: SellerDetailsComponent,
+    data: {
+      title: 'Detalles del Vendedor',
     },
   },
   {

@@ -1,6 +1,8 @@
 import {Component} from '@angular/core';
 import {ThemeConstantService} from '../../services/theme-constant.service';
 import authorMenu from '../../../../assets/data/global/header/author-menu.json';
+import {AuthenticationService} from '../../services/authentication.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -16,11 +18,11 @@ export class HeaderComponent {
   isExpand: boolean;
   appAuthorMenu = authorMenu.appAuthorMenu;
 
-  constructor(private themeService: ThemeConstantService) {
+  constructor(private themeService: ThemeConstantService, private auth: AuthenticationService, private router: Router) {
   }
 
   signOut(): void {
-    console.log('User signed out!');
+    this.auth.logout();
   }
 
   toggleFold(): void {

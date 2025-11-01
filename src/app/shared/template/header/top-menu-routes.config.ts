@@ -432,7 +432,7 @@ export const ROUTES: TopMenuInterface[] = [{
   iconTheme: 'outline',
   icon: 'lock',
   submenu: [{
-      path: '/authentication/login-1',
+      path: '/authentication/login',
       title: 'Log In',
       iconType: '',
       icon: '',
@@ -440,23 +440,6 @@ export const ROUTES: TopMenuInterface[] = [{
       iconTheme: '',
       submenu: []
     },
-    {
-      path: '/authentication/sign-up-1',
-      title: 'Sign Up',
-      iconType: '',
-      icon: '',
-
-      iconTheme: '',
-      submenu: []
-    },
-    {
-      path: '/authentication/forget-pass',
-      title: 'Forget password',
-      iconType: '',
-      icon: '',
-      iconTheme: '',
-      submenu: []
-    }
   ]
 },
 {
@@ -520,14 +503,6 @@ export const ROUTES: TopMenuInterface[] = [{
       title: 'Banners',
       iconType: 'nzIcon',
       icon: 'profile',
-      iconTheme: 'outline',
-      submenu: []
-    },
-    {
-      path: '/pages/blank-page',
-      title: 'Blank Page',
-      iconType: 'nzIcon',
-      icon: 'exclamation-circle',
       iconTheme: 'outline',
       submenu: []
     },
