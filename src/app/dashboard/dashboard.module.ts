@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
-import {CommonModule} from "@angular/common";
+import {CommonModule} from '@angular/common';
 import {SharedModule} from '../shared/shared.module';
-import {DashboardRoutingModule} from "./dashboard-routing.module";
+import {DashboardRoutingModule} from './dashboard-routing.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DatePipe} from '@angular/common'; // Import DatePipe
 import {DecimalPipe} from '@angular/common';

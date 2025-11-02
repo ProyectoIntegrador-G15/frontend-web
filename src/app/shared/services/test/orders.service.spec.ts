@@ -104,8 +104,18 @@ describe('OrdersService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
-      req.flush({ detail: errorMessage }, { status: 500, statusText: 'Server Error' });
+      // ApiService tiene retry(2), así que puede hacer hasta 3 peticiones (1 inicial + 2 retries)
+      // Esperamos y resolvemos todas las peticiones que se hacen secuencialmente
+      const req1 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req1.flush({ detail: errorMessage }, { status: 500, statusText: 'Server Error' });
+      
+      // Esperamos el primer retry
+      const req2 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req2.flush({ detail: errorMessage }, { status: 500, statusText: 'Server Error' });
+      
+      // Esperamos el segundo retry
+      const req3 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req3.flush({ detail: errorMessage }, { status: 500, statusText: 'Server Error' });
     });
 
     it('should transform API response to frontend format', () => {
@@ -204,8 +214,19 @@ describe('OrdersService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${apiUrl}${ordersEndpoint}/${orderId}`);
-      req.flush({ detail: 'Orden no encontrada' }, { status: 404, statusText: 'Not Found' });
+      // ApiService tiene retry(2), así que puede hacer hasta 3 peticiones (1 inicial + 2 retries)
+      // Esperamos y resolvemos todas las peticiones que se hacen secuencialmente
+      const errorResponse = { detail: 'Orden no encontrada' };
+      const req1 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}/${orderId}`);
+      req1.flush(errorResponse, { status: 404, statusText: 'Not Found' });
+      
+      // Esperamos el primer retry
+      const req2 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}/${orderId}`);
+      req2.flush(errorResponse, { status: 404, statusText: 'Not Found' });
+      
+      // Esperamos el segundo retry
+      const req3 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}/${orderId}`);
+      req3.flush(errorResponse, { status: 404, statusText: 'Not Found' });
     });
   });
 
@@ -319,8 +340,18 @@ describe('OrdersService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
-      req.error(new ProgressEvent('timeout'));
+      // ApiService tiene retry(2), así que puede hacer hasta 3 peticiones (1 inicial + 2 retries)
+      // Esperamos y resolvemos todas las peticiones que se hacen secuencialmente
+      const req1 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req1.error(new ProgressEvent('timeout'));
+      
+      // Esperamos el primer retry
+      const req2 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req2.error(new ProgressEvent('timeout'));
+      
+      // Esperamos el segundo retry
+      const req3 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req3.error(new ProgressEvent('timeout'));
     });
   });
 
@@ -333,8 +364,19 @@ describe('OrdersService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
-      req.flush({ detail: 'Error específico', message: 'Error genérico' }, { status: 500, statusText: 'Server Error' });
+      // ApiService tiene retry(2), así que puede hacer hasta 3 peticiones (1 inicial + 2 retries)
+      // Esperamos y resolvemos todas las peticiones que se hacen secuencialmente
+      const errorResponse = { detail: 'Error específico', message: 'Error genérico' };
+      const req1 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req1.flush(errorResponse, { status: 500, statusText: 'Server Error' });
+      
+      // Esperamos el primer retry
+      const req2 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req2.flush(errorResponse, { status: 500, statusText: 'Server Error' });
+      
+      // Esperamos el segundo retry
+      const req3 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req3.flush(errorResponse, { status: 500, statusText: 'Server Error' });
     });
 
     it('should use error.error.message when detail is not available', () => {
@@ -345,8 +387,19 @@ describe('OrdersService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
-      req.flush({ message: 'Error en el objeto' }, { status: 500, statusText: 'Server Error' });
+      // ApiService tiene retry(2), así que puede hacer hasta 3 peticiones (1 inicial + 2 retries)
+      // Esperamos y resolvemos todas las peticiones que se hacen secuencialmente
+      const errorResponse = { message: 'Error en el objeto' };
+      const req1 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req1.flush(errorResponse, { status: 500, statusText: 'Server Error' });
+      
+      // Esperamos el primer retry
+      const req2 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req2.flush(errorResponse, { status: 500, statusText: 'Server Error' });
+      
+      // Esperamos el segundo retry
+      const req3 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req3.flush(errorResponse, { status: 500, statusText: 'Server Error' });
     });
 
     it('should use default message when no error details available', () => {
@@ -357,8 +410,18 @@ describe('OrdersService', () => {
         }
       });
 
-      const req = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
-      req.error(new ProgressEvent('error'));
+      // ApiService tiene retry(2), así que puede hacer hasta 3 peticiones (1 inicial + 2 retries)
+      // Esperamos y resolvemos todas las peticiones que se hacen secuencialmente
+      const req1 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req1.error(new ProgressEvent('error'));
+      
+      // Esperamos el primer retry
+      const req2 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req2.error(new ProgressEvent('error'));
+      
+      // Esperamos el segundo retry
+      const req3 = httpMock.expectOne(`${apiUrl}${ordersEndpoint}`);
+      req3.error(new ProgressEvent('error'));
     });
   });
 });

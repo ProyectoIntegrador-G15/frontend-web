@@ -218,8 +218,18 @@
     "unitsCompliance": "% cumplimiento unidades",
     "revenueCompliance": "% cumplimiento ingresos",
     "topProducts": "Productos más vendidos",
-    "viewAllProducts": "Ver todos los productos",
     "ordersDetail": "Detalle de pedidos",
-    "export": "Exportar CSV/PDF"
+    "export": "Exportar CSV/PDF",
+    "selectMonthYear": "Seleccionar mes/año",
+    "product": "Producto",
+    "quantity": "Cantidad",
+    "amount": "Monto",
+    "units": "unidades",
+    "noProductsMessage": "No hay productos vendidos para este vendedor en el período seleccionado.",
+    "productsChart": "Gráfico de productos vendidos",
+    "noChartData": "No hay datos disponibles para mostrar el gráfico.",
+    "quantitySoldLabel": "Cantidad vendida (unidades)",
+    "productsLabel": "Productos",
+    "quantitySoldSeries": "Cantidad vendida"
   }
 }

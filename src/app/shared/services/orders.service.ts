@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
+import {Injectable, inject} from '@angular/core';
+import {Observable, throwError} from 'rxjs';
+import {map, catchError} from 'rxjs/operators';
+import {ApiService} from './api/api.service';
+import {EndpointsService} from './api/endpoints.service';
 
 // Interfaz para el producto en una orden
 export interface ProductOrder {
@@ -45,20 +45,25 @@ export interface Order {
   products: ProductOrder[];
 }
 
+export interface TopProductSales {
+  product_id: number;
+  product_name: string;
+  total_quantity: number;
+  total_sales_amount: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class OrdersService {
-
-  constructor(private http: HttpClient) { }
+  private apiService = inject(ApiService);
+  private endpointsService = inject(EndpointsService);
 
   /**
    * Gets all orders from the backend
    */
   getOrders(): Observable<Order[]> {
-    const ordersUrl = `${environment.apiUrl}${environment.apiEndpoints.orders}`;
-    
-    return this.http.get<OrderApiResponse[]>(ordersUrl)
+    return this.apiService.getDirect<OrderApiResponse[]>(this.endpointsService.getEndpointPath('orders'))
       .pipe(
         map(orders => orders.map(order => this.transformOrder(order))),
         catchError(this.handleError)
@@ -85,13 +90,36 @@ export class OrdersService {
    * Gets a specific order by ID
    */
   getOrderById(id: string): Observable<Order> {
-    const ordersUrl = `${environment.apiUrl}${environment.apiEndpoints.orders}/${id}`;
-    
-    return this.http.get<OrderApiResponse>(ordersUrl)
+    return this.apiService.getDirect<OrderApiResponse>(`${this.endpointsService.getEndpointPath('orders')}/${id}`)
       .pipe(
         map(order => this.transformOrder(order)),
         catchError(this.handleError)
       );
+  }
+
+  /**
+   * Gets top 10 best-selling products for a specific seller
+   * @param sellerId - Seller ID
+   * @param startDate - Optional start date (YYYY-MM-DD)
+   * @param endDate - Optional end date (YYYY-MM-DD)
+   */
+  getTopProductsBySeller(sellerId: number, startDate?: string, endDate?: string): Observable<TopProductSales[]> {
+    const params: any = {
+      seller_id: sellerId.toString()
+    };
+
+    // Agregar fechas si se proporcionan
+    if (startDate && endDate) {
+      params.start_date = startDate;
+      params.end_date = endDate;
+    }
+
+    return this.apiService.getDirect<TopProductSales[]>(
+      `${this.endpointsService.getEndpointPath('orders')}/top-products-by-seller`,
+      params
+    ).pipe(
+      catchError(this.handleError)
+    );
   }
 
   /**
