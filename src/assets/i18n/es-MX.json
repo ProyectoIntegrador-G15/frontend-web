@@ -142,6 +142,11 @@
     "routeError": "Error al generar la ruta: {error}"
   },
   "routes": {
+    "title": "Rutas de Entrega",
+    "createRoute": "Crear ruta",
+    "retry": "Reintentar",
+    "routeId": "ID de ruta",
+    "creationDate": "Fecha de creación",
     "originWarehouse": "Almacén de origen",
     "assignedDeliveries": "Entregas asignadas",
     "status": "Estado",
