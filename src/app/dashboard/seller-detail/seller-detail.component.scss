@@ -224,8 +224,50 @@
   }
 }
 
+// Performance tab
+.performance-tab {
+  position: relative;
+  z-index: 1;
+  min-height: 400px;
+}
+
+.kpi-card {
+  min-width: 0;
+  overflow: hidden;
+  width: 100%;
+
+  .kpi-value {
+    max-width: 100%;
+    overflow: hidden;
+    word-break: keep-all;
+    line-height: 1.2;
+    display: block;
+
+    padding-right: 0.25rem;
+    padding-left: 0;
+    box-sizing: border-box;
+
+    font-size: clamp(0.875rem, 3vw, 1.5rem);
+
+    @media (min-width: 1536px) {
+      font-size: 1.5rem;
+    }
+
+    @media (max-width: 1280px) and (min-width: 1024px) {
+      font-size: clamp(1rem, 3.5vw, 1.375rem);
+    }
+
+    @media (max-width: 1023px) and (min-width: 768px) {
+      font-size: clamp(0.875rem, 4vw, 1.25rem);
+    }
+
+    @media (max-width: 767px) {
+      font-size: clamp(0.75rem, 5vw, 1.125rem);
+    }
+  }
+}
+
 // Empty states for other tabs
-.performance-tab,
 .sales-plan-tab {
   min-height: 400px;
   display: flex;
