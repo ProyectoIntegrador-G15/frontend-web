@@ -1,7 +1,32 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SellersService, Seller } from '../../shared/services/sellers.service';
 import { VisitRoutesService, VisitRoute } from '../../shared/services/visit-routes.service';
+import { OrdersService } from '../../shared/services/orders.service';
+import { TranslateService } from '@ngx-translate/core';
+import {
+  ApexAxisChartSeries,
+  ApexChart,
+  ApexXAxis,
+  ApexYAxis,
+  ApexDataLabels,
+  ApexTooltip,
+  ApexLegend,
+  ApexPlotOptions,
+  ChartComponent
+} from 'ng-apexcharts';
+
+export type ChartOptions = {
+  series: ApexAxisChartSeries;
+  chart: ApexChart;
+  xaxis: ApexXAxis;
+  yaxis: ApexYAxis;
+  dataLabels: ApexDataLabels;
+  tooltip: ApexTooltip;
+  legend: ApexLegend;
+  colors: string[];
+  plotOptions: ApexPlotOptions;
+};
 
 interface Tab {
   id: string;
@@ -20,6 +45,32 @@ export class SellerDetailComponent implements OnInit {
   activeTab = 'information';
   visitRoutes: VisitRoute[] = [];
   loadingRoutes = false;
+
+  // Fecha actual
+  currentYear = new Date().getFullYear();
+  currentMonth = new Date().getMonth() + 1;
+
+  // Datos de desempeño
+  performanceData = {
+    startDate: new Date(),
+    endDate: new Date(),
+    kpis: {
+      total_revenue: 0,
+      total_orders: 0,
+      total_visits: 0,
+      units_compliance: 0,
+      revenue_compliance: 0,
+    },
+    topProducts: [] as Array<{ name: string; quantity: number; sales_amount: number }>
+  };
+
+  loadingPerformance = false;
+  loadingTopProducts = false;
+
+  // Configuración del gráfico
+  chartOptions: Partial<ChartOptions> = {};
+
+  @ViewChild('chart') chart: ChartComponent | undefined;
 
   tabs: Tab[] = [
     { id: 'information', label: 'Información' },
@@ -76,15 +127,31 @@ export class SellerDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private sellersService: SellersService,
-    private visitRoutesService: VisitRoutesService
-  ) {}
+    private visitRoutesService: VisitRoutesService,
+    private ordersService: OrdersService,
+    private translateService: TranslateService
+  ) {
+    this.initializeChartOptions();
+  }
 
   ngOnInit(): void {
+    // Suscribirse a cambios de idioma para actualizar el gráfico
+    this.translateService.onLangChange.subscribe(() => {
+      this.initializeChartOptions();
+      if (this.performanceData.topProducts.length > 0) {
+        this.updateChart();
+      }
+    });
+
     const sellerId = this.route.snapshot.paramMap.get('id');
     if (sellerId) {
       this.loadSellerDetail(sellerId);
       this.loadVisitRoutes(sellerId);
     }
+
+    // Inicializar fechas al primer día del mes actual
+    this.performanceData.startDate = new Date(this.currentYear, this.currentMonth - 1, 1);
+    this.performanceData.endDate = new Date(this.currentYear, this.currentMonth - 1, 1);
     
     // Escuchar cambios en el fragment para activar tab
     this.route.fragment.subscribe(fragment => {
@@ -111,6 +178,11 @@ export class SellerDetailComponent implements OnInit {
 
   onTabChange(tabId: string): void {
     this.activeTab = tabId;
+    
+    // Si cambia a la tab de performance, cargar datos
+    if (tabId === 'performance') {
+      this.fetchPerformance();
+    }
     
     // Si cambia a la tab de rutas de visita, recargar datos
     if (tabId === 'visit-routes' && this.seller) {
@@ -236,6 +308,251 @@ export class SellerDetailComponent implements OnInit {
     }
     
     return route.stops.map((stop, idx) => `${idx + 1}. ${stop.clientName}`).join('\n');
+  }
+
+  // ========== MÉTODOS DE PERFORMANCE ==========
+
+  private initializeChartOptions(): void {
+    const locale = this.translateService.currentLang || 'es-CO';
+    this.chartOptions = {
+      series: [],
+      chart: {
+        type: 'bar',
+        height: 350,
+        toolbar: {
+          show: false
+        }
+      },
+      plotOptions: {
+        bar: {
+          borderRadius: 4,
+          horizontal: true,
+          dataLabels: {
+            position: 'top'
+          }
+        }
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: (val: number) => {
+          const units = this.translateService.instant('performance.units');
+          return val.toLocaleString(locale) + ' ' + units;
+        },
+        offsetX: 0,
+        offsetY: -20,
+        style: {
+          fontSize: '12px',
+          colors: ['#304758']
+        }
+      },
+      xaxis: {
+        categories: [],
+        title: {
+          text: this.translateService.instant('performance.quantitySoldLabel'),
+          style: {
+            fontSize: '14px',
+            fontWeight: 600
+          }
+        },
+        labels: {
+          formatter: (val: string) => {
+            return parseInt(val).toLocaleString(locale);
+          }
+        }
+      },
+      yaxis: {
+        title: {
+          text: this.translateService.instant('performance.productsLabel'),
+          style: {
+            fontSize: '14px',
+            fontWeight: 600
+          }
+        }
+      },
+      tooltip: {
+        y: {
+          formatter: (val: number) => {
+            const units = this.translateService.instant('performance.units');
+            return val.toLocaleString(locale) + ' ' + units;
+          }
+        }
+      },
+      colors: ['#1890ff'],
+      legend: {
+        show: false
+      }
+    };
+  }
+
+  onStartDateChange(date: Date): void {
+    this.performanceData.startDate = date;
+    if (this.isMonthAfter(this.performanceData.startDate, this.performanceData.endDate)) {
+      this.performanceData.endDate = new Date(this.performanceData.startDate);
+    }
+    if (this.activeTab === 'performance') {
+      this.fetchPerformance();
+    }
+  }
+
+  onEndDateChange(date: Date): void {
+    this.performanceData.endDate = date;
+    if (this.isMonthAfter(this.performanceData.startDate, this.performanceData.endDate)) {
+      this.performanceData.startDate = new Date(this.performanceData.endDate);
+    }
+    if (this.activeTab === 'performance') {
+      this.fetchPerformance();
+    }
+  }
+
+  // Deshabilitar meses futuros en el DatePicker (modo mes)
+  disableFutureMonths = (current: Date): boolean => {
+    if (!current) { return false; }
+    const now = new Date();
+    const y = current.getFullYear();
+    const m = current.getMonth();
+    if (y > now.getFullYear()) { return true; }
+    if (y === now.getFullYear() && m > now.getMonth()) { return true; }
+    return false;
+  }
+
+  private formatDateYYYYMMDD(date: Date): string {
+    const d = new Date(date);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  private firstDayOfMonth(date: Date): Date {
+    const d = new Date(date);
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  }
+
+  private lastDayOfMonth(date: Date): Date {
+    const d = new Date(date);
+    return new Date(d.getFullYear(), d.getMonth() + 1, 0);
+  }
+
+  private isMonthAfter(a: Date, b: Date): boolean {
+    const ay = a.getFullYear();
+    const by = b.getFullYear();
+    const am = a.getMonth();
+    const bm = b.getMonth();
+    return ay > by || (ay === by && am > bm);
+  }
+
+  private fetchPerformance(): void {
+    if (!this.seller) return;
+
+    const sellerId = parseInt(this.seller.id);
+    const startMonthFirst = this.firstDayOfMonth(this.performanceData.startDate);
+    const endMonthLast = this.lastDayOfMonth(this.performanceData.endDate);
+    const start = this.formatDateYYYYMMDD(startMonthFirst);
+    const end = this.formatDateYYYYMMDD(endMonthLast);
+
+    this.loadingPerformance = true;
+    this.sellersService.getSellerPerformance(sellerId, start, end).subscribe({
+      next: (resp) => {
+        this.performanceData.kpis = {
+          total_revenue: resp.total_revenue ?? 0,
+          total_orders: resp.total_orders ?? 0,
+          total_visits: resp.total_visits ?? 0,
+          units_compliance: resp.units_compliance ?? 0,
+          revenue_compliance: resp.revenue_compliance ?? 0,
+        };
+        this.loadingPerformance = false;
+      },
+      error: (err) => {
+        console.error('Error fetching seller performance', err);
+        this.loadingPerformance = false;
+      }
+    });
+
+    // Obtener top productos vendidos con las mismas fechas que el performance
+    this.loadingTopProducts = true;
+    this.ordersService.getTopProductsBySeller(sellerId, start, end).subscribe({
+      next: (products) => {
+        this.performanceData.topProducts = products.map(product => ({
+          name: product.product_name,
+          quantity: product.total_quantity,
+          sales_amount: product.total_sales_amount
+        }));
+        this.updateChart();
+        this.loadingTopProducts = false;
+      },
+      error: (err) => {
+        console.error('Error fetching top products by seller', err);
+        this.loadingTopProducts = false;
+        // Limpiar productos en caso de error
+        this.performanceData.topProducts = [];
+        this.updateChart();
+      }
+    });
+  }
+
+  private updateChart(): void {
+    const locale = this.translateService.currentLang || 'es-CO';
+    const quantitySoldSeries = this.translateService.instant('performance.quantitySoldSeries');
+
+    if (this.performanceData.topProducts.length > 0) {
+      const categories = this.performanceData.topProducts.map(p => p.name);
+      const data = this.performanceData.topProducts.map(p => p.quantity);
+
+      this.chartOptions = {
+        ...this.chartOptions,
+        series: [{
+          name: quantitySoldSeries,
+          data
+        }],
+        dataLabels: {
+          ...this.chartOptions.dataLabels,
+          formatter: (val: number) => {
+            const units = this.translateService.instant('performance.units');
+            return val.toLocaleString(locale) + ' ' + units;
+          }
+        },
+        xaxis: {
+          ...this.chartOptions.xaxis,
+          categories,
+          title: {
+            ...this.chartOptions.xaxis?.title,
+            text: this.translateService.instant('performance.quantitySoldLabel')
+          },
+          labels: {
+            formatter: (val: string) => {
+              return parseInt(val).toLocaleString(locale);
+            }
+          }
+        },
+        yaxis: {
+          ...this.chartOptions.yaxis,
+          title: {
+            ...this.chartOptions.yaxis?.title,
+            text: this.translateService.instant('performance.productsLabel')
+          }
+        },
+        tooltip: {
+          y: {
+            formatter: (val: number) => {
+              const units = this.translateService.instant('performance.units');
+              return val.toLocaleString(locale) + ' ' + units;
+            }
+          }
+        }
+      };
+    } else {
+      this.chartOptions = {
+        ...this.chartOptions,
+        series: [{
+          name: quantitySoldSeries,
+          data: []
+        }],
+        xaxis: {
+          ...this.chartOptions.xaxis,
+          categories: []
+        }
+      };
+    }
   }
 }
 
