@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SellersService, Seller } from '../../shared/services/sellers.service';
+import { VisitRoutesService, VisitRoute } from '../../shared/services/visit-routes.service';
 
 interface Tab {
   id: string;
@@ -17,6 +18,8 @@ export class SellerDetailComponent implements OnInit {
   loading = true;
   error = '';
   activeTab = 'information';
+  visitRoutes: VisitRoute[] = [];
+  loadingRoutes = false;
 
   tabs: Tab[] = [
     { id: 'information', label: 'Información' },
@@ -72,14 +75,23 @@ export class SellerDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private sellersService: SellersService
+    private sellersService: SellersService,
+    private visitRoutesService: VisitRoutesService
   ) {}
 
   ngOnInit(): void {
     const sellerId = this.route.snapshot.paramMap.get('id');
     if (sellerId) {
       this.loadSellerDetail(sellerId);
+      this.loadVisitRoutes(sellerId);
     }
+    
+    // Escuchar cambios en el fragment para activar tab
+    this.route.fragment.subscribe(fragment => {
+      if (fragment === 'visit-routes') {
+        this.activeTab = 'visit-routes';
+      }
+    });
   }
 
   loadSellerDetail(sellerId: string): void {
@@ -99,6 +111,26 @@ export class SellerDetailComponent implements OnInit {
 
   onTabChange(tabId: string): void {
     this.activeTab = tabId;
+    
+    // Si cambia a la tab de rutas de visita, recargar datos
+    if (tabId === 'visit-routes' && this.seller) {
+      this.loadVisitRoutes(this.seller.id);
+    }
+  }
+
+  loadVisitRoutes(sellerId: string): void {
+    this.loadingRoutes = true;
+    
+    this.visitRoutesService.getVisitRoutes({ sellerId: parseInt(sellerId) }).subscribe({
+      next: (response) => {
+        this.visitRoutes = response.routes;
+        this.loadingRoutes = false;
+      },
+      error: (error) => {
+        console.error('Error loading visit routes:', error);
+        this.loadingRoutes = false;
+      }
+    });
   }
 
   goBack(): void {
@@ -145,7 +177,65 @@ export class SellerDetailComponent implements OnInit {
   }
 
   createVisitRoute(): void {
-    this.router.navigate(['/dashboard/visit-routes/create']);
+    if (this.seller) {
+      this.router.navigate(['/dashboard/visit-routes/create'], {
+        queryParams: { sellerId: this.seller.id }
+      });
+    }
+  }
+
+  viewRouteDetail(routeId: string): void {
+    // Por ahora solo mostrar en consola
+    // Después se puede crear una vista de detalle
+    console.log('Ver detalle de ruta:', routeId);
+    alert(`Vista de detalle de ruta #${routeId} - Por implementar`);
+  }
+
+  getRouteStatusColor(status: string): string {
+    switch (status) {
+      case 'confirmed': return 'blue';
+      case 'in_progress': return 'orange';
+      case 'completed': return 'green';
+      case 'cancelled': return 'red';
+      default: return 'default';
+    }
+  }
+
+  getRouteStatusText(status: string): string {
+    switch (status) {
+      case 'draft': return 'Borrador';
+      case 'confirmed': return 'Planificada';
+      case 'in_progress': return 'En progreso';
+      case 'completed': return 'Completada';
+      case 'cancelled': return 'Cancelada';
+      default: return status;
+    }
+  }
+
+  getClientNamesShort(route: VisitRoute): string {
+    if (!route.stops || route.stops.length === 0) {
+      return `${route.totalClients} clientes`;
+    }
+
+    const names = route.stops.map(stop => stop.clientName);
+    
+    // Si son 1-2 clientes, mostrar nombres completos
+    if (names.length <= 2) {
+      return names.join(', ');
+    }
+    
+    // Si son 3 o más, mostrar los primeros 2 y "X más"
+    const firstTwo = names.slice(0, 2).join(', ');
+    const remaining = names.length - 2;
+    return `${firstTwo} y ${remaining} más`;
+  }
+
+  getClientNamesForTooltip(route: VisitRoute): string {
+    if (!route.stops || route.stops.length === 0) {
+      return '';
+    }
+    
+    return route.stops.map((stop, idx) => `${idx + 1}. ${stop.clientName}`).join('\n');
   }
 }
 

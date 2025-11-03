@@ -6,4 +6,19 @@
   border-radius: 10px;
 }
 
+:host ::ng-deep {
+  .btn-primary {
+    color: white !important;
+    
+    span, nz-spin {
+      color: white !important;
+    }
+  }
+  
+  .btn-secondary {
+    span {
+      color: var(--blue-violet-a11y, #5F6AB0) !important;
+    }
+  }
+}
 

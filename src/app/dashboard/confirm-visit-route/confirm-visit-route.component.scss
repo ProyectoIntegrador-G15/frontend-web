@@ -1,0 +1,108 @@
+.confirm-route-container {
+  padding: 24px;
+  min-height: calc(100vh - 120px);
+}
+
+.subtitle {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--gray-dark);
+  margin: 0;
+  padding-bottom: 16px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.route-content {
+  width: 100%;
+}
+
+.map-container {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 10px;
+  padding: 24px;
+}
+
+// .stops-section: La tabla usa estilos globales de .table-container
+
+#routeMap {
+  width: 100%;
+  height: 500px;
+  border-radius: 8px;
+  background: #e0e0e0; /* Fondo gris mientras carga */
+  position: relative;
+  
+  // Asegurar que Google Maps llene el contenedor
+  > div {
+    border-radius: 8px;
+  }
+}
+
+.map-footer {
+  padding: 12px 0 0;
+  text-align: center;
+  border-top: 1px solid #e8e8e8;
+  margin-top: 12px;
+}
+
+// Estilos para Google Maps
+:host ::ng-deep {
+  // Personalizar InfoWindows de Google Maps
+  .gm-style .gm-style-iw-c {
+    border-radius: 8px;
+    padding: 0;
+  }
+  
+  .gm-style .gm-style-iw-d {
+    overflow: auto !important;
+  }
+  
+  .gm-style .gm-style-iw-t::after {
+    background: linear-gradient(45deg, white 50%, transparent 51%, transparent 100%);
+  }
+}
+
+// Wrapper para scroll si hay muchas paradas
+.table-container {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.stop-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: #5F6AB0;
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+// Asegurar que el botón tenga texto blanco
+:host ::ng-deep {
+  .btn-primary {
+    color: white !important;
+    
+    span, nz-spin {
+      color: white !important;
+    }
+  }
+}
+
+// Dark mode para componentes específicos
+:host-context(.dark) {
+  .map-container {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+

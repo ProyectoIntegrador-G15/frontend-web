@@ -8,8 +8,10 @@ export const environment = {
   apiEndpoints: {
     orders: '/orders',
     customers: '/customers',
+    clients: '/clients',
     products: '/products',
     routes: '/routes',
+    visitRoutes: '/visits/visit-routes',
     warehouses: '/warehouses',
     visits: '/visits',
     logistics: '/logistics',

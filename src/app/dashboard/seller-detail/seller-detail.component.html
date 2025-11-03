@@ -45,9 +45,9 @@
               {{ getStatusText() }}
             </span>
 
-            <button class="btn-primary view-clients-btn">
-              Ver clientes
-            </button>
+            <!-- <button class="btn-primary view-clients-btn" (click)="createVisitRoute()">
+              Generar ruta de visita
+            </button> -->
           </div>
         </div>
 
@@ -132,39 +132,56 @@
           </button>
         </div>
 
-        <div class="table-container">
+        <!-- Loading -->
+        <div *ngIf="loadingRoutes" class="text-center py-8">
+          <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
+          <p class="mt-4 text-gray-500">Cargando rutas...</p>
+        </div>
+
+        <!-- Sin rutas -->
+        <div *ngIf="!loadingRoutes && visitRoutes.length === 0" class="empty-state text-center py-12">
+          <span nz-icon nzType="calendar" nzTheme="outline" class="empty-icon text-6xl mb-4 block text-gray-300"></span>
+          <h3 class="text-lg font-semibold text-dark dark:text-white mb-2">Sin rutas de visita</h3>
+          <p class="text-gray-500">Aún no hay rutas de visita generadas para este vendedor.</p>
+        </div>
+
+        <!-- Tabla de rutas -->
+        <div *ngIf="!loadingRoutes && visitRoutes.length > 0" class="table-container">
           <table>
             <thead>
               <tr>
                 <th>ID</th>
                 <th>Fecha</th>
-                <th>Hora</th>
-                <th>Cliente</th>
+                <th>Clientes</th>
+                <th>Duración</th>
                 <th>Estado</th>
-                <th>Observaciones</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let visit of mockVisits">
+              <tr *ngFor="let route of visitRoutes">
                 <td>
-                  <p class="font-medium">#{{ visit.id }}</p>
+                  <p class="font-medium">#{{ route.id }}</p>
                 </td>
                 <td>
-                  <p>{{ visit.visitDate }}</p>
+                  <p>{{ route.routeDate }}</p>
                 </td>
                 <td>
-                  <p>{{ visit.visitTime }}</p>
+                  <p class="font-medium" 
+                     [nz-tooltip]="getClientNamesForTooltip(route)"
+                     *ngIf="route.stops && route.stops.length > 0">
+                    {{ getClientNamesShort(route) }}
+                  </p>
+                  <p class="font-medium" *ngIf="!route.stops || route.stops.length === 0">
+                    {{ route.totalClients }} clientes
+                  </p>
                 </td>
                 <td>
-                  <p class="font-medium">{{ visit.clientName }}</p>
+                  <p>{{ route.estimatedDurationMinutes ? (route.estimatedDurationMinutes + ' min') : '--' }}</p>
                 </td>
                 <td>
-                  <nz-tag [nzColor]="visit.status === 'completed' ? 'green' : visit.status === 'pending' ? 'blue' : 'orange'">
-                    {{ visit.status === 'completed' ? 'Completada' : visit.status === 'pending' ? 'Pendiente' : 'En progreso' }}
+                  <nz-tag [nzColor]="getRouteStatusColor(route.status)">
+                    {{ getRouteStatusText(route.status) }}
                   </nz-tag>
-                </td>
-                <td>
-                  <p class="observations-cell">{{ visit.observations }}</p>
                 </td>
               </tr>
             </tbody>

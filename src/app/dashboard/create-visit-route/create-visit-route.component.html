@@ -5,9 +5,20 @@
     <h1 class="screen-title">Generar ruta de visita</h1>
   </div>
 
+  <!-- Alertas de error -->
+  <div *ngIf="error" class="mb-4">
+    <nz-alert nzType="error" [nzMessage]="error" nzCloseable (nzOnClose)="error = null"></nz-alert>
+  </div>
+
   <!-- Card principal -->
   <div class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
     <div class="p-[25px]">
+      <!-- Info del Vendedor -->
+      <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Vendedor</p>
+        <p class="text-lg font-semibold text-dark dark:text-white">{{ sellerName || 'Cargando...' }}</p>
+      </div>
+
       <!-- Campo de Fecha -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-dark dark:text-white mb-2">
@@ -33,22 +44,28 @@
           </span>
         </div>
 
-        <div class="table-container">
+        <!-- Loading spinner -->
+        <div *ngIf="loadingClients" class="text-center py-8">
+          <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
+          <p class="mt-4 text-gray-500">Cargando clientes...</p>
+        </div>
+
+        <!-- Tabla -->
+        <div *ngIf="!loadingClients" class="table-container">
           <table>
             <thead>
               <tr>
                 <th>Seleccionar</th>
                 <th>Cliente</th>
                 <th>Dirección</th>
-                <th>Fecha de Ingreso</th>
+                <th>Email</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let client of paginatedClients">
                 <td class="text-center">
                   <label nz-checkbox 
-                    [(ngModel)]="client.selected"
-                    (ngModelChange)="toggleClientSelection(client)">
+                    [(ngModel)]="client.selected">
                   </label>
                 </td>
                 <td>
@@ -58,7 +75,7 @@
                   <p>{{ client.address }}</p>
                 </td>
                 <td>
-                  <p>{{ client.entryDate }}</p>
+                  <p>{{ client.email }}</p>
                 </td>
               </tr>
             </tbody>
@@ -79,11 +96,15 @@
 
       <!-- Botones de acción -->
       <div class="flex justify-end gap-4 mt-8">
-        <button class="btn-secondary" (click)="goBack()">
+        <button class="btn-secondary" (click)="goBack()" [disabled]="loading">
           Cancelar
         </button>
-        <button class="btn-primary" (click)="generateVisitRoute()">
-          Generar ruta de visita
+        <button class="btn-primary" (click)="generateVisitRoute()" [disabled]="loading || loadingClients">
+          <span *ngIf="!loading">Generar ruta de visita</span>
+          <span *ngIf="loading">
+            <nz-spin nzSimple [nzSize]="'small'"></nz-spin>
+            Generando...
+          </span>
         </button>
       </div>
     </div>

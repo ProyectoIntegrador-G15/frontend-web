@@ -10,6 +10,7 @@ import {CreateRouteComponent} from './create-route/create-route.component';
 import {SellersListComponent} from './sellers-list/sellers-list.component';
 import {SellerDetailComponent} from './seller-detail/seller-detail.component';
 import {CreateVisitRouteComponent} from './create-visit-route/create-visit-route.component';
+import {ConfirmVisitRouteComponent} from './confirm-visit-route/confirm-visit-route.component';
 import {ReportsComponent} from './reports/reports.component';
 
 
@@ -75,6 +76,13 @@ const routes: Routes = [
     component: CreateVisitRouteComponent,
     data: {
       title: 'Generar ruta de visita',
+    },
+  },
+  {
+    path: 'visit-routes/confirm/:routeId',
+    component: ConfirmVisitRouteComponent,
+    data: {
+      title: 'Confirmar ruta',
     },
   },
   {

@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { ClientsService, Client } from '../../shared/services/clients.service';
+import { VisitRoutesService, VisitRoute } from '../../shared/services/visit-routes.service';
+import { SellersService, Seller } from '../../shared/services/sellers.service';
+import { SnackService } from '../../shared/services/snack.service';
 
-interface Client {
-  id: number;
-  name: string;
-  address: string;
-  entryDate: string;
+interface ClientWithSelection extends Client {
   selected: boolean;
 }
 
@@ -16,81 +16,98 @@ interface Client {
 })
 export class CreateVisitRouteComponent implements OnInit {
   selectedDate: Date | null = null;
-  clients: Client[] = [];
+  selectedSellerId: string | null = null;
+  sellerName: string = '';
+  clients: ClientWithSelection[] = [];
+  
+  // Estado
+  loading = false;
+  loadingClients = false;
+  error: string | null = null;
   
   // Paginación
   currentPage = 1;
   pageSize = 5;
+  
+  // Ruta generada
+  generatedRoute: VisitRoute | null = null;
+  showRoutePreview = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private clientsService: ClientsService,
+    private visitRoutesService: VisitRoutesService,
+    private sellersService: SellersService,
+    private snackService: SnackService
+  ) {}
 
   ngOnInit(): void {
+    // Obtener sellerId de la URL o del queryParams
+    this.route.queryParams.subscribe(params => {
+      this.selectedSellerId = params['sellerId'] || '1'; // Default a 1 si no viene
+    });
+    
+    this.route.params.subscribe(params => {
+      if (params['sellerId']) {
+        this.selectedSellerId = params['sellerId'];
+      }
+    });
+
+    // Si tenemos sellerId, cargar info del vendedor
+    if (this.selectedSellerId) {
+      this.loadSellerInfo();
+    }
+    
     this.loadClients();
   }
 
-  loadClients(): void {
-    // Datos quemados de clientes
-    this.clients = [
-      {
-        id: 1,
-        name: 'Hospital San Rafael',
-        address: 'Calle 123 #45-67, Bogotá',
-        entryDate: '15-01-2024',
-        selected: false
+  loadSellerInfo(): void {
+    if (!this.selectedSellerId) return;
+    
+    this.sellersService.getSellerById(this.selectedSellerId).subscribe({
+      next: (seller) => {
+        this.sellerName = seller.name;
       },
-      {
-        id: 2,
-        name: 'Clínica Central',
-        address: 'Av. 68 #25-30, Medellín',
-        entryDate: '20-02-2024',
-        selected: false
-      },
-      {
-        id: 3,
-        name: 'Farmacia Vida',
-        address: 'Carrera 15 #80-50, Bogotá',
-        entryDate: '10-03-2024',
-        selected: false
-      },
-      {
-        id: 4,
-        name: 'Hospital del Sur',
-        address: 'Carrera 30 #17-55, Cali',
-        entryDate: '05-04-2024',
-        selected: false
-      },
-      {
-        id: 5,
-        name: 'Centro Médico Norte',
-        address: 'Calle 170 #7-30, Bogotá',
-        entryDate: '12-05-2024',
-        selected: false
-      },
-      {
-        id: 6,
-        name: 'Farmacia Popular',
-        address: 'Carrera 7 #32-16, Bogotá',
-        entryDate: '18-06-2024',
-        selected: false
-      },
-      {
-        id: 7,
-        name: 'Clínica del Occidente',
-        address: 'Av. Américas #50-20, Cali',
-        entryDate: '22-07-2024',
-        selected: false
-      },
-      {
-        id: 8,
-        name: 'Hospital General',
-        address: 'Calle 100 #15-20, Cartagena',
-        entryDate: '30-08-2024',
-        selected: false
+      error: (error) => {
+        console.error('Error loading seller:', error);
+        // Si no podemos cargar el vendedor, usamos el primero disponible
+        this.selectedSellerId = '1';
+        this.sellerName = 'Vendedor 1';
       }
-    ];
+    });
   }
 
-  get paginatedClients(): Client[] {
+  loadClients(): void {
+    if (!this.selectedSellerId) {
+      return;
+    }
+
+    this.loadingClients = true;
+    this.error = null;
+
+    const sellerId = parseInt(this.selectedSellerId);
+    
+    this.clientsService.getClients(sellerId).subscribe({
+      next: (clients) => {
+        if (clients.length === 0) {
+          this.error = 'Este vendedor no tiene clientes asignados.';
+        }
+        
+        this.clients = clients.map(client => ({
+          ...client,
+          selected: false
+        }));
+        this.loadingClients = false;
+      },
+      error: (error) => {
+        this.error = 'No se pudieron cargar los clientes. Por favor, intente nuevamente.';
+        this.loadingClients = false;
+      }
+    });
+  }
+
+  get paginatedClients(): ClientWithSelection[] {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
     return this.clients.slice(startIndex, endIndex);
@@ -100,11 +117,11 @@ export class CreateVisitRouteComponent implements OnInit {
     return this.clients.length;
   }
 
-  get selectedClients(): Client[] {
+  get selectedClients(): ClientWithSelection[] {
     return this.clients.filter(c => c.selected);
   }
 
-  toggleClientSelection(client: Client): void {
+  toggleClientSelection(client: ClientWithSelection): void {
     client.selected = !client.selected;
   }
 
@@ -115,27 +132,76 @@ export class CreateVisitRouteComponent implements OnInit {
   };
 
   generateVisitRoute(): void {
+    // Validaciones
+    if (!this.selectedSellerId) {
+      this.error = 'Por favor selecciona un vendedor';
+      return;
+    }
+
     if (!this.selectedDate) {
-      alert('Por favor selecciona una fecha para la ruta de visita');
+      this.error = 'Por favor selecciona una fecha para la ruta de visita';
       return;
     }
 
     if (this.selectedClients.length === 0) {
-      alert('Por favor selecciona al menos un cliente para visitar');
+      this.error = 'Por favor selecciona al menos un cliente para visitar';
       return;
     }
 
-    console.log('Generando ruta de visita:', {
-      date: this.selectedDate,
-      clients: this.selectedClients
-    });
+    // Guardar datos en sessionStorage para la pantalla de confirmación
+    const routeData = {
+      seller_id: parseInt(this.selectedSellerId),
+      seller_name: this.sellerName,
+      route_date: this.formatDateForBackend(this.selectedDate),
+      client_ids: this.selectedClients.map(c => parseInt(c.id)),
+      clients: this.selectedClients,
+      start_time: '08:00'
+    };
 
-    // Por ahora solo mostrar alert, después conectar al backend
-    alert(`Ruta de visita generada para ${this.selectedClients.length} cliente(s) el ${this.formatDate(this.selectedDate)}`);
+    sessionStorage.setItem('pendingVisitRoute', JSON.stringify(routeData));
+    
+    // Redirigir a la pantalla de confirmación (sin crear la ruta aún)
+    this.router.navigate(['/dashboard/visit-routes/confirm/preview']);
+  }
+
+  confirmRoute(): void {
+    if (!this.generatedRoute) return;
+
+    this.loading = true;
+    this.error = null;
+
+    this.visitRoutesService.confirmVisitRoute(this.generatedRoute.id).subscribe({
+      next: (route) => {
+        // Mostrar snack de confirmación
+        this.snackService.success(
+          `Ruta de visita #${route.id} confirmada exitosamente para ${this.sellerName}. Total: ${route.totalClients} clientes.`
+        );
+        
+        // Redirigir al detalle del vendedor (tab de rutas de visita)
+        this.router.navigate(['/dashboard/sellers', this.selectedSellerId], {
+          fragment: 'visit-routes'
+        });
+      },
+      error: (error) => {
+        console.error('Error confirming route:', error);
+        this.error = error.message || 'No se pudo confirmar la ruta';
+        this.snackService.error('Error al confirmar la ruta: ' + (error.message || 'Error desconocido'));
+        this.loading = false;
+      }
+    });
+  }
+
+  cancelRoutePreview(): void {
+    this.showRoutePreview = false;
+    this.generatedRoute = null;
   }
 
   goBack(): void {
-    this.router.navigate(['/dashboard/sellers']);
+    if (this.showRoutePreview) {
+      this.cancelRoutePreview();
+    } else {
+      this.router.navigate(['/dashboard/sellers']);
+    }
   }
 
   private formatDate(date: Date): string {
@@ -143,6 +209,37 @@ export class CreateVisitRouteComponent implements OnInit {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
+  }
+
+  private formatDateForBackend(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  formatTime(timeString?: string): string {
+    if (!timeString) return '--:--';
+    // timeString viene en formato HH:MM:SS desde el backend
+    return timeString.substring(0, 5); // Retorna HH:MM
+  }
+
+  formatDistance(meters?: number): string {
+    if (!meters) return '--';
+    if (meters < 1000) {
+      return `${meters}m`;
+    }
+    return `${(meters / 1000).toFixed(1)}km`;
+  }
+
+  formatDuration(minutes?: number): string {
+    if (!minutes) return '--';
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (hours > 0) {
+      return `${hours}h ${mins}min`;
+    }
+    return `${mins}min`;
   }
 }
 
