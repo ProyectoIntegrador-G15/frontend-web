@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { VisitRoutesService, VisitRoute } from '../../shared/services/visit-routes.service';
 import { SnackService } from '../../shared/services/snack.service';
+import { environment } from '../../../environments/environment';
 
 // Declarar google como global para TypeScript
 declare var google: any;
@@ -303,13 +304,10 @@ export class ConfirmVisitRouteComponent implements OnInit, AfterViewInit {
   }
 
   async geocodeAddress(address: string): Promise<{lat: number, lng: number}> {
-    // API Key de Google Maps (específica para Maps)
-    const GOOGLE_MAPS_API_KEY = 'AIzaSyCZPmIyF0n71zTpgsEmet4O0tKvgQMJmjs';
-    
     try {
       // Usar Google Maps Geocoding API
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&region=co&key=${GOOGLE_MAPS_API_KEY}`
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&region=co&key=${environment.googleMapsApiKey}`
       );
       
       const data = await response.json();

@@ -19,4 +19,5 @@ export const environment = {
   },
   firebaseApiKey: 'AIzaSyAEcWSpsJOLVQ9lVH5tP1m8XaSq7zIpk5Q',
   firebaseAuthBase: 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword',
+  googleMapsApiKey: 'AIzaSyCZPmIyF0n71zTpgsEmet4O0tKvgQMJmjs',
 };

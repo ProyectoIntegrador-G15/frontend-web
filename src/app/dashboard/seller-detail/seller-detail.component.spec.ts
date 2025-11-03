@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SellerDetailComponent } from './seller-detail.component';
 import { SellersService, Seller } from '../../shared/services/sellers.service';
 import { of, throwError } from 'rxjs';
@@ -32,10 +33,12 @@ describe('SellerDetailComponent', () => {
         paramMap: {
           get: jasmine.createSpy('get').and.returnValue('1')
         }
-      }
+      },
+      fragment: of(null) // Mock del Observable fragment
     };
 
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       providers: [
         SellerDetailComponent,
         { provide: SellersService, useValue: sellersServiceSpy },
@@ -57,20 +60,24 @@ describe('SellerDetailComponent', () => {
     it('should load seller detail on init', () => {
       sellersService.getSellerById.and.returnValue(of(mockSeller));
       spyOn(component, 'loadSellerDetail');
+      spyOn(component, 'loadVisitRoutes');
 
       component.ngOnInit();
 
       expect(activatedRoute.snapshot.paramMap.get).toHaveBeenCalledWith('id');
       expect(component.loadSellerDetail).toHaveBeenCalledWith('1');
+      expect(component.loadVisitRoutes).toHaveBeenCalledWith('1');
     });
 
     it('should not load seller if no id in route', () => {
       activatedRoute.snapshot.paramMap.get.and.returnValue(null);
       spyOn(component, 'loadSellerDetail');
+      spyOn(component, 'loadVisitRoutes');
 
       component.ngOnInit();
 
       expect(component.loadSellerDetail).not.toHaveBeenCalled();
+      expect(component.loadVisitRoutes).not.toHaveBeenCalled();
     });
   });
 
