@@ -1,6 +1,5 @@
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { AuthTokenInterceptor } from './shared/interceptors/auth-token.interceptor';
+import { HttpClientModule, HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -14,7 +13,8 @@ import es from '@angular/common/locales/es';
 
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { HttpClient } from '@angular/common/http';
+
+import { AuthTokenInterceptor } from './shared/interceptors/auth-token.interceptor';
 
 import { AppRoutingModule } from './app-routing.module';
 import { TemplateModule } from './shared/template/template.module';
@@ -48,6 +48,7 @@ registerLocaleData(es);
     imports: [
         BrowserModule,
         BrowserAnimationsModule,
+        HttpClientModule,
         AppRoutingModule,
         TemplateModule,
         SharedModule,
@@ -56,18 +57,17 @@ registerLocaleData(es);
         BaseChartDirective,
         NgApexchartsModule,
         FullCalendarModule,
-        HttpClientModule,
         AngularSvgIconModule.forRoot(),
         SnackContainerComponent,
-                TranslateModule.forRoot({
-                    loader: {
-                        provide: TranslateLoader,
-                        useFactory: HttpLoaderFactory,
-                        deps: [HttpClient]
-                    },
-                    defaultLanguage: 'es-CO',
-                    useDefaultLang: true
-                })
+        TranslateModule.forRoot({
+            loader: {
+                provide: TranslateLoader,
+                useFactory: HttpLoaderFactory,
+                deps: [HttpClient]
+            },
+            defaultLanguage: 'es-CO',
+            useDefaultLang: true
+        })
     ],
     providers: [
         {

@@ -4,8 +4,10 @@ export const environment = {
   apiEndpoints: {
     orders: '/orders',
     customers: '/customers',
+    clients: '/clients',
     products: '/products',
     routes: '/routes',
+    visitRoutes: '/visits/visit-routes',
     warehouses: '/warehouses',
     visits: '/visits',
     logistics: '/logistics',
@@ -13,8 +15,9 @@ export const environment = {
     inventory: '/inventory',
     authentication: '/auth',
     sellers: '/sellers',
-    reports: '/reports'
+    reports: '/reports',
   },
   firebaseApiKey: 'AIzaSyAEcWSpsJOLVQ9lVH5tP1m8XaSq7zIpk5Q',
   firebaseAuthBase: 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword',
+  googleMapsApiKey: 'AIzaSyCZPmIyF0n71zTpgsEmet4O0tKvgQMJmjs',
 };

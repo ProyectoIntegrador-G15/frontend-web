@@ -8,7 +8,9 @@ import {ProductInventoryComponent} from './product-inventory/product-inventory.c
 import {RoutesListComponent} from './routes-list/routes-list.component';
 import {CreateRouteComponent} from './create-route/create-route.component';
 import {SellersListComponent} from './sellers-list/sellers-list.component';
-import {SellerDetailsComponent} from './seller-details/seller-details.component';
+import {SellerDetailComponent} from './seller-detail/seller-detail.component';
+import {CreateVisitRouteComponent} from './create-visit-route/create-visit-route.component';
+import {ConfirmVisitRouteComponent} from './confirm-visit-route/confirm-visit-route.component';
 import {ReportsComponent} from './reports/reports.component';
 
 
@@ -64,9 +66,23 @@ const routes: Routes = [
   },
   {
     path: 'sellers/:id',
-    component: SellerDetailsComponent,
+    component: SellerDetailComponent,
     data: {
-      title: 'Detalles del Vendedor',
+      title: 'Perfil del vendedor',
+    },
+  },
+  {
+    path: 'visit-routes/create',
+    component: CreateVisitRouteComponent,
+    data: {
+      title: 'Generar ruta de visita',
+    },
+  },
+  {
+    path: 'visit-routes/confirm/:routeId',
+    component: ConfirmVisitRouteComponent,
+    data: {
+      title: 'Confirmar ruta',
     },
   },
   {
