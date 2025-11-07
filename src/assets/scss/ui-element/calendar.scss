@@ -104,3 +104,35 @@
     @apply dark:text-white/[.87];
   }
 }
+
+
+// Estilos personalizados para el date picker - mejorar contraste de fecha seleccionada
+.ant-picker-cell-selected .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+// Cuando está en hover sobre una fecha con fondo morado
+.ant-picker-cell-in-view.ant-picker-cell-selected:hover .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-start:hover .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-end:hover .ant-picker-cell-inner {
+  color: white !important;
+}
+
+// Fecha actual (today) con fondo morado - IMPORTANTE para el contraste
+.ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner {
+  color: white !important;
+}
+
+// Borde de la fecha actual
+.ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
+  border-color: white !important;
+}
+
+// Borde de la fecha actual cuando está seleccionada
+.ant-picker-cell-in-view.ant-picker-cell-today.ant-picker-cell-selected .ant-picker-cell-inner::before {
+  border-color: white !important;
+}

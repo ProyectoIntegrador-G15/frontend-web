@@ -1,0 +1,485 @@
+<!-- skeleton -->
+<ng-template #loadingSkeleton>
+  <nz-skeleton class="bg-white dark:bg-white/10 rounded-6 p-[30px] pt-[15px]" [nzShape]="circle" [nzAvatar]="true" [nzActive]="true"
+               [nzParagraph]="{ rows: 1 }"></nz-skeleton>
+</ng-template>
+<!-- skeleton -->
+
+<div nz-row>
+  <div nz-col nzXs="24">
+    <ng-container *ngIf="showContent; else loadingSkeleton">
+      <!-- Botón de regreso -->
+      <div class="mb-6">
+        <button
+          (click)="goBack()"
+          class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Regresar
+        </button>
+      </div>
+
+      <h1 class="screen-title mb-6">Perfil del vendedor</h1>
+
+      <!-- Sistema de Tabs -->
+      <div class="px-4 mb-3 bg-white dark:bg-white/10 rounded-10">
+        <ul class="flex flex-wrap items-center">
+          <li class="{{listItemClass}}" (click)="switchTab('informacion')"
+              [ngClass]="{ 'active': activeTab === 'informacion' }">
+            Información
+          </li>
+          <li class="{{listItemClass}}" (click)="switchTab('desempeno')"
+              [ngClass]="{ 'active': activeTab === 'desempeno' }">
+            Desempeño
+          </li>
+          <li class="{{listItemClass}}" (click)="switchTab('plan-ventas')"
+              [ngClass]="{ 'active': activeTab === 'plan-ventas' }">
+            Plan de ventas
+          </li>
+          <li class="{{listItemClass}}" (click)="switchTab('rutas-visita')"
+              [ngClass]="{ 'active': activeTab === 'rutas-visita' }">
+            Rutas de visita
+          </li>
+        </ul>
+      </div>
+
+      <!-- Contenido de los Tabs -->
+      <div class="bg-white dark:bg-white/10 rounded-10 p-[25px]">
+
+        <!-- Tab Información -->
+        <div *ngIf="activeTab === 'informacion'">
+          <!-- Tarjeta de Perfil -->
+          <div class="bg-white dark:bg-white/10 rounded-10 p-6">
+            <!-- Foto de perfil -->
+            <div class="flex justify-center mb-4">
+              <div class="w-24 h-24 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <img
+                  src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"
+                  alt="Foto de {{sellerData.name}}"
+                  class="w-full h-full object-cover"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="w-full h-full bg-primary/20 flex items-center justify-center text-primary text-2xl font-semibold" style="display: none;">
+                  {{sellerData.name.charAt(0)}}
+                </div>
+              </div>
+            </div>
+
+            <!-- Nombre y rol -->
+            <div class="text-center mb-4">
+              <h2 class="text-xl font-bold text-dark dark:text-white/[.87] mb-1">{{sellerData.name}}</h2>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                <span nz-icon nzType="check-circle" nzTheme="outline" class="mr-1 text-xs"></span>
+                {{sellerData.status === 'active' ? 'Activo' : 'Inactivo'}}
+              </span>
+            </div>
+
+            <!-- Línea separadora -->
+            <div class="border-t border-gray-200 dark:border-gray-600 my-4"></div>
+
+            <!-- Información de contacto -->
+            <div class="space-y-3">
+              <!-- Email -->
+              <div class="flex items-center">
+                <span nz-icon nzType="mail" nzTheme="outline" class="text-dark dark:text-white/[.87] mr-3"></span>
+                <span class="text-dark dark:text-white/[.87]">{{sellerData.email}}</span>
+              </div>
+
+              <!-- Teléfono -->
+              <div class="flex items-center">
+                <span nz-icon nzType="phone" nzTheme="outline" class="text-dark dark:text-white/[.87] mr-3"></span>
+                <span class="text-dark dark:text-white/[.87]">{{sellerData.phone}}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información adicional -->
+          <div class="bg-white dark:bg-white/10 rounded-10 p-6">
+            <h3 class="text-lg font-semibold mb-4 text-dark dark:text-white/[.87]">Información Adicional</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <p class="text-sm text-light dark:text-white/60">Identificación:</p>
+                <p class="text-dark dark:text-white/[.87]">{{sellerData.identification}}</p>
+              </div>
+              <div class="space-y-2">
+                <p class="text-sm text-light dark:text-white/60">Dirección:</p>
+                <p class="text-dark dark:text-white/[.87]">{{sellerData.address}}</p>
+              </div>
+              <div class="space-y-2">
+                <p class="text-sm text-light dark:text-white/60">Comisión:</p>
+                <p class="text-dark dark:text-white/[.87]">{{sellerData.commission}}%</p>
+              </div>
+              <div class="space-y-2">
+                <p class="text-sm text-light dark:text-white/60">Meta de ventas:</p>
+                <p class="text-dark dark:text-white/[.87]">${{sellerData.sales_target | number}}</p>
+              </div>
+              <div class="space-y-2">
+                <p class="text-sm text-light dark:text-white/60">Fecha de ingreso:</p>
+                <p class="text-dark dark:text-white/[.87]">{{sellerData.entry_date | date:'dd/MM/yyyy'}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Desempeño -->
+        <div *ngIf="activeTab === 'desempeno'">
+          <h2 class="text-lg font-semibold mb-6 text-dark dark:text-white/[.87]">{{ 'performance.title' | customTranslate }} {{sellerData.name}}</h2>
+
+          <!-- Selectores de fecha -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-dark dark:text-white/[.87]">{{ 'performance.startDate' | customTranslate }}</label>
+              <nz-date-picker
+                [(ngModel)]="performanceData.startDate"
+                (ngModelChange)="onStartDateChange($event)"
+                nzMode="month"
+                nzFormat="MM/yyyy"
+                [nzDisabledDate]="disableFutureMonths"
+                [nzPlaceHolder]="'performance.selectMonthYear' | customTranslate"
+                class="w-full">
+              </nz-date-picker>
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-dark dark:text-white/[.87]">{{ 'performance.endDate' | customTranslate }}</label>
+              <nz-date-picker
+                [(ngModel)]="performanceData.endDate"
+                (ngModelChange)="onEndDateChange($event)"
+                nzMode="month"
+                nzFormat="MM/yyyy"
+                [nzDisabledDate]="disableFutureMonths"
+                [nzPlaceHolder]="'performance.selectMonthYear' | customTranslate"
+                class="w-full">
+              </nz-date-picker>
+            </div>
+          </div>
+
+          <!-- KPIs -->
+          <div class="mb-6">
+            <h3 class="text-md font-semibold mb-4 text-dark dark:text-white/[.87]">{{ 'performance.kpis' | customTranslate }}</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              <!-- Ventas realizadas -->
+              <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600 flex flex-col kpi-card">
+                <h4 class="text-sm font-medium text-light dark:text-white/60 mb-2">{{ 'performance.salesDone' | customTranslate }}</h4>
+                <ng-container *ngIf="!loadingPerformance; else loadingKpi">
+                  <p class="text-2xl font-bold text-dark dark:text-white/[.87] mt-auto kpi-value">${{performanceData.kpis.total_revenue | number:'1.0-0'}}</p>
+                </ng-container>
+                <ng-template #loadingKpi>
+                  <nz-skeleton class="mt-auto" [nzActive]="true" [nzTitle]="false" [nzParagraph]="{rows: 1, width: '80%'}"></nz-skeleton>
+                </ng-template>
+              </div>
+
+              <!-- Órdenes generadas -->
+              <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600 flex flex-col kpi-card">
+                <h4 class="text-sm font-medium text-light dark:text-white/60 mb-2">{{ 'performance.ordersGenerated' | customTranslate }}</h4>
+                <ng-container *ngIf="!loadingPerformance; else loadingKpi2">
+                  <p class="text-2xl font-bold text-dark dark:text-white/[.87] mt-auto kpi-value">{{performanceData.kpis.total_orders}}</p>
+                </ng-container>
+                <ng-template #loadingKpi2>
+                  <nz-skeleton class="mt-auto" [nzActive]="true" [nzTitle]="false" [nzParagraph]="{rows: 1, width: '60%'}"></nz-skeleton>
+                </ng-template>
+              </div>
+
+              <!-- Visitas realizadas -->
+              <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600 flex flex-col kpi-card">
+                <h4 class="text-sm font-medium text-light dark:text-white/60 mb-2">{{ 'performance.visitsDone' | customTranslate }}</h4>
+                <ng-container *ngIf="!loadingPerformance; else loadingKpi3">
+                  <p class="text-2xl font-bold text-dark dark:text-white/[.87] mt-auto kpi-value">{{performanceData.kpis.total_visits}}</p>
+                </ng-container>
+                <ng-template #loadingKpi3>
+                  <nz-skeleton class="mt-auto" [nzActive]="true" [nzTitle]="false" [nzParagraph]="{rows: 1, width: '60%'}"></nz-skeleton>
+                </ng-template>
+              </div>
+
+              <!-- % cumplimiento unidades -->
+              <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600 flex flex-col kpi-card">
+                <h4 class="text-sm font-medium text-light dark:text-white/60 mb-2">{{ 'performance.unitsCompliance' | customTranslate }}</h4>
+                <ng-container *ngIf="!loadingPerformance; else loadingKpi4">
+                  <p class="text-2xl font-bold text-dark dark:text-white/[.87] mt-auto kpi-value">{{performanceData.kpis.units_compliance}}%</p>
+                </ng-container>
+                <ng-template #loadingKpi4>
+                  <nz-skeleton class="mt-auto" [nzActive]="true" [nzTitle]="false" [nzParagraph]="{rows: 1, width: '70%'}"></nz-skeleton>
+                </ng-template>
+              </div>
+
+              <!-- % cumplimiento ingresos -->
+              <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600 flex flex-col kpi-card">
+                <h4 class="text-sm font-medium text-light dark:text-white/60 mb-2">{{ 'performance.revenueCompliance' | customTranslate }}</h4>
+                <ng-container *ngIf="!loadingPerformance; else loadingKpi5">
+                  <p class="text-2xl font-bold text-dark dark:text-white/[.87] mt-auto kpi-value">{{performanceData.kpis.revenue_compliance}}%</p>
+                </ng-container>
+                <ng-template #loadingKpi5>
+                  <nz-skeleton class="mt-auto" [nzActive]="true" [nzTitle]="false" [nzParagraph]="{rows: 1, width: '70%'}"></nz-skeleton>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+
+          <!-- Productos más vendidos -->
+          <div class="mb-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-md font-semibold text-dark dark:text-white/[.87]">{{ 'performance.topProducts' | customTranslate }}</h3>
+            </div>
+            <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+              <ng-container *ngIf="!loadingTopProducts; else loadingTopProductsSkeleton">
+                <div class="space-y-3" *ngIf="performanceData.topProducts.length > 0; else noProducts">
+                  <!-- Header de la tabla -->
+                  <div class="grid grid-cols-12 gap-4 pb-2 border-b border-gray-200 dark:border-gray-600 mb-2">
+                    <div class="col-span-1 text-xs font-semibold text-light dark:text-white/60 text-center">#</div>
+                    <div class="col-span-5 text-xs font-semibold text-light dark:text-white/60">{{ 'performance.product' | customTranslate }}</div>
+                    <div class="col-span-3 text-xs font-semibold text-light dark:text-white/60 text-right">{{ 'performance.quantity' | customTranslate }}</div>
+                    <div class="col-span-3 text-xs font-semibold text-light dark:text-white/60 text-right">{{ 'performance.amount' | customTranslate }}</div>
+                  </div>
+                  <!-- Filas de productos -->
+                  <div *ngFor="let product of performanceData.topProducts; let i = index"
+                       class="grid grid-cols-12 gap-4 py-2 border-b border-gray-100 dark:border-gray-600 last:border-b-0 items-center">
+                    <div class="col-span-1 flex justify-center">
+                      <span class="w-6 h-6 bg-primary/10 text-primary text-xs font-semibold rounded-full flex items-center justify-center">
+                        {{i + 1}}
+                      </span>
+                    </div>
+                    <div class="col-span-5">
+                      <span class="text-sm text-dark dark:text-white/[.87]">{{product.name}}</span>
+                    </div>
+                    <div class="col-span-3 text-right">
+                      <span class="text-sm text-light dark:text-white/60">{{product.quantity}} {{ 'performance.units' | customTranslate }}</span>
+                    </div>
+                    <div class="col-span-3 text-right">
+                      <span class="text-sm font-medium text-dark dark:text-white/[.87]">{{formatCurrency(product.sales_amount)}}</span>
+                    </div>
+                  </div>
+                </div>
+                <ng-template #noProducts>
+                  <div class="text-center py-4 text-light dark:text-white/60">
+                    {{ 'performance.noProductsMessage' | customTranslate }}
+                  </div>
+                </ng-template>
+              </ng-container>
+              <ng-template #loadingTopProductsSkeleton>
+                <div class="space-y-3">
+                  <!-- Header de skeleton -->
+                  <div class="grid grid-cols-12 gap-4 pb-2 border-b border-gray-200 dark:border-gray-600 mb-2">
+                    <div class="col-span-1"></div>
+                    <div class="col-span-5"></div>
+                    <div class="col-span-3"></div>
+                    <div class="col-span-3"></div>
+                  </div>
+                  <!-- Skeleton rows -->
+                  <div *ngFor="let item of [1,2,3,4,5]" class="grid grid-cols-12 gap-4 py-2 border-b border-gray-100 dark:border-gray-600 last:border-b-0">
+                    <div class="col-span-1 flex justify-center">
+                      <nz-skeleton [nzActive]="true" [nzTitle]="false" [nzParagraph]="{rows: 1, width: '24px'}"></nz-skeleton>
+                    </div>
+                    <div class="col-span-5">
+                      <nz-skeleton [nzActive]="true" [nzTitle]="false" [nzParagraph]="{rows: 1}"></nz-skeleton>
+                    </div>
+                    <div class="col-span-3">
+                      <nz-skeleton [nzActive]="true" [nzTitle]="false" [nzParagraph]="{rows: 1, width: '80%'}"></nz-skeleton>
+                    </div>
+                    <div class="col-span-3">
+                      <nz-skeleton [nzActive]="true" [nzTitle]="false" [nzParagraph]="{rows: 1, width: '70%'}"></nz-skeleton>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+
+          <!-- Gráfico de productos vendidos -->
+          <div class="mb-6">
+            <div class="mb-4">
+              <h3 class="text-md font-semibold text-dark dark:text-white/[.87]">{{ 'performance.productsChart' | customTranslate }}</h3>
+            </div>
+            <div class="bg-white dark:bg-white/10 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+              <ng-container *ngIf="!loadingTopProducts; else loadingChartSkeleton">
+                <div *ngIf="performanceData.topProducts.length > 0; else noChartData">
+                  <apx-chart
+                    #chart
+                    [series]="chartOptions.series"
+                    [chart]="chartOptions.chart"
+                    [xaxis]="chartOptions.xaxis"
+                    [yaxis]="chartOptions.yaxis"
+                    [dataLabels]="chartOptions.dataLabels"
+                    [tooltip]="chartOptions.tooltip"
+                    [colors]="chartOptions.colors"
+                    [legend]="chartOptions.legend"
+                    [plotOptions]="chartOptions.plotOptions">
+                  </apx-chart>
+                </div>
+                <ng-template #noChartData>
+                  <div class="text-center py-8 text-light dark:text-white/60">
+                    <p>{{ 'performance.noChartData' | customTranslate }}</p>
+                  </div>
+                </ng-template>
+              </ng-container>
+              <ng-template #loadingChartSkeleton>
+                <div class="flex items-center justify-center py-8">
+                  <nz-skeleton [nzActive]="true" [nzTitle]="false" [nzParagraph]="{rows: 8, width: ['100%', '90%', '95%', '85%', '100%', '90%', '95%', '85%']}"></nz-skeleton>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Plan de ventas -->
+        <div *ngIf="activeTab === 'plan-ventas'">
+          <h2 class="text-lg font-semibold mb-6 text-dark dark:text-white/[.87]">Plan de ventas de {{sellerData.name}}</h2>
+
+          <!-- Controles superiores -->
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <!-- Selector de mes -->
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-dark dark:text-white/[.87]">Mes del plan</label>
+              <nz-select
+                [(ngModel)]="salesPlanData.selectedMonth"
+                (ngModelChange)="onMonthChange($event)"
+                nzPlaceHolder="Seleccionar mes"
+                class="w-full md:w-48">
+                <nz-option *ngFor="let month of salesPlanData.months" [nzValue]="month" [nzLabel]="month"></nz-option>
+              </nz-select>
+            </div>
+
+            <!-- Botón crear plan -->
+            <button
+              (click)="createPlan()"
+              class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors duration-200 flex items-center">
+              <span nz-icon nzType="plus" nzTheme="outline" class="mr-2"></span>
+              Crear plan
+            </button>
+          </div>
+
+          <!-- Tabla de planes de ventas -->
+          <div class="bg-white dark:bg-white/10 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Nombre del plan
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Productos
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Meta total (unidades)
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Meta total ($)
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Región
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Periodo
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-white/10 divide-y divide-gray-200 dark:divide-gray-600">
+                  <tr *ngFor="let plan of salesPlanData.plans" class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-dark dark:text-white/[.87]">
+                        {{plan.name}}
+                      </div>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <span class="text-sm text-light dark:text-white/60">{{plan.products}}</span>
+                        <span nz-icon nzType="exclamation-circle" nzTheme="outline"
+                              class="ml-2 text-gray-400 text-xs"></span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <div class="text-sm text-light dark:text-white/60">
+                        {{plan.totalUnits | number}}
+                      </div>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <div class="text-sm text-light dark:text-white/60">
+                        ${{plan.totalAmount | number}} COP
+                      </div>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <div class="text-sm text-light dark:text-white/60">
+                        {{plan.region}}
+                      </div>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <div class="text-sm text-light dark:text-white/60">
+                        {{plan.period}}
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Rutas de visita -->
+        <div *ngIf="activeTab === 'rutas-visita'">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <h2 class="text-lg font-semibold text-dark dark:text-white/[.87]">Rutas de visita de {{sellerData.name}}</h2>
+
+            <!-- Botón generar ruta -->
+            <button
+              (click)="generateRoute()"
+              class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors duration-200 flex items-center">
+              <span nz-icon nzType="plus" nzTheme="outline" class="mr-2"></span>
+              Generar ruta
+            </button>
+          </div>
+
+          <!-- Tabla de rutas de visita -->
+          <div class="bg-white dark:bg-white/10 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      ID de ruta
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Fecha de ruta
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Clientes agendados
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Estado
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-white/10 divide-y divide-gray-200 dark:divide-gray-600">
+                  <tr *ngFor="let route of routesData.routes" class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-dark dark:text-white/[.87]">
+                        {{route.id}}
+                      </div>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <div class="text-sm text-primary font-medium">
+                        {{route.date}}
+                      </div>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <span class="text-sm text-light dark:text-white/60">{{route.clients}}</span>
+                        <span nz-icon nzType="exclamation-circle" nzTheme="outline"
+                              class="ml-2 text-gray-400 text-xs"></span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                            [ngClass]="getStatusBadgeClass(route.status)">
+                        {{getStatusText(route.status)}}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </ng-container>
+  </div>
+</div>

@@ -1,11 +1,11 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {Injectable, inject} from '@angular/core';
 import {Observable, BehaviorSubject} from 'rxjs';
 import {map, catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 
 import {Product} from '../interfaces/product.type';
-import {environment} from '../../../environments/environment';
+import {ApiService, ApiResponse} from './api/api.service';
+import {EndpointsService} from './api/endpoints.service';
 
 export interface ProductApiResponse {
   id: number;
@@ -16,6 +16,7 @@ export interface ProductApiResponse {
   temperature_range: string;
   requires_cold_chain: boolean;
   status: boolean;
+  supplier_id: number;
   created_at: string;
   updated_at: string;
 }
@@ -27,14 +28,32 @@ export class ProductsService {
   private productsSubject = new BehaviorSubject<Product[]>([]);
   public products$ = this.productsSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  private apiService = inject(ApiService);
+  private endpointsService = inject(EndpointsService);
+
+  constructor() {
   }
 
   getProducts(): Observable<Product[]> {
-    return this.http.get<ProductApiResponse[]>(`${environment.apiUrl}${environment.apiEndpoints.products}`)
+    return this.apiService.getDirect<ProductApiResponse[]>(this.endpointsService.getEndpointPath('products'))
       .pipe(
         map(products => products.map(product => this.transformProduct(product))),
         catchError(this.handleError)
+      );
+  }
+
+  getProductsPaginated(page: number = 1, status: boolean = true, searchTerm: string = ''): Observable<any> {
+    const params: any = {
+      page: page.toString(),
+      status: status.toString()
+    };
+
+    if (searchTerm && searchTerm.trim()) {
+      params.name = searchTerm.trim();
+    }
+
+    return this.apiService.getDirect<any>(`${this.endpointsService.getEndpointPath('products')}/paginated`, params)
+      .pipe(catchError(this.handleError),
       );
   }
 
@@ -45,17 +64,38 @@ export class ProductsService {
     return {
       id: apiProduct.id.toString(),
       name: apiProduct.name,
-      price: apiProduct.purchase_price,
-      provider: 'N/A', // El backend no devuelve este campo todavía
-      needsCold: apiProduct.requires_cold_chain,
-      status: apiProduct.status ? 'active' : 'inactive',
+      purchase_price: apiProduct.purchase_price,
+      supplier: `Proveedor ${apiProduct.supplier_id}`, // Convertir supplier_id a string descriptivo
+      requires_cold_chain: apiProduct.requires_cold_chain,
+      status: apiProduct.status,
       description: apiProduct.description,
       storageInstructions: apiProduct.storage_instructions
     };
   }
 
   createProduct(productData: any): Observable<any> {
-    return this.http.post<any>(`${environment.apiUrl}${environment.apiEndpoints.products}`, productData)
+    return this.apiService.post<any>(this.endpointsService.getEndpointPath('products'), productData)
+      .pipe(
+        map(response => {
+          this.refreshProducts();
+          return response;
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  addInventoryToProduct(productId: string, inventoryData: any): Observable<any> {
+    return this.apiService.post<any>(`${this.endpointsService.getEndpointPath('products')}/${productId}/inventory`, inventoryData)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  bulkUploadProducts(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.apiService.postDirect<any>(`${this.endpointsService.getEndpointPath('products')}/bulk`, formData)
       .pipe(
         map(response => {
           this.refreshProducts();
@@ -80,7 +120,6 @@ export class ProductsService {
    * Manejo de errores
    */
   private handleError(error: any): Observable<never> {
-    console.error('Error en ProductsService:', error);
     let errorMessage = 'Ocurrió un error inesperado';
 
     if (error.error?.message) {

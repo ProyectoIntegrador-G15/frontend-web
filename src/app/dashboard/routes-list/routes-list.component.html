@@ -1,10 +1,10 @@
 <div class="routes-list-container">
   <!-- Header con título y botón crear ruta -->
   <div class="flex items-center justify-between mb-6">
-    <h1 class="screen-title">Rutas de Entrega</h1>
+    <h1 class="screen-title">{{ 'routes.title' | customTranslate }}</h1>
     <button class="btn-primary" (click)="createRoute()">
       <span nz-icon nzType="plus" nzTheme="outline"></span>
-      Crear ruta
+      {{ 'routes.createRoute' | customTranslate }}
     </button>
   </div>
 
@@ -16,20 +16,20 @@
   <!-- Mensaje de error -->
   <div *ngIf="error && !loading" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
     <p class="font-medium">{{ error }}</p>
-    <button class="mt-2 text-sm underline" (click)="loadRoutes()">Reintentar</button>
+    <button class="mt-2 text-sm underline" (click)="loadRoutes()">{{ 'routes.retry' | customTranslate }}</button>
   </div>
 
   <!-- Tabla de rutas con estilos globales -->
-  <div *ngIf="!loading && !error" class="table-container">
+  <div *ngIf="!loading && !error && routes.length > 0" class="table-container">
     <table>
       <thead>
         <tr>
-          <th>ID de ruta</th>
-          <th>Fecha de creación</th>
-          <th>Bodega de origen</th>
-          <th>Entregas asignadas</th>
-          <th>Estado</th>
-          <th>Camion asignado</th>
+          <th>{{ 'routes.routeId' | customTranslate }}</th>
+          <th>{{ 'routes.creationDate' | customTranslate }}</th>
+          <th>{{ 'routes.originWarehouse' | customTranslate }}</th>
+          <th>{{ 'routes.assignedDeliveries' | customTranslate }}</th>
+          <th>{{ 'routes.status' | customTranslate }}</th>
+          <th>{{ 'routes.assignedTruck' | customTranslate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -55,8 +55,19 @@
     </table>
   </div>
 
+  <!-- Empty State - Sin rutas -->
+  <div *ngIf="!loading && !error && routes.length === 0" class="empty-state">
+    <div class="empty-state-content">
+      <span nz-icon nzType="environment" nzTheme="outline" class="empty-icon"></span>
+      <h2 class="empty-title">{{ 'routes.noRoutes' | customTranslate }}</h2>
+      <p class="empty-description">
+        {{ 'routes.noRoutesDescription' | customTranslate }}
+      </p>
+    </div>
+  </div>
+
   <!-- Paginador -->
-  <div class="flex justify-center mt-6">
+  <div *ngIf="routes.length > 0" class="flex justify-center mt-6">
     <nz-pagination [(nzPageIndex)]="currentPage" [nzTotal]="totalItems" [nzPageSize]="pageSize"
       [nzShowSizeChanger]="false" [nzShowQuickJumper]="false">
     </nz-pagination>

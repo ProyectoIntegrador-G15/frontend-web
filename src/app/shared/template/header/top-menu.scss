@@ -63,3 +63,30 @@
     @apply flex;
   }
 }
+
+// Custom avatar circle styles
+.custom-avatar-circle {
+  width: 32px !important;
+  height: 32px !important;
+  background-color: #5F6AB0 !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+}
+
+// Header dropdown shadow and positioning customization
+::ng-deep .ant-dropdown {
+  box-shadow: 0 14px 16px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  margin-top: 0 !important; // Override the default 6px margin-top
+  border-radius: 12px !important; // Round the dropdown
+}
+
+// Round the dropdown menu content
+::ng-deep .ant-dropdown-menu {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}

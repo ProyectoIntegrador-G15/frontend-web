@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
-import {CommonModule} from "@angular/common";
+import {CommonModule} from '@angular/common';
 import {SharedModule} from '../shared/shared.module';
-import {DashboardRoutingModule} from "./dashboard-routing.module";
+import {DashboardRoutingModule} from './dashboard-routing.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DatePipe} from '@angular/common'; // Import DatePipe
 import {DecimalPipe} from '@angular/common';
@@ -36,6 +36,8 @@ import {NzInputModule} from 'ng-zorro-antd/input';
 import {NzMessageModule} from 'ng-zorro-antd/message';
 import {NzPaginationModule} from 'ng-zorro-antd/pagination';
 import {NzSpinModule} from 'ng-zorro-antd/spin';
+import {NzUploadModule} from 'ng-zorro-antd/upload';
+import {NzAlertModule} from 'ng-zorro-antd/alert';
 
 import {AngularSvgIconModule} from 'angular-svg-icon';
 import {BaseChartDirective} from 'ng2-charts';
@@ -45,7 +47,6 @@ import {PERFECT_SCROLLBAR_CONFIG} from 'ngx-om-perfect-scrollbar';
 import {PerfectScrollbarConfigInterface} from 'ngx-om-perfect-scrollbar';
 import {FullCalendarModule} from '@fullcalendar/angular';
 
-import {BlankPageComponent} from './blank-page/blank-page.component';
 import {WarehousesComponent} from './warehouse/warehouses.component';
 import {WarehouseInventoryComponent} from './warehouse-inventory/warehouse-inventory.component';
 
@@ -54,6 +55,13 @@ import {ProductsComponent} from './products/products.component';
 import {ProductInventoryComponent} from './product-inventory/product-inventory.component';
 import {RoutesListComponent} from './routes-list/routes-list.component';
 import {CreateRouteComponent} from './create-route/create-route.component';
+import {SellersListComponent} from './sellers-list/sellers-list.component';
+import {SellerDetailComponent} from './seller-detail/seller-detail.component';
+import {CreateVisitRouteComponent} from './create-visit-route/create-visit-route.component';
+import {ConfirmVisitRouteComponent} from './confirm-visit-route/confirm-visit-route.component';
+import {TabsComponent} from '../shared/components/tabs/tabs.component';
+import {BackButtonComponent} from '../shared/components/back-button/back-button.component';
+import {ReportsComponent} from './reports/reports.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -96,7 +104,9 @@ const antdModule = [
   FullCalendarModule,
   NzMessageModule,
   NzPaginationModule,
-  NzSpinModule
+  NzSpinModule,
+  NzUploadModule,
+  NzAlertModule
 ];
 
 @NgModule({
@@ -104,17 +114,23 @@ const antdModule = [
     CommonModule,
     SharedModule,
     DashboardRoutingModule,
+    TabsComponent,
+    BackButtonComponent,
     ...antdModule
   ],
   exports: [],
   declarations: [
-    BlankPageComponent,
     ProductsComponent,
     ProductInventoryComponent,
     WarehousesComponent,
     WarehouseInventoryComponent,
     RoutesListComponent,
     CreateRouteComponent,
+    SellersListComponent,
+    SellerDetailComponent,
+    CreateVisitRouteComponent,
+    ConfirmVisitRouteComponent,
+    ReportsComponent,
   ],
   providers: [
     ThemeConstantService,

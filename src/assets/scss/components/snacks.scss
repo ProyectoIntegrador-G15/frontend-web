@@ -1,0 +1,149 @@
+// Snack Components
+// Base snack styles
+.snack {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.10), 0 4px 6px -4px rgba(0, 0, 0, 0.10);
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+  animation: slideInRight 0.3s ease-out;
+
+  .snack-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    span[nz-icon] {
+      font-size: 14px;
+      color: white;
+    }
+  }
+
+  .snack-content {
+    flex: 1;
+    color: inherit;
+  }
+
+  .snack-close {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    span[nz-icon] {
+      font-size: 16px;
+    }
+  }
+}
+
+// Success Snack
+.snack-success {
+  border: 1px solid var(--Success, #3A823D);
+  background: #F1FFF2;
+  color: #3A823D;
+
+  .snack-icon {
+    background: #3A823D;
+  }
+
+  .snack-close span[nz-icon] {
+    color: #3A823D;
+  }
+}
+
+// Error Snack (para futuro uso)
+.snack-error {
+  border: 1px solid #D32F2F;
+  background: #FFEBEE;
+  color: #D32F2F;
+
+  .snack-icon {
+    background: #D32F2F;
+  }
+
+  .snack-close span[nz-icon] {
+    color: #D32F2F;
+  }
+}
+
+// Warning Snack (para futuro uso)
+.snack-warning {
+  border: 1px solid #F57C00;
+  background: #FFF3E0;
+  color: #F57C00;
+
+  .snack-icon {
+    background: #F57C00;
+  }
+
+  .snack-close span[nz-icon] {
+    color: #F57C00;
+  }
+}
+
+// Info Snack (para futuro uso)
+.snack-info {
+  border: 1px solid #1976D2;
+  background: #E3F2FD;
+  color: #1976D2;
+
+  .snack-icon {
+    background: #1976D2;
+  }
+
+  .snack-close span[nz-icon] {
+    color: #1976D2;
+  }
+}
+
+// Animation
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+// Container for snacks (fixed position)
+.snack-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 9999;
+  max-width: 400px;
+  width: 100%;
+  pointer-events: none;
+
+  .snack {
+    pointer-events: all;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .snack-container {
+    left: 20px;
+    right: 20px;
+    max-width: none;
+  }
+}
+
+

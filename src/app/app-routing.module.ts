@@ -8,10 +8,10 @@ import { FullLayout_ROUTES } from "./shared/routes/full-layout.routes";
 import { CommonLayout_ROUTES } from "./shared/routes/common-layout.routes";
 
 const appRoutes: Routes = [
-  { path: '', redirectTo: '/authentication/login-1', pathMatch: 'full' },
+  { path: '', redirectTo: '/authentication/login', pathMatch: 'full' },
   {
       path: '',
-      redirectTo: '/authentication/login-1',
+      redirectTo: '/authentication/login',
       pathMatch: 'full',
   },
   {
