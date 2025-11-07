@@ -45,7 +45,7 @@ describe('ProductInventoryComponent', () => {
   beforeEach(async () => {
     const inventoryServiceSpy = jasmine.createSpyObj('InventoryService', ['getProductInventory']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    
+
     mockActivatedRoute = {
       params: of({ id: 'MED-001' })
     };
@@ -75,9 +75,9 @@ describe('ProductInventoryComponent', () => {
   describe('ngOnInit', () => {
     it('should initialize component and load product inventory', () => {
       mockInventoryService.getProductInventory.and.returnValue(of(mockProductInventory));
-      
+
       component.ngOnInit();
-      
+
       expect(component.productId).toBe('MED-001');
       expect(mockInventoryService.getProductInventory).toHaveBeenCalledWith('MED-001');
     });
@@ -86,9 +86,9 @@ describe('ProductInventoryComponent', () => {
       const newParams = { id: 'MED-002' };
       mockActivatedRoute.params = of(newParams);
       mockInventoryService.getProductInventory.and.returnValue(of(mockProductInventory));
-      
+
       component.ngOnInit();
-      
+
       expect(component.productId).toBe('MED-002');
       expect(mockInventoryService.getProductInventory).toHaveBeenCalledWith('MED-002');
     });
@@ -101,9 +101,9 @@ describe('ProductInventoryComponent', () => {
 
     it('should load inventory data successfully', () => {
       mockInventoryService.getProductInventory.and.returnValue(of(mockProductInventory));
-      
+
       component.getProductInventory();
-      
+
       expect(component.isLoading).toBe(false);
       expect(component.errorMessage).toBe('');
       expect(component.inventoryData).toEqual(mockProductInventory);
@@ -112,11 +112,11 @@ describe('ProductInventoryComponent', () => {
 
     it('should handle loading state correctly', () => {
       mockInventoryService.getProductInventory.and.returnValue(of(mockProductInventory));
-      
+
       expect(component.isLoading).toBe(true);
-      
+
       component.getProductInventory();
-      
+
       expect(component.isLoading).toBe(false);
       expect(component.errorMessage).toBe('');
     });
@@ -124,9 +124,9 @@ describe('ProductInventoryComponent', () => {
     it('should handle error when loading inventory', () => {
       const error = new Error('Network error');
       mockInventoryService.getProductInventory.and.returnValue(throwError(() => error));
-      
+
       component.getProductInventory();
-      
+
       expect(component.isLoading).toBe(false);
       expect(component.errorMessage).toBe('Error al obtener el inventario del producto.');
       expect(component.inventoryData).toBeNull();
@@ -136,9 +136,9 @@ describe('ProductInventoryComponent', () => {
     it('should add subscription to prevent memory leaks', () => {
       mockInventoryService.getProductInventory.and.returnValue(of(mockProductInventory));
       spyOn(component['subscription'], 'add');
-      
+
       component.getProductInventory();
-      
+
       expect(component['subscription'].add).toHaveBeenCalled();
     });
   });
@@ -180,7 +180,7 @@ describe('ProductInventoryComponent', () => {
   describe('goBack', () => {
     it('should navigate to products dashboard', () => {
       component.goBack();
-      
+
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/products']);
     });
   });
@@ -188,9 +188,9 @@ describe('ProductInventoryComponent', () => {
   describe('ngOnDestroy', () => {
     it('should unsubscribe from all subscriptions', () => {
       spyOn(component['subscription'], 'unsubscribe');
-      
+
       component.ngOnDestroy();
-      
+
       expect(component['subscription'].unsubscribe).toHaveBeenCalled();
     });
   });
@@ -207,16 +207,16 @@ describe('ProductInventoryComponent', () => {
     it('should update state when inventory is loaded', () => {
       mockInventoryService.getProductInventory.and.returnValue(of(mockProductInventory));
       component.productId = 'MED-001';
-      
+
       component.getProductInventory();
-      
+
       expect(component.inventoryData).toEqual(mockProductInventory);
       expect(component.warehousesData).toEqual(mockProductInventory.warehouses);
       expect(component.isLoading).toBe(false);
       expect(component.errorMessage).toBe('');
     });
 
-    it('should handle empty warehouse data', () => {
+    it('should handle empty warehouses-list data', () => {
       const emptyInventory: ProductInventory = {
         product_id: 'MED-001',
         product_name: 'Test Product',
@@ -224,12 +224,12 @@ describe('ProductInventoryComponent', () => {
         total_warehouses: 0,
         total_quantity: 0
       };
-      
+
       mockInventoryService.getProductInventory.and.returnValue(of(emptyInventory));
       component.productId = 'MED-001';
-      
+
       component.getProductInventory();
-      
+
       expect(component.warehousesData).toEqual([]);
       expect(component.inventoryData).toEqual(emptyInventory);
     });
@@ -240,9 +240,9 @@ describe('ProductInventoryComponent', () => {
       const error = new Error('Service unavailable');
       mockInventoryService.getProductInventory.and.returnValue(throwError(() => error));
       component.productId = 'MED-001';
-      
+
       component.getProductInventory();
-      
+
       expect(component.errorMessage).toBe('Error al obtener el inventario del producto.');
       expect(component.isLoading).toBe(false);
       expect(component.inventoryData).toBeNull();
@@ -252,9 +252,9 @@ describe('ProductInventoryComponent', () => {
       component.errorMessage = 'Previous error';
       mockInventoryService.getProductInventory.and.returnValue(of(mockProductInventory));
       component.productId = 'MED-001';
-      
+
       component.getProductInventory();
-      
+
       expect(component.errorMessage).toBe('');
     });
   });

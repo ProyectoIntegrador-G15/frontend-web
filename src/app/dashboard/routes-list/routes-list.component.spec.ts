@@ -91,9 +91,9 @@ describe('RoutesListComponent', () => {
   describe('ngOnInit', () => {
     it('should call loadRoutes on initialization', () => {
       spyOn(component, 'loadRoutes');
-      
+
       component.ngOnInit();
-      
+
       expect(component.loadRoutes).toHaveBeenCalled();
     });
 
@@ -137,7 +137,7 @@ describe('RoutesListComponent', () => {
 
       // Check loading state before subscribe completes
       component.loadRoutes();
-      
+
       // Note: loading will be true momentarily, then false after subscribe
       expect(mockRoutesService.getRoutes).toHaveBeenCalled();
     });
@@ -174,7 +174,7 @@ describe('RoutesListComponent', () => {
       // Second call succeeds
       mockRoutesService.getRoutes.and.returnValue(of(mockRoutes));
       component.loadRoutes();
-      
+
       expect(component.error).toBeNull();
       expect(component.routes).toEqual(mockRoutes);
     });
@@ -284,7 +284,7 @@ describe('RoutesListComponent', () => {
     it('should handle page change', () => {
       component.currentPage = 2;
       fixture.detectChanges();
-      
+
       expect(component.currentPage).toBe(2);
     });
   });
@@ -533,7 +533,7 @@ describe('RoutesListComponent', () => {
       expect(component.totalItems).toBe(100);
     });
 
-    it('should handle routes with special characters in warehouse names', () => {
+    it('should handle routes with special characters in warehouses-list names', () => {
       const routesWithSpecialChars: Route[] = [
         { ...mockRoutes[0], originWarehouse: 'Bogotá D.C.' },
         { ...mockRoutes[1], originWarehouse: 'San José & Co.' }
@@ -562,7 +562,7 @@ describe('RoutesListComponent', () => {
 
   describe('Status mapping consistency', () => {
     it('should map all valid statuses to colors', () => {
-      const statuses: Array<'planned' | 'in_progress' | 'with_incidents' | 'completed'> = 
+      const statuses: Array<'planned' | 'in_progress' | 'with_incidents' | 'completed'> =
         ['planned', 'in_progress', 'with_incidents', 'completed'];
 
       statuses.forEach(status => {
@@ -573,7 +573,7 @@ describe('RoutesListComponent', () => {
     });
 
     it('should map all valid statuses to text', () => {
-      const statuses: Array<'planned' | 'in_progress' | 'with_incidents' | 'completed'> = 
+      const statuses: Array<'planned' | 'in_progress' | 'with_incidents' | 'completed'> =
         ['planned', 'in_progress', 'with_incidents', 'completed'];
 
       statuses.forEach(status => {
@@ -668,7 +668,7 @@ describe('RoutesListComponent', () => {
     it('should not mutate original routes data', () => {
       const originalRoutes = JSON.parse(JSON.stringify(mockRoutes));
       mockRoutesService.getRoutes.and.returnValue(of(mockRoutes));
-      
+
       component.loadRoutes();
 
       expect(JSON.stringify(mockRoutes)).toBe(JSON.stringify(originalRoutes));

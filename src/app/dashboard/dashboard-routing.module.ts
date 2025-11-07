@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {Routes, RouterModule} from '@angular/router';
 
-import {WarehousesComponent} from './warehouse/warehouses.component';
+import {WarehousesListComponent} from './warehouses-list/warehouses-list.component';
 import {WarehouseInventoryComponent} from './warehouse-inventory/warehouse-inventory.component';
 import {ProductsComponent} from './products/products.component';
 import {ProductInventoryComponent} from './product-inventory/product-inventory.component';
@@ -31,7 +31,7 @@ const routes: Routes = [
   },
   {
     path: 'warehouses',
-    component: WarehousesComponent,
+    component: WarehousesListComponent,
     data: {
       title: 'Bodegas',
     },

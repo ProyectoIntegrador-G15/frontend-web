@@ -9,7 +9,7 @@ describe('WarehousesService', () => {
 
   const mockWarehouses: Warehouse[] = [
     {
-      id: '1',
+      id: 1,
       name: 'Bodega Central',
       city: 'Bogotá',
       country: 'Colombia',
@@ -19,7 +19,7 @@ describe('WarehousesService', () => {
       updated_at: '2025-10-13T00:00:00'
     },
     {
-      id: '2',
+      id: 2,
       name: 'Bodega Sur',
       city: 'Cali',
       country: 'Colombia',
@@ -29,7 +29,7 @@ describe('WarehousesService', () => {
       updated_at: '2025-10-13T00:00:00'
     },
     {
-      id: '3',
+      id: 3,
       name: 'Bodega Norte',
       city: 'Medellín',
       country: 'Colombia',
@@ -39,7 +39,7 @@ describe('WarehousesService', () => {
       updated_at: '2025-10-13T00:00:00'
     },
     {
-      id: '4',
+      id: 4,
       name: 'Bodega Este',
       city: 'Barranquilla',
       country: 'Colombia',
@@ -179,7 +179,7 @@ describe('WarehousesService', () => {
     it('should return empty array when no active warehouses exist', (done) => {
       const inactiveWarehouses: Warehouse[] = [
         {
-          id: '1',
+          id: 1,
           name: 'Bodega Inactiva',
           city: 'Bogotá',
           country: 'Colombia',
@@ -423,9 +423,9 @@ describe('WarehousesService', () => {
       req.flush(null);
     });
 
-    it('should handle very large warehouse list', (done) => {
+    it('should handle very large warehouses-list list', (done) => {
       const largeWarehouseList: Warehouse[] = Array.from({ length: 1000 }, (_, i) => ({
-        id: `${i + 1}`,
+        id: i + 1,
         name: `Bodega ${i + 1}`,
         city: `Ciudad ${i + 1}`,
         country: 'Colombia',
@@ -449,7 +449,7 @@ describe('WarehousesService', () => {
 
     it('should filter large list to get only active warehouses', (done) => {
       const largeWarehouseList: Warehouse[] = Array.from({ length: 100 }, (_, i) => ({
-        id: `${i + 1}`,
+        id: i + 1,
         name: `Bodega ${i + 1}`,
         city: `Ciudad ${i + 1}`,
         country: 'Colombia',
@@ -479,7 +479,7 @@ describe('WarehousesService', () => {
     it('should handle warehouses with special characters in names', (done) => {
       const specialWarehouses: Warehouse[] = [
         {
-          id: '1',
+          id: 1,
           name: 'Bodega "Especial" & Única',
           city: 'Bogotá',
           country: 'Colombia',
@@ -617,6 +617,175 @@ describe('WarehousesService', () => {
       const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.warehouses}`);
       expect(req.request.method).toBe('GET');
       req.flush([]);
+    });
+  });
+
+  // ========================================
+  // GET WAREHOUSES PAGINATED TESTS
+  // ========================================
+
+  describe('getWarehousesPaginated', () => {
+    const mockPaginatedResponse = {
+      warehouses: mockWarehouses,
+      total: 4,
+      total_pages: 1,
+      page: 1,
+      page_size: 5
+    };
+
+    it('should retrieve paginated warehouses', (done) => {
+      service.getWarehousesPaginated(1).subscribe({
+        next: (response) => {
+          expect(response.warehouses).toEqual(mockWarehouses);
+          expect(response.total).toBe(4);
+          expect(response.page).toBe(1);
+          done();
+        },
+        error: done.fail
+      });
+
+      const req = httpMock.expectOne(req => req.url.includes('/warehouses') && req.params.get('page') === '1');
+      expect(req.request.method).toBe('GET');
+      req.flush(mockPaginatedResponse);
+    });
+
+    it('should include name filter in request', (done) => {
+      service.getWarehousesPaginated(1, 'Bodega').subscribe({
+        next: (response) => {
+          expect(response.warehouses.length).toBeGreaterThan(0);
+          done();
+        },
+        error: done.fail
+      });
+
+      const req = httpMock.expectOne(req => 
+        req.url.includes('/warehouses') && 
+        req.params.get('page') === '1' &&
+        req.params.get('name') === 'Bodega'
+      );
+      req.flush(mockPaginatedResponse);
+    });
+
+    it('should include country filter in request', (done) => {
+      service.getWarehousesPaginated(1, undefined, 'Colombia').subscribe({
+        next: (response) => {
+          expect(response.warehouses.length).toBeGreaterThan(0);
+          done();
+        },
+        error: done.fail
+      });
+
+      const req = httpMock.expectOne(req => 
+        req.url.includes('/warehouses') && 
+        req.params.get('page') === '1' &&
+        req.params.get('country') === 'Colombia'
+      );
+      req.flush(mockPaginatedResponse);
+    });
+
+    it('should include both name and country filters', (done) => {
+      service.getWarehousesPaginated(1, 'Bodega', 'Colombia').subscribe({
+        next: (response) => {
+          expect(response.warehouses.length).toBeGreaterThan(0);
+          done();
+        },
+        error: done.fail
+      });
+
+      const req = httpMock.expectOne(req => 
+        req.url.includes('/warehouses') && 
+        req.params.get('page') === '1' &&
+        req.params.get('name') === 'Bodega' &&
+        req.params.get('country') === 'Colombia'
+      );
+      req.flush(mockPaginatedResponse);
+    });
+
+  });
+
+  // ========================================
+  // CREATE WAREHOUSE TESTS
+  // ========================================
+
+  describe('createWarehouse', () => {
+    const newWarehouse = {
+      name: 'Bodega Nueva',
+      city: 'Bogotá',
+      country: 'Colombia',
+      address: 'Calle 123 #45-67'
+    };
+
+    const createdWarehouse: Warehouse = {
+      id: 5,
+      name: 'Bodega Nueva',
+      city: 'Bogotá',
+      country: 'Colombia',
+      address: 'Calle 123 #45-67',
+      status: 'active',
+      created_at: '2025-10-13T00:00:00',
+      updated_at: '2025-10-13T00:00:00'
+    };
+
+    it('should create a new warehouse', (done) => {
+      service.createWarehouse(newWarehouse).subscribe({
+        next: (warehouse) => {
+          expect(warehouse.name).toBe(newWarehouse.name);
+          expect(warehouse.city).toBe(newWarehouse.city);
+          expect(warehouse.country).toBe(newWarehouse.country);
+          expect(warehouse.address).toBe(newWarehouse.address);
+          done();
+        },
+        error: done.fail
+      });
+
+      // Mock de la petición POST para crear la bodega
+      const postReq = httpMock.expectOne(
+        req => req.method === 'POST' && req.url === `${environment.apiUrl}${environment.apiEndpoints.warehouses}`
+      );
+      expect(postReq.request.body).toEqual(newWarehouse);
+      postReq.flush(createdWarehouse);
+
+      // Mock de la petición GET que se hace en refreshWarehouses()
+      const getReq = httpMock.expectOne(
+        req => req.method === 'GET' && req.url === `${environment.apiUrl}${environment.apiEndpoints.warehouses}`
+      );
+      getReq.flush(mockWarehouses);
+    });
+
+    it('should handle error when creating warehouse', (done) => {
+      service.createWarehouse(newWarehouse).subscribe({
+        next: () => done.fail('Should have failed'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(
+        req => req.method === 'POST' && req.url === `${environment.apiUrl}${environment.apiEndpoints.warehouses}`
+      );
+      req.flush(
+        { detail: 'Error creating warehouse' },
+        { status: 400, statusText: 'Bad Request' }
+      );
+    });
+
+    it('should handle duplicate name error', (done) => {
+      service.createWarehouse(newWarehouse).subscribe({
+        next: () => done.fail('Should have failed'),
+        error: (error) => {
+          expect(error.message).toContain('Ya existe');
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(
+        req => req.method === 'POST' && req.url === `${environment.apiUrl}${environment.apiEndpoints.warehouses}`
+      );
+      req.flush(
+        { detail: 'Ya existe una bodega con ese nombre.' },
+        { status: 400, statusText: 'Bad Request' }
+      );
     });
   });
 });
