@@ -32,7 +32,16 @@
   },
   "warehouses": {
     "title": "Warehouses",
+    "newWarehouse": "New Warehouse",
+    "createWarehouse": "Create Warehouse",
     "warehouseName": "Warehouse name",
+    "warehouseNamePlaceholder": "Enter warehouse name",
+    "city": "City",
+    "cityPlaceholder": "Enter city",
+    "country": "Country",
+    "selectCountry": "Select country",
+    "address": "Address",
+    "addressPlaceholder": "Enter full address",
     "location": "Location",
     "availableCapacity": "Available capacity",
     "status": "Status",
@@ -40,7 +49,9 @@
     "actions": "Actions",
     "statusOperative": "Operative",
     "statusMaintenance": "Maintenance",
-    "statusClosed": "Closed"
+    "statusClosed": "Closed",
+    "searchByName": "Search warehouses by name",
+    "filterByCountry": "Filter by country"
   },
   "sellers": {
     "title": "Sellers",

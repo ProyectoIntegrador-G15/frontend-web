@@ -10,7 +10,7 @@ import {ProductsService} from '../../shared/services/products.service';
 import {Product} from '../../shared/interfaces/product.type';
 
 @Component({
-  selector: 'app-warehouse-inventory',
+  selector: 'app-warehouses-list-inventory',
   templateUrl: 'warehouse-inventory.component.html',
 })
 export class WarehouseInventoryComponent implements OnInit, OnDestroy {

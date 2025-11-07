@@ -47,7 +47,7 @@ import {PERFECT_SCROLLBAR_CONFIG} from 'ngx-om-perfect-scrollbar';
 import {PerfectScrollbarConfigInterface} from 'ngx-om-perfect-scrollbar';
 import {FullCalendarModule} from '@fullcalendar/angular';
 
-import {WarehousesComponent} from './warehouse/warehouses.component';
+import {WarehousesListComponent} from './warehouses-list/warehouses-list.component';
 import {WarehouseInventoryComponent} from './warehouse-inventory/warehouse-inventory.component';
 
 // Products
@@ -122,7 +122,7 @@ const antdModule = [
   declarations: [
     ProductsComponent,
     ProductInventoryComponent,
-    WarehousesComponent,
+    WarehousesListComponent,
     WarehouseInventoryComponent,
     RoutesListComponent,
     CreateRouteComponent,

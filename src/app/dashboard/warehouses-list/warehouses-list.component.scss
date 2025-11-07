@@ -1,0 +1,9 @@
+// Estilos para el componente de lista de bodegas
+.pagination-centered {
+  ::ng-deep .ant-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+}
+

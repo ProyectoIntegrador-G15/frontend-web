@@ -104,8 +104,8 @@
 
   <ng-template #productModalFooter>
     <div class="flex justify-center gap-3 w-full">
-      <button class="btn-secondary" (click)="handleProductModalCancel()">{{ 'common.cancel' | customTranslate }}</button>
-      <button class="btn-primary" (click)="handleProductModalOk()" [nzLoading]="isProductModalLoading">
+      <button class="btn-secondary-sm" (click)="handleProductModalCancel()">{{ 'common.cancel' | customTranslate }}</button>
+      <button class="btn-primary-sm" (click)="handleProductModalOk()" [nzLoading]="isProductModalLoading">
         <span nz-icon nzType="plus" nzTheme="outline"></span>
         {{ 'products.createProduct' | customTranslate }}
       </button>
