@@ -12,6 +12,7 @@ import {SellerDetailComponent} from './seller-detail/seller-detail.component';
 import {CreateVisitRouteComponent} from './create-visit-route/create-visit-route.component';
 import {ConfirmVisitRouteComponent} from './confirm-visit-route/confirm-visit-route.component';
 import {ReportsComponent} from './reports/reports.component';
+import {SuppliersListComponent} from './suppliers-list/suppliers-list.component';
 
 
 const routes: Routes = [
@@ -90,6 +91,13 @@ const routes: Routes = [
     component: ReportsComponent,
     data: {
       title: 'Reportes',
+    },
+  },
+  {
+    path: 'suppliers',
+    component: SuppliersListComponent,
+    data: {
+      title: 'Proveedores',
     },
   },
 ];
