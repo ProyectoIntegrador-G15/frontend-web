@@ -62,6 +62,7 @@ import {ConfirmVisitRouteComponent} from './confirm-visit-route/confirm-visit-ro
 import {TabsComponent} from '../shared/components/tabs/tabs.component';
 import {BackButtonComponent} from '../shared/components/back-button/back-button.component';
 import {ReportsComponent} from './reports/reports.component';
+import {SuppliersListComponent} from './suppliers-list/suppliers-list.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -131,6 +132,7 @@ const antdModule = [
     CreateVisitRouteComponent,
     ConfirmVisitRouteComponent,
     ReportsComponent,
+    SuppliersListComponent,
   ],
   providers: [
     ThemeConstantService,
