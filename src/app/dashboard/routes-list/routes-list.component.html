@@ -30,6 +30,7 @@
           <th>{{ 'routes.assignedDeliveries' | customTranslate }}</th>
           <th>{{ 'routes.status' | customTranslate }}</th>
           <th>{{ 'routes.assignedTruck' | customTranslate }}</th>
+          <th>{{ 'routes.actions' | customTranslate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -49,6 +50,19 @@
           </td>
           <td>
             <p>{{ route.assignedTruck }}</p>
+          </td>
+          <td class="actions-cell">
+            <button
+              nz-button
+              nzType="default"
+              type="button"
+              (click)="viewRoute(route)"
+              class="action-button"
+              [nzTooltipTitle]="'routes.viewDetail' | customTranslate">
+              <span class="action-icon">
+                <span nz-icon nzType="eye" nzTheme="outline"></span>
+              </span>
+            </button>
           </td>
         </tr>
       </tbody>

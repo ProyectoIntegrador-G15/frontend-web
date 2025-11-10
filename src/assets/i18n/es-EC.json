@@ -157,7 +157,48 @@
     "statusPlanned": "Planificada",
     "statusInProgress": "En curso",
     "statusWithIncidents": "Con incidencias",
-    "statusCompleted": "Completada"
+    "statusCompleted": "Completada",
+    "actions": "Acciones",
+    "viewDetail": "Ver detalle"
+  },
+  "routeDetail": {
+    "title": "Resultado de la ruta",
+    "routeLabel": "Ruta",
+    "loading": "Cargando detalle de la ruta...",
+    "loadingHint": "Estamos preparando el mapa y los puntos de entrega.",
+    "pickupLabel": "Recogida",
+    "deliveryLabel": "Entrega",
+    "summary": {
+      "title": "Resumen de ruta",
+      "date": "Fecha",
+      "origin": "Bodega",
+      "truck": "Camión asignado",
+      "deliveries": "Entregas"
+    },
+    "metrics": {
+      "totalStops": "Paradas",
+      "distance": "Distancia estimada",
+      "duration": "Duración estimada",
+      "cost": "Costo estimado"
+    },
+    "map": {
+      "title": "Mapa de la ruta",
+      "totalStops": "paradas programadas",
+      "geocoding": "Geocodificando direcciones..."
+    },
+    "table": {
+      "title": "Detalle de paradas",
+      "type": "Tipo",
+      "name": "Nombre",
+      "address": "Dirección",
+      "order": "Pedido"
+    },
+    "errors": {
+      "invalidRouteId": "Ruta inválida. Por favor, regresa a la lista de rutas.",
+      "loadFailed": "No se pudo cargar el detalle de la ruta.",
+      "geocodingFailed": "No se pudieron obtener las coordenadas de algunos puntos.",
+      "mapsNotLoaded": "No fue posible cargar Google Maps. Verifica tu conexión e intenta nuevamente."
+    }
   },
   "reports": {
     "title": "Reportes",
