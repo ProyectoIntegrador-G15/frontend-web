@@ -1,0 +1,115 @@
+<div class="relative main-content py-[120px] bg-top bg-no-repeat bg-[url('/assets/images/shape/admin-bg-light.png')] dark:bg-[url('/assets/images/shape/admin-bg-dark.png')] dark:bg-[#010312] bg-contain">
+  <div class="admin">
+    <div class="text-center">
+      <img class="inline dark:hidden" style="width: 185px; height: 40px;" src="../../../assets/images/logo/logo-dark.svg" alt="MediSupply Logo" />
+      <img class="hidden dark:inline" style="width: 185px; height: 40px;" src="../../../assets/images/logo/logo-white.svg" alt="MediSupply Logo" />
+    </div>
+    <div nz-row class="justify-center">
+      <div nz-col nzXs="24" nzSm="18" nzMd="12" nzXl="8" nzXXl="6">
+        <div class="rounded-6 mt-[25px] shadow_[0px_5px_20px_rgba(173,181,217, 0.03)] dark:shadow_[0px_5px_15px_rgba(0, 0, 0, .1)] bg-white dark:bg-[#1b1d2a]">
+          <div class="p-[25px] text-center border-b border-regular dark:border-white/[.05] top">
+            <h2 class="text-18 font-semibold leading-[1] mb-0 text-dark dark:text-white/[.87] title">Autenticación 2FA</h2>
+          </div>
+          <div class="py-[30px] px-[40px] content">
+            <form [formGroup]="otpForm" (ngSubmit)="submitOTP()" class="otp-form">
+              <div class="mb-[25px]">
+                <label class="text-[14px] leading-[1.4285714286] font-medium text-dark dark:text-white/[.87] mb-[8px] block">
+                  Código de seguridad
+                </label>
+                <div class="otp-input-container" (paste)="onPaste($event)">
+                  <input
+                    #firstInput
+                    id="otp-digit-0"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="1"
+                    formControlName="digit0"
+                    class="otp-input"
+                    [class.error]="hasFieldError(0)"
+                    (input)="onDigitInput($event, 0)"
+                    (keydown)="onKeyDown($event, 0)"
+                    autocomplete="off"
+                    autofocus
+                  />
+                  <input
+                    id="otp-digit-1"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="1"
+                    formControlName="digit1"
+                    class="otp-input"
+                    [class.error]="hasFieldError(1)"
+                    (input)="onDigitInput($event, 1)"
+                    (keydown)="onKeyDown($event, 1)"
+                    autocomplete="off"
+                  />
+                  <input
+                    id="otp-digit-2"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="1"
+                    formControlName="digit2"
+                    class="otp-input"
+                    [class.error]="hasFieldError(2)"
+                    (input)="onDigitInput($event, 2)"
+                    (keydown)="onKeyDown($event, 2)"
+                    autocomplete="off"
+                  />
+                  <span class="otp-separator">-</span>
+                  <input
+                    id="otp-digit-3"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="1"
+                    formControlName="digit3"
+                    class="otp-input"
+                    [class.error]="hasFieldError(3)"
+                    (input)="onDigitInput($event, 3)"
+                    (keydown)="onKeyDown($event, 3)"
+                    autocomplete="off"
+                  />
+                  <input
+                    id="otp-digit-4"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="1"
+                    formControlName="digit4"
+                    class="otp-input"
+                    [class.error]="hasFieldError(4)"
+                    (input)="onDigitInput($event, 4)"
+                    (keydown)="onKeyDown($event, 4)"
+                    autocomplete="off"
+                  />
+                  <input
+                    id="otp-digit-5"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="1"
+                    formControlName="digit5"
+                    class="otp-input"
+                    [class.error]="hasFieldError(5)"
+                    (input)="onDigitInput($event, 5)"
+                    (keydown)="onKeyDown($event, 5)"
+                    autocomplete="off"
+                  />
+                </div>
+                <div *ngIf="error" class="error-message mt-[8px]">
+                  <span class="text-[14px] text-[#ff4d4f] dark:text-[#ff7875]">{{ errorMessage }}</span>
+                </div>
+                <div *ngIf="!error" class="help-text mt-[8px]">
+                  <span class="text-[13px] text-[#8c8c8c] dark:text-white/60">Ingrese el código de 6 dígitos enviado a su correo electrónico</span>
+                </div>
+              </div>
+              <button type="submit" class="btn-primary w-full" [disabled]="isLoading">
+                <i class="fas fa-cog fa-spin" [hidden]="!isLoading"></i>
+                <span [hidden]="isLoading">Confirmar</span>
+                <span [hidden]="!isLoading">Validando...</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
