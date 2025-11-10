@@ -1,9 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SellersService, Seller } from '../../shared/services/sellers.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { SellersService, Seller, SalesPlan, CreateSalesPlanRequest } from '../../shared/services/sellers.service';
 import { VisitRoutesService, VisitRoute } from '../../shared/services/visit-routes.service';
 import { OrdersService } from '../../shared/services/orders.service';
 import { TranslateService } from '@ngx-translate/core';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -39,6 +41,21 @@ interface Tab {
   styleUrls: ['./seller-detail.component.scss']
 })
 export class SellerDetailComponent implements OnInit {
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private sellersService: SellersService,
+    private visitRoutesService: VisitRoutesService,
+    private ordersService: OrdersService,
+    private translateService: TranslateService,
+    private fb: FormBuilder,
+    private notification: NzNotificationService
+  ) {
+    this.initializeChartOptions();
+    this.initializeYears();
+    this.initSalesPlanForm();
+  }
   seller: Seller | null = null;
   loading = true;
   error = '';
@@ -49,6 +66,32 @@ export class SellerDetailComponent implements OnInit {
   // Fecha actual
   currentYear = new Date().getFullYear();
   currentMonth = new Date().getMonth() + 1;
+
+  // Datos de planes de venta
+  salesPlans: SalesPlan[] = [];
+  loadingSalesPlans = false;
+  selectedMonth = new Date().getMonth() + 1; // 1-12
+  selectedYear = new Date().getFullYear();
+  months = [
+    { value: 1, label: 'Enero' },
+    { value: 2, label: 'Febrero' },
+    { value: 3, label: 'Marzo' },
+    { value: 4, label: 'Abril' },
+    { value: 5, label: 'Mayo' },
+    { value: 6, label: 'Junio' },
+    { value: 7, label: 'Julio' },
+    { value: 8, label: 'Agosto' },
+    { value: 9, label: 'Septiembre' },
+    { value: 10, label: 'Octubre' },
+    { value: 11, label: 'Noviembre' },
+    { value: 12, label: 'Diciembre' }
+  ];
+  years: number[] = [];
+
+  // Modal de creación de plan de ventas
+  isSalesPlanModalVisible = false;
+  isSalesPlanModalLoading = false;
+  salesPlanForm: FormGroup;
 
   // Datos de desempeño
   performanceData = {
@@ -123,15 +166,28 @@ export class SellerDetailComponent implements OnInit {
     }
   ];
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private sellersService: SellersService,
-    private visitRoutesService: VisitRoutesService,
-    private ordersService: OrdersService,
-    private translateService: TranslateService
-  ) {
-    this.initializeChartOptions();
+  // Fechas del formulario (Date objects para nz-date-picker)
+  getDefaultStartMonth(): Date {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  }
+
+  getDefaultEndMonth(): Date {
+    const now = new Date();
+    const nextMonth = now.getMonth() + 1;
+    const year = nextMonth > 11 ? now.getFullYear() + 1 : now.getFullYear();
+    const month = nextMonth > 11 ? 0 : nextMonth;
+    return new Date(year, month, 1);
+  }
+
+  private initializeYears(): void {
+    const currentYear = new Date().getFullYear();
+    // Generar años desde 5 años atrás hasta 2 años adelante
+    for (let i = currentYear - 5; i <= currentYear + 2; i++) {
+      this.years.push(i);
+    }
+    // Ordenar de mayor a menor
+    this.years.sort((a, b) => b - a);
   }
 
   ngOnInit(): void {
@@ -152,7 +208,7 @@ export class SellerDetailComponent implements OnInit {
     // Inicializar fechas al primer día del mes actual
     this.performanceData.startDate = new Date(this.currentYear, this.currentMonth - 1, 1);
     this.performanceData.endDate = new Date(this.currentYear, this.currentMonth - 1, 1);
-    
+
     // Escuchar cambios en el fragment para activar tab
     this.route.fragment.subscribe(fragment => {
       if (fragment === 'visit-routes') {
@@ -178,21 +234,26 @@ export class SellerDetailComponent implements OnInit {
 
   onTabChange(tabId: string): void {
     this.activeTab = tabId;
-    
+
     // Si cambia a la tab de performance, cargar datos
     if (tabId === 'performance') {
       this.fetchPerformance();
     }
-    
+
     // Si cambia a la tab de rutas de visita, recargar datos
     if (tabId === 'visit-routes' && this.seller) {
       this.loadVisitRoutes(this.seller.id);
+    }
+
+    // Si cambia a la tab de planes de venta, cargar datos
+    if (tabId === 'sales-plan' && this.seller) {
+      this.loadSalesPlans();
     }
   }
 
   loadVisitRoutes(sellerId: string): void {
     this.loadingRoutes = true;
-    
+
     this.visitRoutesService.getVisitRoutes({ sellerId: parseInt(sellerId) }).subscribe({
       next: (response) => {
         this.visitRoutes = response.routes;
@@ -210,8 +271,8 @@ export class SellerDetailComponent implements OnInit {
   }
 
   getStatusColor(): string {
-    if (!this.seller) return '';
-    
+    if (!this.seller) { return ''; }
+
     switch (this.seller.status) {
       case 'active':
         return 'status-active';
@@ -225,8 +286,8 @@ export class SellerDetailComponent implements OnInit {
   }
 
   getStatusText(): string {
-    if (!this.seller) return '';
-    
+    if (!this.seller) { return ''; }
+
     switch (this.seller.status) {
       case 'active':
         return 'Activo';
@@ -290,12 +351,12 @@ export class SellerDetailComponent implements OnInit {
     }
 
     const names = route.stops.map(stop => stop.clientName);
-    
+
     // Si son 1-2 clientes, mostrar nombres completos
     if (names.length <= 2) {
       return names.join(', ');
     }
-    
+
     // Si son 3 o más, mostrar los primeros 2 y "X más"
     const firstTwo = names.slice(0, 2).join(', ');
     const remaining = names.length - 2;
@@ -306,7 +367,7 @@ export class SellerDetailComponent implements OnInit {
     if (!route.stops || route.stops.length === 0) {
       return '';
     }
-    
+
     return route.stops.map((stop, idx) => `${idx + 1}. ${stop.clientName}`).join('\n');
   }
 
@@ -415,6 +476,33 @@ export class SellerDetailComponent implements OnInit {
     return false;
   }
 
+  // Deshabilitar fechas fuera del rango permitido para el plan de ventas
+  // Permite desde el mes actual hasta 6 meses en el futuro
+  disableFutureMonthsForSalesPlan = (current: Date): boolean => {
+    if (!current) { return false; }
+    const now = new Date();
+    const currentYear = current.getFullYear();
+    const currentMonth = current.getMonth();
+    const nowYear = now.getFullYear();
+    const nowMonth = now.getMonth();
+
+    // Calcular la fecha máxima permitida (6 meses después)
+    const maxDate = new Date(now);
+    maxDate.setMonth(maxDate.getMonth() + 6);
+    const maxYear = maxDate.getFullYear();
+    const maxMonth = maxDate.getMonth();
+
+    // Deshabilitar fechas anteriores al mes actual
+    if (currentYear < nowYear) { return true; }
+    if (currentYear === nowYear && currentMonth < nowMonth) { return true; }
+
+    // Deshabilitar fechas posteriores a 6 meses
+    if (currentYear > maxYear) { return true; }
+    if (currentYear === maxYear && currentMonth > maxMonth) { return true; }
+
+    return false;
+  }
+
   private formatDateYYYYMMDD(date: Date): string {
     const d = new Date(date);
     const yyyy = d.getFullYear();
@@ -442,7 +530,7 @@ export class SellerDetailComponent implements OnInit {
   }
 
   private fetchPerformance(): void {
-    if (!this.seller) return;
+    if (!this.seller) { return; }
 
     const sellerId = parseInt(this.seller.id);
     const startMonthFirst = this.firstDayOfMonth(this.performanceData.startDate);
@@ -553,6 +641,375 @@ export class SellerDetailComponent implements OnInit {
         }
       };
     }
+  }
+
+  // ========== MÉTODOS DE PLANES DE VENTA ==========
+
+  loadSalesPlans(): void {
+    if (!this.seller) { return; }
+
+    this.loadingSalesPlans = true;
+    this.sellersService.getSalesPlans(this.seller.id, this.selectedMonth, this.selectedYear).subscribe({
+      next: (response) => {
+        this.salesPlans = response.sales_plans;
+        this.loadingSalesPlans = false;
+      },
+      error: (error) => {
+        console.error('Error loading sales plans:', error);
+        this.salesPlans = [];
+        this.loadingSalesPlans = false;
+      }
+    });
+  }
+
+  onMonthChange(): void {
+    this.loadSalesPlans();
+  }
+
+  onYearChange(): void {
+    this.loadSalesPlans();
+  }
+
+  initSalesPlanForm(): void {
+    this.salesPlanForm = this.fb.group({
+      name: [null, [Validators.required, Validators.minLength(1), Validators.maxLength(255)]],
+      start_month: [this.getDefaultStartMonth(), [Validators.required, this.startDateValidator.bind(this)]],
+      end_month: [this.getDefaultEndMonth(), [Validators.required, this.endDateValidator.bind(this)]],
+      total_units_target: [null, [Validators.required, Validators.min(1)]],
+      total_value_target: [null, [Validators.required, Validators.min(0.01)]],
+      visits_target: [null, [Validators.required, Validators.min(1)]]
+    }, { validators: this.dateRangeValidator });
+
+    // Suscribirse a cambios en las fechas para validar en tiempo real
+    this.salesPlanForm.get('start_month')?.valueChanges.subscribe(() => {
+      this.validateDateRange();
+      // Revalidar el campo de fin cuando cambia el inicio
+      this.salesPlanForm.get('end_month')?.updateValueAndValidity({ emitEvent: false });
+    });
+    this.salesPlanForm.get('end_month')?.valueChanges.subscribe(() => {
+      this.validateDateRange();
+    });
+  }
+
+  // Validador personalizado para fecha de inicio
+  startDateValidator(control: any): { [key: string]: any } | null {
+    if (!control.value) {
+      return null; // La validación required se encarga de esto
+    }
+
+    const date = control.value instanceof Date ? control.value : new Date(control.value);
+    if (isNaN(date.getTime())) {
+      return { invalidDate: true };
+    }
+
+    const now = new Date();
+    const nowYear = now.getFullYear();
+    const nowMonth = now.getMonth();
+    const dateYear = date.getFullYear();
+    const dateMonth = date.getMonth();
+
+    // Validar que no sea una fecha pasada (anterior al mes actual)
+    if (dateYear < nowYear || (dateYear === nowYear && dateMonth < nowMonth)) {
+      return { dateInPast: true };
+    }
+
+    // Validar que no sea más de 6 meses en el futuro
+    const maxDate = new Date(now);
+    maxDate.setMonth(maxDate.getMonth() + 6);
+    const maxYear = maxDate.getFullYear();
+    const maxMonth = maxDate.getMonth();
+
+    if (dateYear > maxYear || (dateYear === maxYear && dateMonth > maxMonth)) {
+      return { dateTooFar: true };
+    }
+
+    return null;
+  }
+
+  // Validador personalizado para fecha de fin
+  endDateValidator(control: any): { [key: string]: any } | null {
+    if (!control.value) {
+      return null; // La validación required se encarga de esto
+    }
+
+    const date = control.value instanceof Date ? control.value : new Date(control.value);
+    if (isNaN(date.getTime())) {
+      return { invalidDate: true };
+    }
+
+    const now = new Date();
+    const nowYear = now.getFullYear();
+    const nowMonth = now.getMonth();
+    const dateYear = date.getFullYear();
+    const dateMonth = date.getMonth();
+
+    // Validar que no sea una fecha pasada (anterior al mes actual)
+    if (dateYear < nowYear || (dateYear === nowYear && dateMonth < nowMonth)) {
+      return { dateInPast: true };
+    }
+
+    // Validar que no sea más de 6 meses en el futuro
+    const maxDate = new Date(now);
+    maxDate.setMonth(maxDate.getMonth() + 6);
+    const maxYear = maxDate.getFullYear();
+    const maxMonth = maxDate.getMonth();
+
+    if (dateYear > maxYear || (dateYear === maxYear && dateMonth > maxMonth)) {
+      return { dateTooFar: true };
+    }
+
+    // Validar que la fecha de fin sea posterior a la de inicio
+    const startMonthValue = this.salesPlanForm?.get('start_month')?.value;
+    if (startMonthValue) {
+      const startDate = startMonthValue instanceof Date ? startMonthValue : new Date(startMonthValue);
+      if (date <= startDate) {
+        return { endBeforeStart: true };
+      }
+    }
+
+    return null;
+  }
+
+  validateDateRange(): void {
+    if (!this.salesPlanForm) {
+      return;
+    }
+
+    const startMonthValue = this.salesPlanForm.get('start_month')?.value;
+    const endMonthValue = this.salesPlanForm.get('end_month')?.value;
+
+    if (!startMonthValue || !endMonthValue) {
+      return;
+    }
+
+    const start = startMonthValue instanceof Date ? startMonthValue : new Date(startMonthValue);
+    const end = endMonthValue instanceof Date ? endMonthValue : new Date(endMonthValue);
+
+    // Validar que ambas fechas sean válidas
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return;
+    }
+
+    const startField = this.salesPlanForm.get('start_month');
+    const endField = this.salesPlanForm.get('end_month');
+
+    // Si la fecha de fin es anterior o igual a la de inicio
+    if (end <= start) {
+      // Marcar error en el campo de fin
+      const endErrors = endField?.errors || {};
+      endField?.setErrors({ ...endErrors, dateRange: true });
+
+      // También marcar error en el campo de inicio si es necesario
+      const startErrors = startField?.errors || {};
+      if (end < start) {
+        startField?.setErrors({ ...startErrors, dateRange: true });
+      }
+    } else {
+      // Limpiar errores de rango si la validación pasa
+      if (endField?.errors?.dateRange) {
+        const endErrors = { ...endField.errors };
+        delete endErrors.dateRange;
+        endField.setErrors(Object.keys(endErrors).length > 0 ? endErrors : null);
+      }
+      if (startField?.errors?.dateRange) {
+        const startErrors = { ...startField.errors };
+        delete startErrors.dateRange;
+        startField.setErrors(Object.keys(startErrors).length > 0 ? startErrors : null);
+      }
+    }
+  }
+
+  dateRangeValidator = (control: FormGroup): { [s: string]: boolean } => {
+    const startMonthValue = control.get('start_month')?.value;
+    const endMonthValue = control.get('end_month')?.value;
+
+    if (!startMonthValue || !endMonthValue) {
+      return {};
+    }
+
+    const start = startMonthValue instanceof Date ? startMonthValue : new Date(startMonthValue);
+    const end = endMonthValue instanceof Date ? endMonthValue : new Date(endMonthValue);
+
+    // Validar que ambas fechas sean válidas
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return {};
+    }
+
+    if (end <= start) {
+      return { dateRange: true };
+    }
+    return {};
+  }
+
+  getFieldStatus(fieldName: string): string {
+    const field = this.salesPlanForm.get(fieldName);
+    if (field && (field.dirty || field.touched) && field.invalid) {
+      return 'error';
+    }
+    if (field && (field.dirty || field.touched) && field.valid) {
+      return 'success';
+    }
+    return '';
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.salesPlanForm.get(fieldName);
+    if (field && field.errors && (field.dirty || field.touched)) {
+      if (field.errors.required) {
+        return 'Este campo es obligatorio';
+      }
+      if (field.errors.min) {
+        return fieldName === 'total_value_target'
+          ? 'El valor debe ser mayor a 0'
+          : 'El valor debe ser mayor a 0';
+      }
+      if (field.errors.minlength) {
+        return 'Este campo es demasiado corto';
+      }
+      if (field.errors.maxlength) {
+        return 'Este campo es demasiado largo';
+      }
+      if (field.errors.invalidDate) {
+        return 'La fecha seleccionada no es válida';
+      }
+      if (field.errors.dateInPast) {
+        return 'No se puede seleccionar una fecha anterior al mes actual';
+      }
+      if (field.errors.dateTooFar) {
+        return 'No se puede seleccionar una fecha más de 6 meses en el futuro';
+      }
+      if (field.errors.endBeforeStart) {
+        return 'La fecha de fin debe ser posterior a la fecha de inicio';
+      }
+      if (field.errors.dateRange) {
+        if (fieldName === 'start_month') {
+          return 'La fecha de inicio no puede ser posterior a la fecha de fin';
+        }
+        if (fieldName === 'end_month') {
+          return 'La fecha de fin debe ser posterior a la fecha de inicio';
+        }
+      }
+    }
+    return '';
+  }
+
+  validateFormFields(): boolean {
+    for (const i in this.salesPlanForm.controls) {
+      this.salesPlanForm.controls[i].markAsDirty();
+      this.salesPlanForm.controls[i].updateValueAndValidity();
+    }
+    return this.salesPlanForm.valid;
+  }
+
+  onCreatePlan(): void {
+    // Establecer valores por defecto al abrir el modal
+    this.salesPlanForm.patchValue({
+      start_month: this.getDefaultStartMonth(),
+      end_month: this.getDefaultEndMonth()
+    });
+
+    this.isSalesPlanModalVisible = true;
+  }
+
+  handleSalesPlanModalCancel(): void {
+    this.isSalesPlanModalVisible = false;
+    this.salesPlanForm.reset();
+    // Restablecer valores por defecto
+    this.salesPlanForm.patchValue({
+      start_month: this.getDefaultStartMonth(),
+      end_month: this.getDefaultEndMonth()
+    });
+  }
+
+  handleSalesPlanModalOk(): void {
+    if (!this.validateFormFields()) {
+      return;
+    }
+
+    if (!this.seller) {
+      this.notification.error('Error', 'No se encontró información del vendedor');
+      return;
+    }
+
+    this.isSalesPlanModalLoading = true;
+
+    const formData = this.salesPlanForm.value;
+    // nz-date-picker devuelve un objeto Date, usar directamente
+    const startDateObj = formData.start_month instanceof Date
+      ? formData.start_month
+      : new Date(formData.start_month);
+    const endDateObj = formData.end_month instanceof Date
+      ? formData.end_month
+      : new Date(formData.end_month);
+
+    // start_date: primer día del mes seleccionado
+    const startDate = new Date(startDateObj.getFullYear(), startDateObj.getMonth(), 1);
+
+    // end_date: último día del mes seleccionado
+    // new Date(year, month + 1, 0) devuelve el último día del mes anterior (que es el último día del mes que queremos)
+    const endDate = new Date(endDateObj.getFullYear(), endDateObj.getMonth() + 1, 0);
+
+    const planData: CreateSalesPlanRequest = {
+      name: formData.name,
+      start_date: this.formatDateForAPI(startDate),
+      end_date: this.formatDateForAPI(endDate),
+      total_units_target: formData.total_units_target,
+      total_value_target: formData.total_value_target,
+      visits_target: formData.visits_target
+    };
+
+    this.sellersService.createSalesPlan(this.seller.id, planData).subscribe({
+      next: (response) => {
+        this.isSalesPlanModalVisible = false;
+        this.isSalesPlanModalLoading = false;
+        this.salesPlanForm.reset();
+
+        // Recargar planes de venta
+        this.loadSalesPlans();
+
+        this.notification.create(
+          'success',
+          '¡Plan de venta creado exitosamente!',
+          `El plan "${planData.name}" ha sido creado correctamente.`
+        );
+      },
+      error: (error) => {
+        this.isSalesPlanModalLoading = false;
+        const errorMessage = error?.error?.detail || error?.message || 'Error al crear el plan de venta';
+        this.notification.create(
+          'error',
+          'Error al crear plan de venta',
+          errorMessage
+        );
+      }
+    });
+  }
+
+  formatDateForAPI(date: Date | string): string {
+    if (!date) { return ''; }
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  formatPeriod(startDate: string, endDate: string): string {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const startMonth = this.months[start.getMonth()].label;
+    const endMonth = this.months[end.getMonth()].label;
+    const year = start.getFullYear();
+
+    if (startMonth === endMonth && start.getFullYear() === end.getFullYear()) {
+      return `${startMonth} ${year}`;
+    }
+
+    if (start.getFullYear() === end.getFullYear()) {
+      return `${startMonth} - ${endMonth} ${year}`;
+    }
+
+    return `${startMonth} ${start.getFullYear()} - ${endMonth} ${end.getFullYear()}`;
   }
 }
 
