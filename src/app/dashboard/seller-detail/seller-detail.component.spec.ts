@@ -3,8 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TranslateModule, TranslateService, LangChangeEvent } from '@ngx-translate/core';
 import { EventEmitter } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { SellerDetailComponent } from './seller-detail.component';
-import { SellersService, Seller } from '../../shared/services/sellers.service';
+import { SellersService, Seller, SalesPlan, SalesPlanListResponse, CreateSalesPlanRequest } from '../../shared/services/sellers.service';
 import { VisitRoutesService } from '../../shared/services/visit-routes.service';
 import { OrdersService } from '../../shared/services/orders.service';
 import { of, throwError } from 'rxjs';
@@ -32,10 +34,17 @@ describe('SellerDetailComponent', () => {
   };
 
   beforeEach(() => {
-    const sellersServiceSpy = jasmine.createSpyObj('SellersService', ['getSellerById', 'getSellerPerformance']);
+    const sellersServiceSpy = jasmine.createSpyObj('SellersService', [
+      'getSellerById',
+      'getSellerPerformance',
+      'getSalesPlans',
+      'getSalesPlan',
+      'createSalesPlan'
+    ]);
     const ordersServiceSpy = jasmine.createSpyObj('OrdersService', ['getTopProductsBySeller']);
     const visitRoutesServiceSpy = jasmine.createSpyObj('VisitRoutesService', ['getVisitRoutes']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    const notificationSpy = jasmine.createSpyObj('NzNotificationService', ['create', 'error']);
     
     activatedRoute = {
       snapshot: {
@@ -49,15 +58,18 @@ describe('SellerDetailComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        TranslateModule.forRoot()
+        TranslateModule.forRoot(),
+        ReactiveFormsModule
       ],
       providers: [
         SellerDetailComponent,
+        FormBuilder,
         { provide: SellersService, useValue: sellersServiceSpy },
         { provide: OrdersService, useValue: ordersServiceSpy },
         { provide: VisitRoutesService, useValue: visitRoutesServiceSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: ActivatedRoute, useValue: activatedRoute }
+        { provide: ActivatedRoute, useValue: activatedRoute },
+        { provide: NzNotificationService, useValue: notificationSpy }
       ]
     });
 
@@ -88,11 +100,17 @@ describe('SellerDetailComponent', () => {
     }));
     ordersService.getTopProductsBySeller.and.returnValue(of([]));
     sellersService.getSellerPerformance.and.returnValue(of({
-      total_revenue: 0,
       total_orders: 0,
+      total_revenue: 0,
       total_visits: 0,
+      total_units_sold: 0,
       units_compliance: 0,
-      revenue_compliance: 0
+      revenue_compliance: 0,
+      visits_compliance: 0
+    }));
+    sellersService.getSalesPlans.and.returnValue(of({
+      sales_plans: [],
+      total: 0
     }));
   });
 
@@ -242,6 +260,293 @@ describe('SellerDetailComponent', () => {
 
     it('should default to information tab', () => {
       expect(component.activeTab).toBe('information');
+    });
+  });
+
+  // ========== PRUEBAS DE PLANES DE VENTA ==========
+
+  describe('Sales Plans', () => {
+    const mockSalesPlan: SalesPlan = {
+      id: 1,
+      seller_id: 1,
+      name: 'Plan Q1 2025',
+      start_date: '2025-01-01',
+      end_date: '2025-03-31',
+      total_units_target: 1000,
+      total_value_target: 50000.0,
+      visits_target: 50,
+      created_at: '2025-01-01T00:00:00Z',
+      updated_at: '2025-01-01T00:00:00Z'
+    };
+
+    const mockSalesPlansResponse: SalesPlanListResponse = {
+      sales_plans: [mockSalesPlan],
+      total: 1
+    };
+
+    describe('loadSalesPlans', () => {
+      it('should load sales plans successfully', () => {
+        component.seller = mockSeller;
+        sellersService.getSalesPlans.and.returnValue(of(mockSalesPlansResponse));
+
+        component.loadSalesPlans();
+
+        expect(component.loadingSalesPlans).toBe(false);
+        expect(component.salesPlans).toEqual([mockSalesPlan]);
+        expect(sellersService.getSalesPlans).toHaveBeenCalledWith(
+          '1',
+          component.selectedMonth,
+          component.selectedYear
+        );
+      });
+
+      it('should not load if seller is null', () => {
+        component.seller = null;
+        component.loadSalesPlans();
+
+        expect(sellersService.getSalesPlans).not.toHaveBeenCalled();
+      });
+
+      it('should handle error when loading sales plans', () => {
+        component.seller = mockSeller;
+        sellersService.getSalesPlans.and.returnValue(
+          throwError(() => ({ message: 'Error loading plans' }))
+        );
+
+        component.loadSalesPlans();
+
+        expect(component.loadingSalesPlans).toBe(false);
+        expect(component.salesPlans).toEqual([]);
+      });
+
+      it('should set loading state correctly', () => {
+        component.seller = mockSeller;
+        sellersService.getSalesPlans.and.returnValue(of(mockSalesPlansResponse));
+
+        component.loadSalesPlans();
+
+        expect(component.loadingSalesPlans).toBe(false);
+      });
+    });
+
+    describe('onMonthChange', () => {
+      it('should reload sales plans when month changes', () => {
+        component.seller = mockSeller;
+        spyOn(component, 'loadSalesPlans');
+
+        component.onMonthChange();
+
+        expect(component.loadSalesPlans).toHaveBeenCalled();
+      });
+    });
+
+    describe('onYearChange', () => {
+      it('should reload sales plans when year changes', () => {
+        component.seller = mockSeller;
+        spyOn(component, 'loadSalesPlans');
+
+        component.onYearChange();
+
+        expect(component.loadSalesPlans).toHaveBeenCalled();
+      });
+    });
+
+    describe('initSalesPlanForm', () => {
+      it('should initialize form with default values', () => {
+        component.initSalesPlanForm();
+
+        expect(component.salesPlanForm).toBeDefined();
+        expect(component.salesPlanForm.get('name')).toBeDefined();
+        expect(component.salesPlanForm.get('start_month')).toBeDefined();
+        expect(component.salesPlanForm.get('end_month')).toBeDefined();
+        expect(component.salesPlanForm.get('total_units_target')).toBeDefined();
+        expect(component.salesPlanForm.get('total_value_target')).toBeDefined();
+        expect(component.salesPlanForm.get('visits_target')).toBeDefined();
+      });
+
+      it('should have required validators on all fields', () => {
+        component.initSalesPlanForm();
+
+        // Los campos de fecha tienen valores por defecto, así que no tienen error required inicialmente
+        // Verificar que el campo name no tiene error required cuando tiene un valor
+        component.salesPlanForm.get('name')?.setValue('Test');
+        expect(component.salesPlanForm.get('name')?.hasError('required')).toBeFalsy();
+        
+        // Al establecer null, debe tener error required
+        component.salesPlanForm.get('name')?.setValue(null);
+        component.salesPlanForm.get('name')?.markAsTouched();
+        component.salesPlanForm.get('name')?.updateValueAndValidity();
+        expect(component.salesPlanForm.get('name')?.hasError('required')).toBeTruthy();
+      });
+    });
+
+    describe('getFieldStatus', () => {
+      beforeEach(() => {
+        component.initSalesPlanForm();
+      });
+
+      it('should return empty string for untouched field', () => {
+        expect(component.getFieldStatus('name')).toBe('');
+      });
+
+      it('should return error for invalid touched field', () => {
+        const field = component.salesPlanForm.get('name');
+        field?.markAsTouched();
+        field?.setValue(null);
+
+        expect(component.getFieldStatus('name')).toBe('error');
+      });
+
+      it('should return success for valid touched field', () => {
+        const field = component.salesPlanForm.get('name');
+        field?.markAsTouched();
+        field?.setValue('Plan de ventas');
+
+        expect(component.getFieldStatus('name')).toBe('success');
+      });
+    });
+
+    describe('getFieldError', () => {
+      beforeEach(() => {
+        component.initSalesPlanForm();
+      });
+
+      it('should return empty string for valid field', () => {
+        expect(component.getFieldError('name')).toBe('');
+      });
+
+      it('should return required error message', () => {
+        const field = component.salesPlanForm.get('name');
+        field?.markAsTouched();
+        field?.setValue(null);
+
+        expect(component.getFieldError('name')).toBe('Este campo es obligatorio');
+      });
+
+      it('should return min error message for numeric fields', () => {
+        const field = component.salesPlanForm.get('total_units_target');
+        field?.markAsTouched();
+        field?.setValue(0);
+
+        expect(component.getFieldError('total_units_target')).toBe('El valor debe ser mayor a 0');
+      });
+
+      it('should return date range error message', () => {
+        const startField = component.salesPlanForm.get('start_month');
+        const endField = component.salesPlanForm.get('end_month');
+        
+        // Usar fechas válidas (no pasadas, no más de 6 meses en el futuro)
+        // pero donde la fecha de fin sea anterior a la de inicio
+        const now = new Date();
+        const month1 = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        const month2 = new Date(now.getFullYear(), now.getMonth() + 2, 1);
+
+        // Establecer fecha de inicio después de la fecha de fin
+        startField?.setValue(month2);
+        endField?.setValue(month1);
+        endField?.markAsTouched();
+        // Forzar actualización de validación
+        endField?.updateValueAndValidity();
+
+        const error = component.getFieldError('end_month');
+        // El validador endDateValidator detecta endBeforeStart y devuelve este mensaje
+        expect(error).toBe('La fecha de fin debe ser posterior a la fecha de inicio');
+      });
+    });
+
+    describe('onCreatePlan', () => {
+      beforeEach(() => {
+        component.initSalesPlanForm();
+        component.seller = mockSeller;
+      });
+
+      it('should open modal and set default values', () => {
+        component.onCreatePlan();
+
+        expect(component.isSalesPlanModalVisible).toBe(true);
+        expect(component.salesPlanForm.get('start_month')?.value).toBeDefined();
+        expect(component.salesPlanForm.get('end_month')?.value).toBeDefined();
+      });
+    });
+
+    describe('handleSalesPlanModalCancel', () => {
+      beforeEach(() => {
+        component.initSalesPlanForm();
+        component.isSalesPlanModalVisible = true;
+      });
+
+      it('should close modal and reset form', () => {
+        component.salesPlanForm.patchValue({
+          name: 'Test Plan',
+          total_units_target: 100
+        });
+
+        component.handleSalesPlanModalCancel();
+
+        expect(component.isSalesPlanModalVisible).toBe(false);
+        expect(component.salesPlanForm.get('name')?.value).toBeNull();
+      });
+    });
+
+    describe('handleSalesPlanModalOk', () => {
+      let notificationService: jasmine.SpyObj<NzNotificationService>;
+
+      beforeEach(() => {
+        component.initSalesPlanForm();
+        component.seller = mockSeller;
+        notificationService = TestBed.inject(NzNotificationService) as jasmine.SpyObj<NzNotificationService>;
+      });
+
+      it('should not submit if form is invalid', () => {
+        component.salesPlanForm.patchValue({
+          name: null
+        });
+
+        component.handleSalesPlanModalOk();
+
+        expect(sellersService.createSalesPlan).not.toHaveBeenCalled();
+      });
+
+      it('should not create if seller is null', () => {
+        component.seller = null;
+        // Simular que el formulario pasó la validación usando spy
+        spyOn(component, 'validateFormFields').and.returnValue(true);
+
+        component.handleSalesPlanModalOk();
+
+        expect(sellersService.createSalesPlan).not.toHaveBeenCalled();
+        expect(notificationService.error).toHaveBeenCalledWith('Error', 'No se encontró información del vendedor');
+      });
+    });
+
+    describe('validateFormFields', () => {
+      beforeEach(() => {
+        component.initSalesPlanForm();
+      });
+
+      it('should mark all fields as dirty when validating', () => {
+        component.validateFormFields();
+
+        Object.keys(component.salesPlanForm.controls).forEach(key => {
+          expect(component.salesPlanForm.get(key)?.dirty).toBe(true);
+        });
+      });
+
+      it('should return false for invalid form', () => {
+        component.salesPlanForm.patchValue({
+          name: null
+        });
+
+        expect(component.validateFormFields()).toBe(false);
+      });
+
+      it('should mark all fields as dirty', () => {
+        component.validateFormFields();
+
+        Object.keys(component.salesPlanForm.controls).forEach(key => {
+          expect(component.salesPlanForm.get(key)?.dirty).toBe(true);
+        });
+      });
     });
   });
 });
