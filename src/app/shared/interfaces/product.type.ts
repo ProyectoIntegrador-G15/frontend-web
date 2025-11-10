@@ -10,4 +10,5 @@ export interface Product {
   category?: string;
   stock?: number;
   warehouseId?: string;
+  location_identifier?: string;
 }
