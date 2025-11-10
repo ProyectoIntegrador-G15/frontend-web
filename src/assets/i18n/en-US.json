@@ -192,7 +192,48 @@
     "statusPlanned": "Planned",
     "statusInProgress": "In progress",
     "statusWithIncidents": "With incidents",
-    "statusCompleted": "Completed"
+    "statusCompleted": "Completed",
+    "actions": "Actions",
+    "viewDetail": "View detail"
+  },
+  "routeDetail": {
+    "title": "Route result",
+    "routeLabel": "Route",
+    "loading": "Loading route details...",
+    "loadingHint": "We are preparing the map and delivery points for you.",
+    "pickupLabel": "Pickup",
+    "deliveryLabel": "Delivery",
+    "summary": {
+      "title": "Route summary",
+      "date": "Date",
+      "origin": "Warehouse",
+      "truck": "Assigned truck",
+      "deliveries": "Deliveries"
+    },
+    "metrics": {
+      "totalStops": "Stops",
+      "distance": "Estimated distance",
+      "duration": "Estimated duration",
+      "cost": "Estimated cost"
+    },
+    "map": {
+      "title": "Route map",
+      "totalStops": "scheduled stops",
+      "geocoding": "Geocoding addresses..."
+    },
+    "table": {
+      "title": "Stops detail",
+      "type": "Type",
+      "name": "Name",
+      "address": "Address",
+      "order": "Order"
+    },
+    "errors": {
+      "invalidRouteId": "Invalid route. Please go back to the routes list.",
+      "loadFailed": "We could not load the route detail.",
+      "geocodingFailed": "We could not resolve the coordinates for some points.",
+      "mapsNotLoaded": "Google Maps could not be loaded. Check your connection and try again."
+    }
   },
   "reports": {
     "title": "Reports",

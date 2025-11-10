@@ -94,4 +94,8 @@ export class RoutesListComponent implements OnInit {
         return status;
     }
   }
+
+  viewRoute(route: RouteItem): void {
+    this.router.navigate(['/dashboard/routes', route.id]);
+  }
 }

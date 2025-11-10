@@ -4,8 +4,8 @@ import {map, catchError, switchMap} from 'rxjs/operators';
 import {ApiService} from './api/api.service';
 import {EndpointsService} from './api/endpoints.service';
 
-// Interfaz para un waypoint/punto de ruta
-export interface Waypoint {
+// Interfaz para un waypoint/punto de ruta devuelto por el backend
+export interface RouteWaypointApi {
   id: number;
   order_id: number;
   sequence: number;
@@ -24,7 +24,7 @@ export interface RouteApiResponse {
   deliveries: number;
   gmaps_metrics: string;
   country: string;
-  waypoints: Waypoint[];
+  waypoints: RouteWaypointApi[];
 }
 
 // Interfaz para la respuesta paginada del backend
@@ -46,6 +46,37 @@ export interface Route {
   assignedTruck: string;
 }
 
+export interface RouteWaypoint {
+  id: number;
+  orderId: number;
+  sequence: number;
+  pointName: string;
+  pointAddress: string;
+  arrivalTime: string | null;
+  pickup: boolean;
+}
+
+export interface RouteMetrics {
+  performedShipmentCount: number | null;
+  totalDuration: number | null;
+  travelDistanceMeters: number | null;
+  totalCost: number | null;
+}
+
+export interface RouteDetail {
+  id: string;
+  createdAt: string;
+  creationDate: string;
+  status: 'planned' | 'in_progress' | 'with_incidents' | 'completed';
+  deliveries: number;
+  vehicleId: number;
+  assignedTruck: string;
+  country: string;
+  originWarehouse: string;
+  metrics: RouteMetrics | null;
+  waypoints: RouteWaypoint[];
+}
+
 // Interfaz para crear una ruta
 export interface CreateRouteRequest {
   vehicle_id: number;
@@ -61,6 +92,19 @@ export class RoutesService {
   private endpointsService = inject(EndpointsService);
 
   constructor() {
+  }
+
+  /**
+   * Obtener detalles de una ruta específica
+   */
+  getRouteDetail(routeId: string): Observable<RouteDetail> {
+    const routesUrl = this.endpointsService.getEndpointPath('routes');
+
+    return this.apiService.getDirect<RouteApiResponse>(`${routesUrl}/${routeId}`)
+      .pipe(
+        map(route => this.transformRouteDetail(route)),
+        catchError(this.handleError)
+      );
   }
 
   /**
@@ -97,7 +141,7 @@ export class RoutesService {
               responses.forEach(response => {
                 allRoutes.push(...response.routes);
               });
-              
+
               return allRoutes.map(route => this.transformRoute(route));
             })
           );
@@ -128,10 +172,10 @@ export class RoutesService {
    * Transforma la respuesta del backend al formato del frontend
    */
   private transformRoute(apiRoute: RouteApiResponse): Route {
-    // Obtener el nombre del almacén del primer waypoint de pickup si existe
-    const firstPickup = apiRoute.waypoints?.find(wp => wp.pickup);
-    const warehouseName = firstPickup?.point_name || 'No asignado';
-    
+    const waypoints = (apiRoute.waypoints || []).map(wp => this.transformWaypoint(wp));
+    const firstPickup = waypoints.find(wp => wp.pickup);
+    const warehouseName = firstPickup?.pointName || 'No asignado';
+
     return {
       id: apiRoute.id.toString(),
       creationDate: this.formatDate(apiRoute.created_at),
@@ -140,6 +184,77 @@ export class RoutesService {
       status: this.mapStatus(apiRoute.state),
       assignedTruck: `VEH-${String(apiRoute.vehicle_id).padStart(3, '0')}`
     };
+  }
+
+  /**
+   * Transforma la respuesta del backend a un detalle completo para el frontend
+   */
+  private transformRouteDetail(apiRoute: RouteApiResponse): RouteDetail {
+    const waypoints = (apiRoute.waypoints || []).map(wp => this.transformWaypoint(wp));
+    const firstPickup = waypoints.find(wp => wp.pickup);
+
+    return {
+      id: apiRoute.id.toString(),
+      createdAt: apiRoute.created_at,
+      creationDate: this.formatDate(apiRoute.created_at),
+      status: this.mapStatus(apiRoute.state),
+      deliveries: apiRoute.deliveries,
+      vehicleId: apiRoute.vehicle_id,
+      assignedTruck: `VEH-${String(apiRoute.vehicle_id).padStart(3, '0')}`,
+      country: apiRoute.country,
+      originWarehouse: firstPickup?.pointName || 'No asignado',
+      metrics: this.parseMetrics(apiRoute.gmaps_metrics),
+      waypoints
+    };
+  }
+
+  /**
+   * Transforma un waypoint del backend al formato del frontend
+   */
+  private transformWaypoint(apiWaypoint: RouteWaypointApi): RouteWaypoint {
+    return {
+      id: apiWaypoint.id,
+      orderId: apiWaypoint.order_id,
+      sequence: apiWaypoint.sequence,
+      pointName: apiWaypoint.point_name,
+      pointAddress: apiWaypoint.point_address,
+      arrivalTime: apiWaypoint.arrival_time,
+      pickup: apiWaypoint.pickup
+    };
+  }
+
+  /**
+   * Parsea y transforma las métricas de Google Maps guardadas como string
+   */
+  private parseMetrics(metrics: string | null | undefined): RouteMetrics | null {
+    if (!metrics) {
+      return null;
+    }
+
+    try {
+      const parsed = typeof metrics === 'string' ? JSON.parse(metrics) : metrics;
+      return {
+        performedShipmentCount: this.safeNumber(parsed.performed_shipment_count),
+        totalDuration: this.safeNumber(parsed.total_duration),
+        travelDistanceMeters: this.safeNumber(parsed.travel_distance_meters),
+        totalCost: this.safeNumber(parsed.total_cost)
+      };
+    } catch (error) {
+      console.warn('No se pudieron parsear las métricas de la ruta', error);
+      return null;
+    }
+  }
+
+  /**
+   * Convierte un valor a número si es posible, en caso contrario devuelve null
+   */
+  private safeNumber(value: any): number | null {
+    if (value === null || value === undefined) {
+      return null;
+    }
+
+    const numericValue = Number(value);
+    return Number.isFinite(numericValue) ? numericValue : null;
   }
 
   /**
