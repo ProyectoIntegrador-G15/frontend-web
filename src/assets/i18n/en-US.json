@@ -6,6 +6,7 @@
     "delete": "Delete",
     "create": "Create",
     "search": "Search",
+    "clearSearch": "Clear search",
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",
@@ -14,7 +15,8 @@
     "no": "No",
     "active": "Active",
     "inactive": "Inactive",
-    "warning": "Warning"
+    "warning": "Warning",
+    "back": "Back"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -109,7 +111,8 @@
     "active": "Active",
     "inactive": "Inactive",
     "addProduct": "Add Product",
-    "bulkUploadProducts": "Bulk Upload"
+    "bulkUploadProducts": "Bulk Upload",
+    "viewInventory": "View inventory"
   },
   "suppliers": {
     "title": "Suppliers",
@@ -219,7 +222,9 @@
     "map": {
       "title": "Route map",
       "totalStops": "scheduled stops",
-      "geocoding": "Geocoding addresses..."
+      "geocoding": "Geocoding addresses...",
+      "description": "Interactive map showing the delivery route",
+      "interactiveControls": "This map contains interactive controls for zoom, pan and marker visualization"
     },
     "table": {
       "title": "Stops detail",
