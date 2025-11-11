@@ -532,5 +532,224 @@ describe('SellersService', () => {
       createReq.flush(mockSellerApiResponse);
     });
   });
+
+  // ========== PRUEBAS DE PLANES DE VENTA ==========
+
+  describe('Sales Plans', () => {
+    const mockSalesPlan = {
+      id: 1,
+      seller_id: 1,
+      name: 'Plan Q1 2025',
+      start_date: '2025-01-01',
+      end_date: '2025-03-31',
+      total_units_target: 1000,
+      total_value_target: 50000.0,
+      visits_target: 50,
+      created_at: '2025-01-01T00:00:00Z',
+      updated_at: '2025-01-01T00:00:00Z'
+    };
+
+    const mockSalesPlansResponse = {
+      sales_plans: [mockSalesPlan],
+      total: 1
+    };
+
+    describe('getSalesPlans', () => {
+      it('should fetch sales plans for a seller filtered by month and year', () => {
+        const sellerId = '1';
+        const month = 1;
+        const year = 2025;
+
+        service.getSalesPlans(sellerId, month, year).subscribe((response) => {
+          expect(response).toBeTruthy();
+          expect(response.sales_plans.length).toBe(1);
+          expect(response.sales_plans[0].id).toBe(1);
+          expect(response.sales_plans[0].name).toBe('Plan Q1 2025');
+          expect(response.total).toBe(1);
+        });
+
+        const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}/${sellerId}/sales-plans?month=${month}&year=${year}`);
+        expect(req.request.method).toBe('GET');
+        req.flush(mockSalesPlansResponse);
+      });
+
+      it('should handle error when fetching sales plans fails', () => {
+        const sellerId = '1';
+        const month = 1;
+        const year = 2025;
+        const errorMessage = 'Error al obtener planes de venta';
+
+        service.getSalesPlans(sellerId, month, year).subscribe({
+          next: () => fail('Should have failed'),
+          error: (error) => {
+            expect(error).toBeTruthy();
+            expect(error.message).toBe(errorMessage);
+          }
+        });
+
+        const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}/${sellerId}/sales-plans?month=${month}&year=${year}`);
+        req.flush({ detail: errorMessage }, { status: 500, statusText: 'Server Error' });
+      });
+
+      it('should handle empty sales plans list', () => {
+        const sellerId = '1';
+        const month = 1;
+        const year = 2025;
+
+        service.getSalesPlans(sellerId, month, year).subscribe((response) => {
+          expect(response.sales_plans).toEqual([]);
+          expect(response.total).toBe(0);
+        });
+
+        const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}/${sellerId}/sales-plans?month=${month}&year=${year}`);
+        req.flush({
+          sales_plans: [],
+          total: 0
+        });
+      });
+    });
+
+    describe('getSalesPlan', () => {
+      it('should fetch a specific sales plan by ID', () => {
+        const sellerId = '1';
+        const planId = 1;
+
+        service.getSalesPlan(sellerId, planId).subscribe((plan) => {
+          expect(plan).toBeTruthy();
+          expect(plan.id).toBe(1);
+          expect(plan.name).toBe('Plan Q1 2025');
+          expect(plan.seller_id).toBe(1);
+        });
+
+        const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}/${sellerId}/sales-plans/${planId}`);
+        expect(req.request.method).toBe('GET');
+        req.flush(mockSalesPlan);
+      });
+
+      it('should handle error when sales plan not found', () => {
+        const sellerId = '1';
+        const planId = 999;
+
+        service.getSalesPlan(sellerId, planId).subscribe({
+          next: () => fail('Should have failed'),
+          error: (error) => {
+            expect(error).toBeTruthy();
+            expect(error.message).toContain('Plan');
+          }
+        });
+
+        const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}/${sellerId}/sales-plans/${planId}`);
+        req.flush({ detail: 'Plan de venta no encontrado' }, { status: 404, statusText: 'Not Found' });
+      });
+    });
+
+    describe('createSalesPlan', () => {
+      it('should create a new sales plan successfully', () => {
+        const sellerId = '1';
+        const planData = {
+          name: 'Plan Q2 2025',
+          start_date: '2025-04-01',
+          end_date: '2025-06-30',
+          total_units_target: 1500,
+          total_value_target: 75000.0,
+          visits_target: 60
+        };
+
+        service.createSalesPlan(sellerId, planData).subscribe((plan) => {
+          expect(plan).toBeTruthy();
+          expect(plan.id).toBe(1);
+          expect(plan.name).toBe('Plan Q1 2025');
+        });
+
+        const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}/${sellerId}/sales-plans`);
+        expect(req.request.method).toBe('POST');
+        expect(req.request.body.name).toBe('Plan Q2 2025');
+        expect(req.request.body.start_date).toBe('2025-04-01');
+        expect(req.request.body.end_date).toBe('2025-06-30');
+        expect(req.request.body.total_units_target).toBe(1500);
+        expect(req.request.body.total_value_target).toBe(75000.0);
+        expect(req.request.body.visits_target).toBe(60);
+        req.flush(mockSalesPlan);
+      });
+
+      it('should handle error when creating sales plan with overlapping dates', () => {
+        const sellerId = '1';
+        const planData = {
+          name: 'Plan Solapado',
+          start_date: '2025-01-15',
+          end_date: '2025-01-20',
+          total_units_target: 1000,
+          total_value_target: 50000.0,
+          visits_target: 50
+        };
+
+        service.createSalesPlan(sellerId, planData).subscribe({
+          next: () => fail('Should have failed'),
+          error: (error) => {
+            expect(error).toBeTruthy();
+            expect(error.message).toContain('solapa');
+          }
+        });
+
+        const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}/${sellerId}/sales-plans`);
+        req.flush(
+          { detail: 'Ya existe un plan de venta que se solapa con el rango de fechas especificado' },
+          { status: 400, statusText: 'Bad Request' }
+        );
+      });
+
+      it('should handle error when seller not found', () => {
+        const sellerId = '999';
+        const planData = {
+          name: 'Plan Test',
+          start_date: '2025-01-01',
+          end_date: '2025-01-31',
+          total_units_target: 1000,
+          total_value_target: 50000.0,
+          visits_target: 50
+        };
+
+        service.createSalesPlan(sellerId, planData).subscribe({
+          next: () => fail('Should have failed'),
+          error: (error) => {
+            expect(error).toBeTruthy();
+            expect(error.message).toContain('Vendedor');
+          }
+        });
+
+        const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}/${sellerId}/sales-plans`);
+        req.flush(
+          { detail: 'Vendedor con ID 999 no encontrado' },
+          { status: 404, statusText: 'Not Found' }
+        );
+      });
+
+      it('should handle error when date range is invalid', () => {
+        const sellerId = '1';
+        const planData = {
+          name: 'Plan Inválido',
+          start_date: '2025-01-31',
+          end_date: '2025-01-01', // Fecha de fin anterior a inicio
+          total_units_target: 1000,
+          total_value_target: 50000.0,
+          visits_target: 50
+        };
+
+        service.createSalesPlan(sellerId, planData).subscribe({
+          next: () => fail('Should have failed'),
+          error: (error) => {
+            expect(error).toBeTruthy();
+            expect(error.message).toContain('fecha');
+          }
+        });
+
+        const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}/${sellerId}/sales-plans`);
+        req.flush(
+          { detail: 'La fecha de fin debe ser posterior a la fecha de inicio' },
+          { status: 400, statusText: 'Bad Request' }
+        );
+      });
+    });
+  });
 });
 
