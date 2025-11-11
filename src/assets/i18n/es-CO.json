@@ -6,6 +6,7 @@
     "delete": "Eliminar",
     "create": "Crear",
     "search": "Buscar",
+    "clearSearch": "Limpiar búsqueda",
     "loading": "Cargando...",
     "error": "Error",
     "success": "Éxito",
@@ -15,7 +16,7 @@
     "active": "Activo",
     "inactive": "Inactivo",
     "warning": "Advertencia",
-    "back": "Volver"
+    "back": "Regresar"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -119,7 +120,8 @@
     "active": "Activo",
     "inactive": "Inactivo",
     "addProduct": "Agregar Producto",
-    "bulkUploadProducts": "Carga Masiva"
+    "bulkUploadProducts": "Carga Masiva",
+    "viewInventory": "Ver inventario"
   },
   "suppliers": {
     "title": "Proveedores",
@@ -229,7 +231,9 @@
     "map": {
       "title": "Mapa de la ruta",
       "totalStops": "paradas programadas",
-      "geocoding": "Geocodificando direcciones..."
+      "geocoding": "Geocodificando direcciones...",
+      "description": "Mapa interactivo que muestra la ruta de entrega",
+      "interactiveControls": "Este mapa contiene controles interactivos para zoom, pan y visualización de marcadores"
     },
     "table": {
       "title": "Detalle de paradas",

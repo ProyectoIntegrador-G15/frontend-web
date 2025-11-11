@@ -14,13 +14,15 @@
       <!-- Nombre del proveedor -->
       <nz-form-item>
         <nz-form-control [nzValidateStatus]="getFieldStatus('name')" [nzErrorTip]="getFieldError('name')">
-          <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+          <nz-form-label id="name-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
             {{ 'suppliers.supplierName' | customTranslate }}: <span class="text-red-500">*</span>
           </nz-form-label>
           <input
             class="{{inputClass}}"
             type="text"
             nz-input
+            id="name-input"
+            [attr.aria-labelledby]="'name-label'"
             [placeholder]="'suppliers.supplierNamePlaceholder' | customTranslate"
             formControlName="name">
         </nz-form-control>
@@ -31,13 +33,15 @@
         <div nz-col nzXs="24" nzSm="18">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('nit')" [nzErrorTip]="getFieldError('nit')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+              <nz-form-label id="nit-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 {{ 'suppliers.nit' | customTranslate }}: <span class="text-red-500">*</span>
               </nz-form-label>
               <input
                 class="{{inputClass}}"
                 type="text"
                 nz-input
+                id="nit-input"
+                [attr.aria-labelledby]="'nit-label'"
                 [placeholder]="'suppliers.nitPlaceholder' | customTranslate"
                 formControlName="nit"
                 maxlength="15">
@@ -47,13 +51,15 @@
         <div nz-col nzXs="24" nzSm="6">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('nitVerificationDigit')" [nzErrorTip]="getFieldError('nitVerificationDigit')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+              <nz-form-label id="nitVerificationDigit-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 {{ 'suppliers.nitVerificationDigit' | customTranslate }}: <span class="text-red-500">*</span>
               </nz-form-label>
               <input
                 class="{{inputClass}}"
                 type="text"
                 nz-input
+                id="nitVerificationDigit-input"
+                [attr.aria-labelledby]="'nitVerificationDigit-label'"
                 [placeholder]="'suppliers.nitVerificationDigitPlaceholder' | customTranslate"
                 formControlName="nitVerificationDigit"
                 maxlength="1">
@@ -65,13 +71,15 @@
       <!-- Email -->
       <nz-form-item>
         <nz-form-control [nzValidateStatus]="getFieldStatus('email')" [nzErrorTip]="getFieldError('email')">
-          <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+          <nz-form-label id="email-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
             {{ 'suppliers.email' | customTranslate }}: <span class="text-red-500">*</span>
           </nz-form-label>
           <input
             class="{{inputClass}}"
             type="email"
             nz-input
+            id="email-input"
+            [attr.aria-labelledby]="'email-label'"
             [placeholder]="'suppliers.emailPlaceholder' | customTranslate"
             formControlName="email">
         </nz-form-control>
@@ -82,12 +90,18 @@
         <div nz-col nzXs="24" nzSm="12">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('country')" [nzErrorTip]="getFieldError('country')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+              <nz-form-label id="country-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 {{ 'suppliers.country' | customTranslate }}: <span class="text-red-500">*</span>
               </nz-form-label>
+              <label for="country-select" class="sr-only">{{ 'suppliers.country' | customTranslate }}</label>
               <nz-select
                 class="w-full"
+                nzId="country-select"
+                nzLabelId="country-label"
                 [nzPlaceHolder]="'suppliers.selectCountry' | customTranslate"
+                [attr.aria-label]="('suppliers.country' | customTranslate) + ' (requerido)'"
+                [attr.aria-labelledby]="'country-label'"
+                [attr.aria-describedby]="'country-label'"
                 nzAllowClear
                 formControlName="country">
                 <nz-option *ngFor="let country of countries" [nzValue]="country" [nzLabel]="country"></nz-option>
@@ -98,13 +112,15 @@
         <div nz-col nzXs="24" nzSm="12">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('city')" [nzErrorTip]="getFieldError('city')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+              <nz-form-label id="city-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 {{ 'suppliers.city' | customTranslate }}: <span class="text-red-500">*</span>
               </nz-form-label>
               <input
                 class="{{inputClass}}"
                 type="text"
                 nz-input
+                id="city-input"
+                [attr.aria-labelledby]="'city-label'"
                 [placeholder]="'suppliers.cityPlaceholder' | customTranslate"
                 formControlName="city">
             </nz-form-control>
@@ -121,7 +137,7 @@
         {{ 'common.cancel' | customTranslate }}
       </button>
       <button class="btn-primary-sm" (click)="handleSupplierModalOk()" [nzLoading]="isSupplierModalLoading">
-        <span nz-icon nzType="plus" nzTheme="outline"></span>
+        <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
         {{ 'suppliers.createSupplier' | customTranslate }}
       </button>
     </div>
@@ -146,15 +162,19 @@
           />
         </nz-input-group>
         <ng-template #suffixIconSearch>
-          <span *ngIf="searchTerm" nz-icon nzType="close-circle" nzTheme="outline" (click)="clearSearch()" class="cursor-pointer hover:text-red-500 text-sm"></span>
+          <span *ngIf="searchTerm" nz-icon nzType="close-circle" nzTheme="outline" (click)="clearSearch()" class="cursor-pointer hover:text-red-500 text-sm" role="button" tabindex="0" [attr.aria-label]="'common.clearSearch' | customTranslate" (keydown.enter)="clearSearch()" (keydown.space)="clearSearch()"></span>
         </ng-template>
       </div>
 
       <!-- Filtro por país -->
       <div class="w-full sm:w-auto sm:min-w-[200px] sm:max-w-[250px]">
+        <label for="country-filter-select" id="country-filter-label" class="sr-only">{{ 'suppliers.filterByCountry' | customTranslate }}</label>
         <nz-select
           class="w-full"
+          nzId="country-filter-select"
           [nzPlaceHolder]="'suppliers.filterByCountry' | customTranslate"
+          [attr.aria-label]="'suppliers.filterByCountry' | customTranslate"
+          [attr.aria-labelledby]="'country-filter-label'"
           nzAllowClear
           nzSize="small"
           [(ngModel)]="countryFilter"
@@ -167,7 +187,7 @@
     <!-- Botón crear proveedor -->
     <div class="w-full sm:w-auto">
       <button class="btn-primary-sm w-full sm:w-auto" (click)="showSupplierModal()">
-        <span nz-icon nzType="plus" nzTheme="outline"></span>
+        <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
         {{ 'suppliers.createSupplier' | customTranslate }}
       </button>
     </div>
@@ -242,12 +262,12 @@
             class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
             <span *ngIf="data.status === 'active'"
                   class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-              <span nz-icon nzType="check-circle" nzTheme="outline" class="mr-1 text-xs"></span>
+              <span nz-icon nzType="check-circle" nzTheme="outline" class="mr-1 text-xs" aria-hidden="true"></span>
               {{ 'common.active' | customTranslate }}
             </span>
             <span *ngIf="data.status !== 'active'"
                   class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
-              <span nz-icon nzType="close-circle" nzTheme="outline" class="mr-1 text-xs"></span>
+              <span nz-icon nzType="close-circle" nzTheme="outline" class="mr-1 text-xs" aria-hidden="true"></span>
               {{ 'common.inactive' | customTranslate }}
             </span>
           </td>
