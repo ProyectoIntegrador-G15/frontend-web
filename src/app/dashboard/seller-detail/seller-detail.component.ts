@@ -922,6 +922,11 @@ export class SellerDetailComponent implements OnInit {
   }
 
   handleSalesPlanModalOk(): void {
+    // Prevenir múltiples envíos
+    if (this.isSalesPlanModalLoading) {
+      return;
+    }
+
     if (!this.validateFormFields()) {
       return;
     }

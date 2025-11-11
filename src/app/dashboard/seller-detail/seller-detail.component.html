@@ -602,8 +602,8 @@
 
   <ng-template #salesPlanModalFooter>
     <div class="flex justify-center gap-3 w-full">
-      <button class="btn-secondary-sm" (click)="handleSalesPlanModalCancel()">Cancelar</button>
-      <button class="btn-primary-sm" (click)="handleSalesPlanModalOk()" [nzLoading]="isSalesPlanModalLoading">
+      <button class="btn-secondary-sm" (click)="handleSalesPlanModalCancel()" [disabled]="isSalesPlanModalLoading">Cancelar</button>
+      <button class="btn-primary-sm" (click)="handleSalesPlanModalOk()" [nzLoading]="isSalesPlanModalLoading" [disabled]="isSalesPlanModalLoading">
         <span nz-icon nzType="plus" nzTheme="outline"></span>
         Crear plan
       </button>
