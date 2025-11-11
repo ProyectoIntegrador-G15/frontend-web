@@ -14,7 +14,8 @@
     "no": "No",
     "active": "Activo",
     "inactive": "Inactivo",
-    "warning": "Advertencia"
+    "warning": "Advertencia",
+    "back": "Volver"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -68,7 +69,16 @@
     "statusActive": "Activo",
     "statusInactive": "Inactivo",
     "statusSuspended": "Suspendido",
-    "statusUnknown": "Desconocido"
+    "statusUnknown": "Desconocido",
+    "viewDetails": "Ver detalles",
+    "manageClients": "Gestionar clientes",
+    "sellerId": "ID del vendedor",
+    "assignedClients": "Clientes asignados",
+    "availableClients": "Clientes disponibles",
+    "noAssignedClients": "No hay clientes asignados a este vendedor",
+    "noAvailableClients": "No hay clientes disponibles para asignar",
+    "assign": "Asignar",
+    "unassign": "Desasignar"
   },
   "products": {
     "title": "Productos",

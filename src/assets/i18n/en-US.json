@@ -14,7 +14,8 @@
     "no": "No",
     "active": "Active",
     "inactive": "Inactive",
-    "warning": "Warning"
+    "warning": "Warning",
+    "back": "Back"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -68,7 +69,16 @@
     "statusActive": "Active",
     "statusInactive": "Inactive",
     "statusSuspended": "Suspended",
-    "statusUnknown": "Unknown"
+    "statusUnknown": "Unknown",
+    "viewDetails": "View details",
+    "manageClients": "Manage clients",
+    "sellerId": "Seller ID",
+    "assignedClients": "Assigned clients",
+    "availableClients": "Available clients",
+    "noAssignedClients": "No clients assigned to this seller",
+    "noAvailableClients": "No available clients to assign",
+    "assign": "Assign",
+    "unassign": "Unassign"
   },
   "products": {
     "title": "Products",
