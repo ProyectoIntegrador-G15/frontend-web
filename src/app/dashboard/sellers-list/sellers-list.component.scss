@@ -1,13 +1,29 @@
 .sellers-list-container {
   padding: 20px;
-}
 
-.action-button {
-  color: #1890ff;
-  
-  &:hover {
-    color: #40a9ff;
-    background-color: #f0f8ff;
+  // Estilos para la tabla con scroll horizontal
+  .overflow-x-auto {
+    &::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+
+      &:hover {
+        background: #555;
+      }
+    }
+
+    table {
+      min-width: 600px; // Ancho mínimo para activar scroll en pantallas pequeñas
+    }
   }
 }
 

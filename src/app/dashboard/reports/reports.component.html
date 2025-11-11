@@ -15,12 +15,18 @@
         <div nz-col nzXs="24" nzSm="12">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('month')" [nzErrorTip]="getFieldError('month')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+              <nz-form-label id="month-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 {{ 'reports.monthReport' | customTranslate }}: <span class="text-red-500">*</span>
               </nz-form-label>
+              <label for="month-select" class="sr-only">{{ 'reports.monthReport' | customTranslate }}</label>
               <nz-select
                 class="w-full"
+                nzId="month-select"
+                nzLabelId="month-label"
                 [nzPlaceHolder]="'reports.selectMonth' | customTranslate"
+                [attr.aria-label]="('reports.monthReport' | customTranslate) + ' (requerido)'"
+                [attr.aria-labelledby]="'month-label'"
+                [attr.aria-describedby]="'month-label'"
                 nzAllowClear
                 formControlName="month">
                 <nz-option
@@ -35,12 +41,18 @@
         <div nz-col nzXs="24" nzSm="12">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('year')" [nzErrorTip]="getFieldError('year')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+              <nz-form-label id="year-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 {{ 'reports.yearReport' | customTranslate }}: <span class="text-red-500">*</span>
               </nz-form-label>
+              <label for="year-select" class="sr-only">{{ 'reports.yearReport' | customTranslate }}</label>
               <nz-select
                 class="w-full"
+                nzId="year-select"
+                nzLabelId="year-label"
                 [nzPlaceHolder]="'reports.selectYear' | customTranslate"
+                [attr.aria-label]="('reports.yearReport' | customTranslate) + ' (requerido)'"
+                [attr.aria-labelledby]="'year-label'"
+                [attr.aria-describedby]="'year-label'"
                 nzAllowClear
                 formControlName="year">
                 <nz-option
@@ -63,7 +75,7 @@
       </button>
       <button class="btn-primary-sm" (click)="handleGenerateReportModalOk()" [nzLoading]="isGenerateReportModalLoading"
               [disabled]="isGenerateReportModalLoading">
-        <span nz-icon nzType="file-text" nzTheme="outline"></span>
+        <span nz-icon nzType="file-text" nzTheme="outline" aria-hidden="true"></span>
         {{ 'reports.generateReport' | customTranslate }}
       </button>
     </div>
@@ -73,7 +85,7 @@
 <div class="flex justify-between items-center mb-6">
   <h1 class="screen-title">{{ 'reports.title' | customTranslate }}</h1>
   <button class="btn-primary-sm w-[250px]" (click)="generateReport()">
-    <span nz-icon nzType="plus" nzTheme="outline"></span>
+    <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
     {{ 'reports.generateReport' | customTranslate }}
   </button>
 </div>
@@ -86,14 +98,17 @@
               class="group inline-flex items-center justify-center w-[40px] h-[40px] p-0 rounded-[6px] border-none bg-[#E8ECFF] dark:bg-white/10 hover:bg-[#3749B3] dark:hover:bg-white/20 transition-all duration-150 ease-in-out"
               (click)="refreshReports()" 
               [disabled]="isLoading"
+              [attr.aria-label]="'reports.refreshList' | customTranslate"
               [nzTooltipTitle]="'reports.refreshList' | customTranslate" 
               nzTooltipPlacement="top" 
-              nz-tooltip>
+              nz-tooltip
+              type="button">
         <span nz-icon 
               nzType="reload" 
               nzTheme="outline"
               [class.animate-spin]="isLoading"
-              class="text-[18px] text-[#3749B3] dark:text-white/60 group-hover:text-white dark:group-hover:text-white transition-colors"></span>
+              class="text-[18px] text-[#3749B3] dark:text-white/60 group-hover:text-white dark:group-hover:text-white transition-colors"
+              aria-hidden="true"></span>
       </button>
     </div>
     <div class="w-full overflow-x-auto">
@@ -148,8 +163,10 @@
           <td
             class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
-                  [ngClass]="getStatusColor(data.status)">
-              <span nz-icon [nzType]="getStatusIcon(data.status)" nzTheme="outline" class="mr-1 text-xs"></span>
+                  [ngClass]="getStatusColor(data.status)"
+                  role="status"
+                  [attr.aria-label]="getStatusText(data.status)">
+              <span nz-icon [nzType]="getStatusIcon(data.status)" nzTheme="outline" class="mr-1 text-xs" aria-hidden="true"></span>
               {{ getStatusText(data.status) }}
             </span>
           </td>
@@ -162,18 +179,22 @@
               style="background-color: var(--blue-violet-extralight, #E8ECFF); color: var(--blue-violet-dark, #3749B3);"
               onmouseover="this.style.backgroundColor='var(--blue-violet-dark, #3749B3)'; this.style.color='white';"
               onmouseout="this.style.backgroundColor='var(--blue-violet-extralight, #E8ECFF)'; this.style.color='var(--blue-violet-dark, #3749B3)';"
+              [attr.aria-label]="('reports.downloadReport' | customTranslate) + ': ' + data.reportMonth + ' ' + data.reportYear"
               [nzTooltipTitle]="'reports.downloadReport' | customTranslate"
               nzTooltipPlacement="top"
-              nz-tooltip>
-              <span class="text-[18px]" nz-icon nzType="download" nzTheme="outline"></span>
+              nz-tooltip
+              type="button">
+              <span class="text-[18px]" nz-icon nzType="download" nzTheme="outline" aria-hidden="true"></span>
             </button>
             <span *ngIf="data.status !== 'completed'"
                   class="inline-flex items-center justify-center w-[44px] h-[44px] rounded-[6px] border-none cursor-not-allowed opacity-50"
                   style="background-color: var(--gray-100, #F3F4F6); color: var(--gray-500, #6B7280);"
+                  role="img"
+                  [attr.aria-label]="data.status === 'processing' ? ('reports.reportProcessing' | customTranslate) : ('reports.notAvailableDownload' | customTranslate)"
                   [nzTooltipTitle]="data.status === 'processing' ? ('reports.reportProcessing' | customTranslate) : ('reports.notAvailableDownload' | customTranslate)"
                   nzTooltipPlacement="top"
                   nz-tooltip>
-              <span class="text-[18px]" nz-icon nzType="lock" nzTheme="outline"></span>
+              <span class="text-[18px]" nz-icon nzType="lock" nzTheme="outline" aria-hidden="true"></span>
             </span>
           </td>
         </tr>

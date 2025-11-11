@@ -103,4 +103,9 @@ export class SellersListComponent implements OnInit {
   viewSeller(sellerId: string) {
     this.router.navigate(['/dashboard/sellers', sellerId]);
   }
+
+  // Method to manage clients assigned to seller
+  manageClients(sellerId: string) {
+    this.router.navigate(['/dashboard/sellers', sellerId, 'clients']);
+  }
 }

@@ -9,7 +9,8 @@ import {RoutesListComponent} from './routes-list/routes-list.component';
 import {CreateRouteComponent} from './create-route/create-route.component';
 import {RouteDetailComponent} from './route-detail/route-detail.component';
 import {SellersListComponent} from './sellers-list/sellers-list.component';
-import {SellerDetailComponent} from './seller-detail/seller-detail.component';
+import {SellerDetailsComponent} from './seller-details/seller-details.component';
+import {SellerClientsComponent} from './seller-clients/seller-clients.component';
 import {CreateVisitRouteComponent} from './create-visit-route/create-visit-route.component';
 import {ConfirmVisitRouteComponent} from './confirm-visit-route/confirm-visit-route.component';
 import {ReportsComponent} from './reports/reports.component';
@@ -75,9 +76,16 @@ const routes: Routes = [
   },
   {
     path: 'sellers/:id',
-    component: SellerDetailComponent,
+    component: SellerDetailsComponent,
     data: {
       title: 'Perfil del vendedor',
+    },
+  },
+  {
+    path: 'sellers/:id/clients',
+    component: SellerClientsComponent,
+    data: {
+      title: 'Gestionar clientes del vendedor',
     },
   },
   {

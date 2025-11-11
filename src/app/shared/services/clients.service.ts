@@ -94,6 +94,42 @@ export class ClientsService {
   }
 
   /**
+   * Gets free clients (not assigned to any seller)
+   */
+  getFreeClients(): Observable<Client[]> {
+    const baseUrl = (environment as any).localServices?.clients 
+      ? `${(environment as any).localServices.clients}${environment.apiEndpoints.clients}`
+      : `${environment.apiUrl}${environment.apiEndpoints.clients}`;
+    
+    const freeClientsUrl = `${baseUrl}/free`;
+    
+    return this.http.get<ClientApiResponse[]>(freeClientsUrl)
+      .pipe(
+        map(clients => clients.map(client => this.transformClient(client))),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * Assign or unassign a client to a seller
+   * If client is already assigned to the seller, it will be unassigned
+   * If client is not assigned, it will be assigned to the seller
+   */
+  assignUnassignClientToSeller(clientId: number, sellerId: number): Observable<Client> {
+    const baseUrl = (environment as any).localServices?.clients 
+      ? `${(environment as any).localServices.clients}${environment.apiEndpoints.clients}`
+      : `${environment.apiUrl}${environment.apiEndpoints.clients}`;
+    
+    const assignUrl = `${baseUrl}/${clientId}/sellers/${sellerId}`;
+    
+    return this.http.patch<ClientApiResponse>(assignUrl, {})
+      .pipe(
+        map(client => this.transformClient(client)),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
    * Transform backend response to frontend format
    */
   private transformClient(apiClient: ClientApiResponse): Client {

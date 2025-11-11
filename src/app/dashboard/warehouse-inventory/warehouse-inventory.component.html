@@ -2,15 +2,17 @@
 <div class="flex items-center justify-between mb-6">
   <button
     (click)="goBack()"
-    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
-    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200"
+    type="button"
+    aria-label="Regresar a la lista de bodegas">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
     </svg>
     Regresar
   </button>
   
-  <button class="btn-primary" (click)="showInventoryModal()">
-    <span nz-icon nzType="plus" nzTheme="outline"></span>
+  <button class="btn-primary" (click)="showInventoryModal()" type="button">
+    <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
     Agregar inventario
   </button>
 </div>
@@ -36,7 +38,7 @@
       />
     </nz-input-group>
     <ng-template #suffixIconSearch>
-      <span *ngIf="searchTerm" nz-icon nzType="close-circle" nzTheme="outline" (click)="clearSearch()" class="cursor-pointer hover:text-red-500"></span>
+      <span *ngIf="searchTerm" nz-icon nzType="close-circle" nzTheme="outline" (click)="clearSearch()" class="cursor-pointer hover:text-red-500" role="button" tabindex="0" aria-label="Limpiar búsqueda" (keydown.enter)="clearSearch()" (keydown.space)="clearSearch()"></span>
     </ng-template>
   </div>
 </div>
@@ -58,11 +60,17 @@
     <form nz-form nzLayout="vertical" [formGroup]="inventoryForm" (ngSubmit)="handleInventoryModalOk()">
       <nz-form-item>
         <nz-form-control [nzValidateStatus]="getFieldStatus('product')" [nzErrorTip]="getFieldError('product')">
-          <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+          <nz-form-label id="product-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
             Producto: <span class="text-red-500">*</span></nz-form-label>
+          <label for="product-select" class="sr-only">Producto</label>
           <nz-select
             class="w-full"
+            nzId="product-select"
+            nzLabelId="product-label"
             nzPlaceHolder="Buscar producto"
+            [attr.aria-label]="'Producto (requerido)'"
+            [attr.aria-labelledby]="'product-label'"
+            [attr.aria-describedby]="'product-label'"
             nzAllowClear
             nzShowSearch
             nzServerSearch
@@ -78,18 +86,18 @@
         <div nz-col nzXs="24" nzSm="12">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('quantity')" [nzErrorTip]="getFieldError('quantity')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+              <nz-form-label id="quantity-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 Cantidad: <span class="text-red-500">*</span></nz-form-label>
-              <input class="{{inputClass}}" type="number" nz-input placeholder="Cantidad" formControlName="quantity">
+              <input class="{{inputClass}}" type="number" nz-input id="quantity-input" [attr.aria-labelledby]="'quantity-label'" placeholder="Cantidad" formControlName="quantity">
             </nz-form-control>
           </nz-form-item>
         </div>
         <div nz-col nzXs="24" nzSm="12">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('location')" [nzErrorTip]="getFieldError('location')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+              <nz-form-label id="location-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 Ubicación: <span class="text-red-500">*</span></nz-form-label>
-              <input class="{{inputClass}}" type="text" nz-input placeholder="Identificador de ubicación" formControlName="location">
+              <input class="{{inputClass}}" type="text" nz-input id="location-input" [attr.aria-labelledby]="'location-label'" placeholder="Identificador de ubicación" formControlName="location">
             </nz-form-control>
           </nz-form-item>
         </div>
@@ -110,7 +118,7 @@
         (click)="handleInventoryModalOk()" 
         [nzLoading]="isInventoryModalLoading"
         [disabled]="isInventoryModalLoading || inventoryForm.invalid">
-        <span nz-icon nzType="plus" nzTheme="outline" *ngIf="!isInventoryModalLoading"></span>
+        <span nz-icon nzType="plus" nzTheme="outline" *ngIf="!isInventoryModalLoading" aria-hidden="true"></span>
         Agregar Inventario
       </button>
     </div>
@@ -153,15 +161,19 @@
                   class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
                   nz-tooltip
                   [nzTooltipTitle]="'Requiere cadena de frío'"
-                  nzTooltipPlacement="top">
-              <span nz-icon nzType="cloud" nzTheme="outline" class="text-sm"></span>
+                  nzTooltipPlacement="top"
+                  role="img"
+                  aria-label="Requiere cadena de frío">
+              <span nz-icon nzType="cloud" nzTheme="outline" class="text-sm" aria-hidden="true"></span>
             </span>
             <span *ngIf="product.storageInstructions"
                   class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                   nz-tooltip
                   [nzTooltipTitle]="product.storageInstructions"
-                  nzTooltipPlacement="top">
-              <span nz-icon nzType="info-circle" nzTheme="outline" class="text-sm"></span>
+                  nzTooltipPlacement="top"
+                  role="img"
+                  [attr.aria-label]="'Instrucciones de almacenamiento: ' + product.storageInstructions">
+              <span nz-icon nzType="info-circle" nzTheme="outline" class="text-sm" aria-hidden="true"></span>
             </span>
             <span *ngIf="!product.requires_cold_chain && !product.storageInstructions" class="text-xs text-gray-400 dark:text-gray-500">
               -
@@ -184,7 +196,7 @@
   <div class="p-[25px]">
     <div class="flex flex-col items-center justify-center py-16">
       <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
-        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
         </svg>
       </div>
@@ -198,7 +210,7 @@
 <div *ngIf="errorMessage" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
   <div class="flex">
     <div class="flex-shrink-0">
-      <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+      <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
       </svg>
     </div>

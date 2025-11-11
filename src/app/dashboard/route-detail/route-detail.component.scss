@@ -3,6 +3,19 @@
   min-height: calc(100vh - 120px);
 }
 
+// Clase para ocultar visualmente pero mantener accesible para lectores de pantalla
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -148,7 +161,7 @@
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #76839c;
+  color: #5A6578;
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
@@ -193,7 +206,7 @@
   align-items: center;
   gap: 16px;
   font-size: 12px;
-  color: #76839c;
+  color: #5A6578;
 }
 
 .legend-item {

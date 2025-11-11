@@ -5,14 +5,14 @@ import { TranslateModule, TranslateService, LangChangeEvent } from '@ngx-transla
 import { EventEmitter } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { SellerDetailComponent } from './seller-detail.component';
+import { SellerDetailsComponent } from './seller-details.component';
 import { SellersService, Seller, SalesPlan, SalesPlanListResponse, CreateSalesPlanRequest } from '../../shared/services/sellers.service';
 import { VisitRoutesService } from '../../shared/services/visit-routes.service';
 import { OrdersService } from '../../shared/services/orders.service';
 import { of, throwError } from 'rxjs';
 
-describe('SellerDetailComponent', () => {
-  let component: SellerDetailComponent;
+describe('SellerDetailsComponent', () => {
+  let component: SellerDetailsComponent;
   let sellersService: jasmine.SpyObj<SellersService>;
   let ordersService: jasmine.SpyObj<OrdersService>;
   let visitRoutesService: jasmine.SpyObj<VisitRoutesService>;
@@ -62,7 +62,7 @@ describe('SellerDetailComponent', () => {
         ReactiveFormsModule
       ],
       providers: [
-        SellerDetailComponent,
+        SellerDetailsComponent,
         FormBuilder,
         { provide: SellersService, useValue: sellersServiceSpy },
         { provide: OrdersService, useValue: ordersServiceSpy },
@@ -78,7 +78,7 @@ describe('SellerDetailComponent', () => {
     visitRoutesService = TestBed.inject(VisitRoutesService) as jasmine.SpyObj<VisitRoutesService>;
     translateService = TestBed.inject(TranslateService);
     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-    component = TestBed.inject(SellerDetailComponent);
+    component = TestBed.inject(SellerDetailsComponent);
 
     // Configurar TranslateService
     translateService.currentLang = 'es-CO';
