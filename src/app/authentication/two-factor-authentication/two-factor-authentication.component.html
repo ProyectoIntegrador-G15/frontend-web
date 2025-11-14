@@ -96,14 +96,28 @@
                 <div *ngIf="error" class="error-message mt-[8px]">
                   <span class="text-[14px] text-[#ff4d4f] dark:text-[#ff7875]">{{ errorMessage }}</span>
                 </div>
-                <div *ngIf="!error" class="help-text mt-[8px]">
+                <div *ngIf="codeSentMessage && !error" class="success-message mt-[8px]">
+                  <span class="text-[14px] text-[#52c41a] dark:text-[#73d13d]">{{ codeSentMessage }}</span>
+                </div>
+                <div *ngIf="isSendingCode && !error" class="info-message mt-[8px]">
+                  <span class="text-[13px] text-[#1890ff] dark:text-[#40a9ff]">
+                    <i class="fas fa-spinner fa-spin"></i> Enviando código de verificación...
+                  </span>
+                </div>
+                <div *ngIf="!error && !codeSentMessage && !isSendingCode" class="help-text mt-[8px]">
                   <span class="text-[13px] text-[#8c8c8c] dark:text-white/60">Ingrese el código de 6 dígitos enviado a su correo electrónico</span>
                 </div>
               </div>
-              <button type="submit" class="btn-primary w-full" [disabled]="isLoading">
+              <button type="submit" class="btn-primary w-full mb-[15px]" [disabled]="isLoading || isSendingCode">
                 <i class="fas fa-cog fa-spin" [hidden]="!isLoading"></i>
                 <span [hidden]="isLoading">Confirmar</span>
                 <span [hidden]="!isLoading">Validando...</span>
+              </button>
+              <button type="button" class="btn-secondary w-full" (click)="sendTotpCode()" [disabled]="isSendingCode || isLoading">
+                <i class="fas fa-paper-plane" [hidden]="isSendingCode"></i>
+                <i class="fas fa-spinner fa-spin" [hidden]="!isSendingCode"></i>
+                <span [hidden]="isSendingCode">Reenviar código</span>
+                <span [hidden]="!isSendingCode">Enviando...</span>
               </button>
             </form>
           </div>

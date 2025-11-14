@@ -1,23 +1,29 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthenticationService } from '../../shared/services/authentication.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-two-factor-authentication',
   templateUrl: './two-factor-authentication.component.html',
   styleUrls: ['./two-factor-authentication.component.scss']
 })
-export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit {
+export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('firstInput', { static: false }) firstInput!: ElementRef<HTMLInputElement>;
   
   otpForm!: FormGroup;
   isLoading = false;
+  isSendingCode = false;
   error = false;
   errorMessage = '';
+  codeSent = false;
+  codeSentMessage = '';
   
-  // Código OTP simulado (en producción vendría del backend)
-  private simulatedOTP = '123456';
+  // Contador de intentos fallidos
+  private failedAttempts = 0;
+  private readonly MAX_ATTEMPTS = 3;
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -26,6 +32,13 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
+    // Verificar que hay un token pendiente
+    if (!this.auth.getPendingToken()) {
+      // Si no hay token, redirigir al login
+      this.router.navigate(['/authentication/login']);
+      return;
+    }
+
     // Crear formulario con 6 campos para el código OTP
     const controls: { [key: string]: AbstractControl } = {};
     for (let i = 0; i < 6; i++) {
@@ -35,6 +48,14 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit {
       ]);
     }
     this.otpForm = this.fb.group(controls);
+
+    // Enviar código TOTP automáticamente al cargar
+    this.sendTotpCode();
+  }
+
+  ngOnDestroy(): void {
+    // Limpiar suscripciones
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   ngAfterViewInit(): void {
@@ -117,6 +138,39 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit {
   }
 
   /**
+   * Envía el código TOTP al email del usuario
+   */
+  sendTotpCode(): void {
+    this.isSendingCode = true;
+    this.error = false;
+    this.errorMessage = '';
+    this.codeSent = false;
+    this.codeSentMessage = '';
+
+    const sub = this.auth.sendTotp().subscribe({
+      next: () => {
+        this.isSendingCode = false;
+        this.codeSent = true;
+        this.codeSentMessage = 'Código de verificación enviado a tu correo electrónico';
+        // Limpiar el mensaje después de 5 segundos
+        setTimeout(() => {
+          this.codeSentMessage = '';
+        }, 5000);
+      },
+      error: (err) => {
+        this.isSendingCode = false;
+        this.showError(err.message || 'Error al enviar el código de verificación. Por favor, intente nuevamente.');
+        // Si hay error al enviar, redirigir al login después de un tiempo
+        setTimeout(() => {
+          this.redirectToLogin();
+        }, 3000);
+      }
+    });
+
+    this.subscriptions.push(sub);
+  }
+
+  /**
    * Valida y envía el código OTP
    */
   submitOTP(): void {
@@ -146,20 +200,66 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit {
     this.error = false;
     this.errorMessage = '';
 
-    // Simular validación del código OTP (emulación sin backend)
-    setTimeout(() => {
-      if (this.validateOTP(otpCode)) {
+    // Validar el código TOTP con el backend
+    const sub = this.auth.validateTotp(otpCode).subscribe({
+      next: () => {
         // Código válido - redirigir al dashboard
+        this.isLoading = false;
         this.router.navigate(['/dashboard/products']).then(() => {
           window.location.reload();
         });
-      } else {
-        // Código inválido - mensaje genérico sin detalles específicos
+      },
+      error: (err: any) => {
         this.isLoading = false;
-        this.showError('La autenticación ha fallado. Por favor, verifique el código e intente nuevamente.');
-        this.clearOTPFields();
+        this.failedAttempts++;
+
+        // Manejar diferentes tipos de errores
+        if (err.status === 423) {
+          // Sesión bloqueada
+          this.showError('Sesión bloqueada por múltiples intentos fallidos. Serás redirigido al login.');
+          setTimeout(() => {
+            this.redirectToLogin();
+          }, 2000);
+        } else if (err.status === 401) {
+          // Código inválido o expirado
+          if (this.failedAttempts >= this.MAX_ATTEMPTS) {
+            this.showError('Has excedido el número máximo de intentos. Serás redirigido al login.');
+            setTimeout(() => {
+              this.redirectToLogin();
+            }, 2000);
+          } else {
+            const remainingAttempts = this.MAX_ATTEMPTS - this.failedAttempts;
+            this.showError(
+              err.message || 
+              `Código inválido. Te quedan ${remainingAttempts} intento${remainingAttempts > 1 ? 's' : ''}.`
+            );
+            this.clearOTPFields();
+          }
+        } else {
+          // Otro error
+          if (this.failedAttempts >= this.MAX_ATTEMPTS) {
+            this.showError('Has excedido el número máximo de intentos. Serás redirigido al login.');
+            setTimeout(() => {
+              this.redirectToLogin();
+            }, 2000);
+          } else {
+            this.showError(err.message || 'Error al validar el código. Por favor, intente nuevamente.');
+            this.clearOTPFields();
+          }
+        }
       }
-    }, 1000);
+    });
+
+    this.subscriptions.push(sub);
+  }
+
+  /**
+   * Redirige al login y limpia la autenticación pendiente
+   */
+  private redirectToLogin(): void {
+    this.auth.clearPendingAuthentication();
+    this.auth.logout();
+    this.router.navigate(['/authentication/login']);
   }
 
   /**
@@ -172,17 +272,6 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit {
       code += digit;
     }
     return code;
-  }
-
-  /**
-   * Valida el código OTP (emulación)
-   * En producción, esto se haría mediante una llamada al backend
-   */
-  private validateOTP(code: string): boolean {
-    // Emulación: solo aceptar el código simulado
-    // En producción, esto sería una llamada HTTP al backend que validaría el código
-    // Para pruebas, puede usar el código '123456'
-    return code === this.simulatedOTP;
   }
 
   /**

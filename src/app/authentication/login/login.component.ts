@@ -50,8 +50,8 @@ export class LoginComponent {
 
   ngOnInit(): void {
     this.validateForm = this.fb.group({
-      userName: ['admin@medisupply.com', [Validators.required]],
-      password: ['MiPassword123!', [Validators.required]],
+      userName: ['', [Validators.required]],
+      password: ['', [Validators.required]],
       remember: [true],
     });
   }
