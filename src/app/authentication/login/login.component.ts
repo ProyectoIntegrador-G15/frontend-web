@@ -30,9 +30,8 @@ export class LoginComponent {
 
       this.auth.firebaseLogin(email, password).subscribe({
         next: (resp) => {
-          this.router.navigate(['/dashboard/products']).then(() => {
-            window.location.reload();
-          });
+          // Redirigir a la página de autenticación 2FA después del login exitoso
+          this.router.navigate(['/authentication/2fa']);
         },
         error: () => {
           this.error = true;
@@ -51,8 +50,8 @@ export class LoginComponent {
 
   ngOnInit(): void {
     this.validateForm = this.fb.group({
-      userName: ['admin@medisupply.com', [Validators.required]],
-      password: ['MiPassword123!', [Validators.required]],
+      userName: ['', [Validators.required]],
+      password: ['', [Validators.required]],
       remember: [true],
     });
   }
