@@ -31,11 +31,19 @@
         <div nz-col nzXs="24" nzSm="12">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('supplier')" [nzErrorTip]="getFieldError('supplier')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+              <nz-form-label id="supplier-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 {{ 'products.supplier' | customTranslate }}: <span class="text-red-500">*</span></nz-form-label>
+              <label for="supplier-select" class="sr-only">{{ 'products.supplier' | customTranslate }}</label>
               <nz-select
                 class="w-full"
-                [nzPlaceHolder]="'products.selectSupplier' | customTranslate" nzAllowClear formControlName="supplier">
+                nzId="supplier-select"
+                nzLabelId="supplier-label"
+                [nzPlaceHolder]="'products.selectSupplier' | customTranslate"
+                [attr.aria-label]="('products.supplier' | customTranslate) + ' (requerido)'"
+                [attr.aria-labelledby]="'supplier-label'"
+                [attr.aria-describedby]="'supplier-label'"
+                nzAllowClear
+                formControlName="supplier">
                 <nz-option nzValue=1 nzLabel="Proveedor 1"></nz-option>
                 <nz-option nzValue=2 nzLabel="Proveedor 2"></nz-option>
                 <nz-option nzValue=3 nzLabel="Proveedor 3"></nz-option>
@@ -50,11 +58,19 @@
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('requiresColdChain')"
                              [nzErrorTip]="getFieldError('requiresColdChain')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+              <nz-form-label id="requiresColdChain-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 {{ 'products.requiresColdChain' | customTranslate }}: <span class="text-red-500">*</span></nz-form-label>
+              <label for="requiresColdChain-select" class="sr-only">{{ 'products.requiresColdChain' | customTranslate }}</label>
               <nz-select
                 class="w-full"
-                [nzPlaceHolder]="'products.selectOption' | customTranslate" nzAllowClear formControlName="requiresColdChain">
+                nzId="requiresColdChain-select"
+                nzLabelId="requiresColdChain-label"
+                [nzPlaceHolder]="'products.selectOption' | customTranslate"
+                [attr.aria-label]="('products.requiresColdChain' | customTranslate) + ' (requerido)'"
+                [attr.aria-labelledby]="'requiresColdChain-label'"
+                [attr.aria-describedby]="'requiresColdChain-label'"
+                nzAllowClear
+                formControlName="requiresColdChain">
                 <nz-option nzValue="si" [nzLabel]="'products.yes' | customTranslate"></nz-option>
                 <nz-option nzValue="no" [nzLabel]="'products.no' | customTranslate"></nz-option>
               </nz-select>
@@ -106,7 +122,7 @@
     <div class="flex justify-center gap-3 w-full">
       <button class="btn-secondary-sm" (click)="handleProductModalCancel()">{{ 'common.cancel' | customTranslate }}</button>
       <button class="btn-primary-sm" (click)="handleProductModalOk()" [nzLoading]="isProductModalLoading">
-        <span nz-icon nzType="plus" nzTheme="outline"></span>
+        <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
         {{ 'products.createProduct' | customTranslate }}
       </button>
     </div>
@@ -137,7 +153,7 @@
           <!-- Plantilla Excel -->
           <div class="flex items-center justify-between p-3 bg-white dark:bg-white/10 rounded-lg border border-gray-200 dark:border-white/20">
             <div class="flex items-center gap-3">
-              <span nz-icon nzType="file-excel" nzTheme="outline" class="text-green-500 text-xl"></span>
+              <span nz-icon nzType="file-excel" nzTheme="outline" class="text-green-500 text-xl" aria-hidden="true"></span>
               <div>
                 <p class="font-medium text-dark dark:text-white/[.87] text-sm">{{ 'products.excelTemplate' | customTranslate }}</p>
                 <p class="text-xs text-gray-500 dark:text-white/50">{{ 'products.excelFormat' | customTranslate }}</p>
@@ -146,7 +162,7 @@
             <button
               class="btn-secondary-sm text-xs px-3 py-1"
               (click)="downloadExcelTemplate()">
-              <span nz-icon nzType="download" nzTheme="outline" class="text-xs"></span>
+              <span nz-icon nzType="download" nzTheme="outline" class="text-xs" aria-hidden="true"></span>
               {{ 'products.downloadTemplate' | customTranslate }}
             </button>
           </div>
@@ -154,7 +170,7 @@
           <!-- Plantilla CSV -->
           <div class="flex items-center justify-between p-3 bg-white dark:bg-white/10 rounded-lg border border-gray-200 dark:border-white/20">
             <div class="flex items-center gap-3">
-              <span nz-icon nzType="file-text" nzTheme="outline" class="text-blue-500 text-xl"></span>
+              <span nz-icon nzType="file-text" nzTheme="outline" class="text-blue-500 text-xl" aria-hidden="true"></span>
               <div>
                 <p class="font-medium text-dark dark:text-white/[.87] text-sm">{{ 'products.csvTemplate' | customTranslate }}</p>
                 <p class="text-xs text-gray-500 dark:text-white/50">{{ 'products.csvFormat' | customTranslate }}</p>
@@ -163,7 +179,7 @@
             <button
               class="btn-secondary-sm text-xs px-3 py-1"
               (click)="downloadCsvTemplate()">
-              <span nz-icon nzType="download" nzTheme="outline" class="text-xs"></span>
+              <span nz-icon nzType="download" nzTheme="outline" class="text-xs" aria-hidden="true"></span>
               {{ 'products.downloadTemplate' | customTranslate }}
             </button>
           </div>
@@ -185,7 +201,7 @@
           (nzChange)="handleFileChange($event)"
         >
           <p class="text-center mb-[20px]">
-            <span nz-icon nzType="cloud-upload" nzTheme="outline" class="text-6xl text-blue-500"></span>
+            <span nz-icon nzType="cloud-upload" nzTheme="outline" class="text-6xl text-blue-500" aria-hidden="true"></span>
           </p>
           <p class="text-[20px] font-medium text-dark dark:text-white/[.87]">
             {{ 'products.dragFileHere' | customTranslate }}
@@ -199,7 +215,7 @@
       <!-- Sección de errores -->
       <div *ngIf="bulkUploadErrors.length > 0" class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
         <div class="flex items-center gap-2 mb-3">
-          <span nz-icon nzType="exclamation-circle" nzTheme="outline" class="text-red-500 text-lg"></span>
+          <span nz-icon nzType="exclamation-circle" nzTheme="outline" class="text-red-500 text-lg" aria-hidden="true"></span>
           <h4 class="font-medium text-red-700 dark:text-red-400">{{ 'products.errorsFound' | customTranslate }}</h4>
         </div>
         <ul class="space-y-2">
@@ -223,8 +239,8 @@
         [disabled]="isBulkUploadLoading"
         [class.opacity-50]="isBulkUploadLoading"
         [class.cursor-not-allowed]="isBulkUploadLoading">
-        <span nz-icon nzType="upload" nzTheme="outline" *ngIf="!isBulkUploadLoading"></span>
-        <span nz-icon nzType="loading" nzTheme="outline" *ngIf="isBulkUploadLoading"></span>
+        <span nz-icon nzType="upload" nzTheme="outline" *ngIf="!isBulkUploadLoading" aria-hidden="true"></span>
+        <span nz-icon nzType="loading" nzTheme="outline" *ngIf="isBulkUploadLoading" aria-hidden="true"></span>
         {{ isBulkUploadLoading ? ('common.loading' | customTranslate) : ('products.uploadFile' | customTranslate) }}
       </button>
     </div>
@@ -250,7 +266,7 @@
           />
         </nz-input-group>
         <ng-template #suffixIconSearch>
-          <span *ngIf="searchTerm" nz-icon nzType="close-circle" nzTheme="outline" (click)="clearSearch()" class="cursor-pointer hover:text-red-500"></span>
+          <span *ngIf="searchTerm" nz-icon nzType="close-circle" nzTheme="outline" (click)="clearSearch()" class="cursor-pointer hover:text-red-500" role="button" tabindex="0" [attr.aria-label]="'common.clearSearch' | customTranslate" (keydown.enter)="clearSearch()" (keydown.space)="clearSearch()"></span>
         </ng-template>
       </div>
 
@@ -259,11 +275,11 @@
         <span class="text-sm font-medium text-dark dark:text-white/[.87]">{{ 'products.status' | customTranslate }}:</span>
         <nz-radio-group [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange($event)">
           <label nz-radio-button [nzValue]="true">
-            <span nz-icon nzType="check-circle" nzTheme="outline" class="mr-1"></span>
+            <span nz-icon nzType="check-circle" nzTheme="outline" class="mr-1" aria-hidden="true"></span>
             {{ 'products.active' | customTranslate }}
           </label>
           <label nz-radio-button [nzValue]="false">
-            <span nz-icon nzType="close-circle" nzTheme="outline" class="mr-1"></span>
+            <span nz-icon nzType="close-circle" nzTheme="outline" class="mr-1" aria-hidden="true"></span>
             {{ 'products.inactive' | customTranslate }}
           </label>
         </nz-radio-group>
@@ -273,11 +289,11 @@
     <!-- Acciones -->
     <div class="flex flex-col items-stretch lg:items-end gap-3 justify-start lg:justify-end">
       <button class="btn-primary-sm w-full lg:w-[300px]" (click)="showProductModal()">
-        <span nz-icon nzType="plus" nzTheme="outline"></span>
+        <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
         {{ 'products.createProduct' | customTranslate }}
       </button>
       <button class="btn-secondary-sm w-full lg:w-[300px]" (click)="loadBulkProducts()">
-        <span nz-icon nzType="upload" nzTheme="outline"></span>
+        <span nz-icon nzType="upload" nzTheme="outline" aria-hidden="true"></span>
         {{ 'products.bulkUpload' | customTranslate }}
       </button>
     </div>
@@ -346,8 +362,10 @@
                     class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
                     [nzTooltipTitle]="'products.requiresColdChainTooltip' | customTranslate"
                     nzTooltipPlacement="top"
-                    nz-tooltip>
-                <span nz-icon nzType="cloud" nzTheme="outline" class="text-sm"></span>
+                    nz-tooltip
+                    role="img"
+                    [attr.aria-label]="'products.requiresColdChainTooltip' | customTranslate">
+                <span nz-icon nzType="cloud" nzTheme="outline" class="text-sm" aria-hidden="true"></span>
               </span>
             </div>
           </td>
@@ -355,12 +373,12 @@
             class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
             <span *ngIf="data.status === true"
                   class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-              <span nz-icon nzType="check-circle" nzTheme="outline" class="mr-1 text-xs"></span>
+              <span nz-icon nzType="check-circle" nzTheme="outline" class="mr-1 text-xs" aria-hidden="true"></span>
               {{ 'products.active' | customTranslate }}
             </span>
             <span *ngIf="data.status === false"
                   class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
-              <span nz-icon nzType="close-circle" nzTheme="outline" class="mr-1 text-xs"></span>
+              <span nz-icon nzType="close-circle" nzTheme="outline" class="mr-1 text-xs" aria-hidden="true"></span>
               {{ 'products.inactive' | customTranslate }}
             </span>
           </td>
@@ -371,8 +389,10 @@
               class="inline-flex items-center justify-center w-[44px] h-[44px] rounded-[6px] border-none cursor-pointer transition-all duration-200"
               style="background-color: var(--blue-violet-extralight, #E8ECFF); color: var(--blue-violet-dark, #3749B3);"
               onmouseover="this.style.backgroundColor='var(--blue-violet-dark, #3749B3)'; this.style.color='white';"
-              onmouseout="this.style.backgroundColor='var(--blue-violet-extralight, #E8ECFF)'; this.style.color='var(--blue-violet-dark, #3749B3)';">
-              <span class="text-[18px]" nz-icon nzType="home" nzTheme="outline"></span>
+              onmouseout="this.style.backgroundColor='var(--blue-violet-extralight, #E8ECFF)'; this.style.color='var(--blue-violet-dark, #3749B3)';"
+              [attr.aria-label]="('products.viewInventory' | customTranslate) + ': ' + data.name"
+              type="button">
+              <span class="text-[18px]" nz-icon nzType="home" nzTheme="outline" aria-hidden="true"></span>
             </button>
           </td>
         </tr>

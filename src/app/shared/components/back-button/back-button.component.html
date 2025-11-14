@@ -1,5 +1,5 @@
-<button class="back-button" (click)="onBackClick()">
-  <span nz-icon nzType="left" nzTheme="outline"></span>
+<button class="back-button" (click)="onBackClick()" type="button" [attr.aria-label]="'common.back' | translate">
+  <span nz-icon nzType="left" nzTheme="outline" aria-hidden="true"></span>
 </button>
 
 

@@ -6,6 +6,7 @@
     "delete": "Eliminar",
     "create": "Crear",
     "search": "Buscar",
+    "clearSearch": "Limpiar búsqueda",
     "loading": "Cargando...",
     "error": "Error",
     "success": "Éxito",
@@ -14,7 +15,8 @@
     "no": "No",
     "active": "Activo",
     "inactive": "Inactivo",
-    "warning": "Advertencia"
+    "warning": "Advertencia",
+    "back": "Regresar"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -68,7 +70,16 @@
     "statusActive": "Activo",
     "statusInactive": "Inactivo",
     "statusSuspended": "Suspendido",
-    "statusUnknown": "Desconocido"
+    "statusUnknown": "Desconocido",
+    "viewDetails": "Ver detalles",
+    "manageClients": "Gestionar clientes",
+    "sellerId": "ID del vendedor",
+    "assignedClients": "Clientes asignados",
+    "availableClients": "Clientes disponibles",
+    "noAssignedClients": "No hay clientes asignados a este vendedor",
+    "noAvailableClients": "No hay clientes disponibles para asignar",
+    "assign": "Asignar",
+    "unassign": "Desasignar"
   },
   "products": {
     "title": "Productos",
@@ -109,7 +120,8 @@
     "active": "Activo",
     "inactive": "Inactivo",
     "addProduct": "Agregar Producto",
-    "bulkUploadProducts": "Carga Masiva"
+    "bulkUploadProducts": "Carga Masiva",
+    "viewInventory": "Ver inventario"
   },
   "suppliers": {
     "title": "Proveedores",
@@ -219,7 +231,9 @@
     "map": {
       "title": "Mapa de la ruta",
       "totalStops": "paradas programadas",
-      "geocoding": "Geocodificando direcciones..."
+      "geocoding": "Geocodificando direcciones...",
+      "description": "Mapa interactivo que muestra la ruta de entrega",
+      "interactiveControls": "Este mapa contiene controles interactivos para zoom, pan y visualización de marcadores"
     },
     "table": {
       "title": "Detalle de paradas",

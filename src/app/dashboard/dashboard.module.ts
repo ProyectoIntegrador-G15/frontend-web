@@ -38,6 +38,7 @@ import {NzPaginationModule} from 'ng-zorro-antd/pagination';
 import {NzSpinModule} from 'ng-zorro-antd/spin';
 import {NzUploadModule} from 'ng-zorro-antd/upload';
 import {NzAlertModule} from 'ng-zorro-antd/alert';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 
 import {AngularSvgIconModule} from 'angular-svg-icon';
 import {BaseChartDirective} from 'ng2-charts';
@@ -57,7 +58,8 @@ import {RoutesListComponent} from './routes-list/routes-list.component';
 import {CreateRouteComponent} from './create-route/create-route.component';
 import {RouteDetailComponent} from './route-detail/route-detail.component';
 import {SellersListComponent} from './sellers-list/sellers-list.component';
-import {SellerDetailComponent} from './seller-detail/seller-detail.component';
+import {SellerDetailsComponent} from './seller-details/seller-details.component';
+import {SellerClientsComponent} from './seller-clients/seller-clients.component';
 import {CreateVisitRouteComponent} from './create-visit-route/create-visit-route.component';
 import {ConfirmVisitRouteComponent} from './confirm-visit-route/confirm-visit-route.component';
 import {TabsComponent} from '../shared/components/tabs/tabs.component';
@@ -108,7 +110,8 @@ const antdModule = [
   NzPaginationModule,
   NzSpinModule,
   NzUploadModule,
-  NzAlertModule
+  NzAlertModule,
+  DragDropModule
 ];
 
 @NgModule({
@@ -130,7 +133,8 @@ const antdModule = [
     CreateRouteComponent,
     RouteDetailComponent,
     SellersListComponent,
-    SellerDetailComponent,
+    SellerDetailsComponent,
+    SellerClientsComponent,
     CreateVisitRouteComponent,
     ConfirmVisitRouteComponent,
     ReportsComponent,

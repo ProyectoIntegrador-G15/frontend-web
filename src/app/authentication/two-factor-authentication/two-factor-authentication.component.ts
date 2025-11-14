@@ -141,6 +141,11 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit, 
    * Envía el código TOTP al email del usuario
    */
   sendTotpCode(): void {
+    // Evitar múltiples requests simultáneos
+    if (this.isSendingCode || this.isLoading) {
+      return;
+    }
+
     this.isSendingCode = true;
     this.error = false;
     this.errorMessage = '';
@@ -174,6 +179,11 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit, 
    * Valida y envía el código OTP
    */
   submitOTP(): void {
+    // Evitar múltiples requests simultáneos
+    if (this.isLoading || this.isSendingCode) {
+      return;
+    }
+
     // Validar que todos los campos estén completos
     if (!this.otpForm.valid) {
       Object.keys(this.otpForm.controls).forEach(key => {

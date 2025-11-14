@@ -28,9 +28,9 @@
         </div>
         <div class="status-chip">
           <span class="status-icon">
-            <span nz-icon nzType="car" nzTheme="outline"></span>
+            <span nz-icon nzType="car" nzTheme="outline" aria-hidden="true"></span>
           </span>
-          <nz-tag class="status-tag" [nzColor]="getStatusTagColor(routeDetail.status)">
+          <nz-tag class="status-tag" [nzColor]="getStatusTagColor(routeDetail.status)" role="status" [attr.aria-label]="getStatusLabel(routeDetail.status)">
             {{ getStatusLabel(routeDetail.status) }}
           </nz-tag>
         </div>
@@ -39,7 +39,7 @@
       <div class="summary-grid">
         <div class="summary-item">
           <div class="summary-icon calendar">
-            <span nz-icon nzType="calendar" nzTheme="outline"></span>
+            <span nz-icon nzType="calendar" nzTheme="outline" aria-hidden="true"></span>
           </div>
           <div class="summary-text">
             <span class="summary-item-label">{{ 'routeDetail.summary.date' | customTranslate }}</span>
@@ -48,7 +48,7 @@
         </div>
         <div class="summary-item">
           <div class="summary-icon warehouse">
-            <span nz-icon nzType="bank" nzTheme="outline"></span>
+            <span nz-icon nzType="bank" nzTheme="outline" aria-hidden="true"></span>
           </div>
           <div class="summary-text">
             <span class="summary-item-label">{{ 'routeDetail.summary.origin' | customTranslate }}</span>
@@ -57,7 +57,7 @@
         </div>
         <div class="summary-item">
           <div class="summary-icon truck">
-            <span nz-icon nzType="car" nzTheme="outline"></span>
+            <span nz-icon nzType="car" nzTheme="outline" aria-hidden="true"></span>
           </div>
           <div class="summary-text">
             <span class="summary-item-label">{{ 'routeDetail.summary.truck' | customTranslate }}</span>
@@ -66,7 +66,7 @@
         </div>
         <div class="summary-item">
           <div class="summary-icon deliveries">
-            <span nz-icon nzType="inbox" nzTheme="outline"></span>
+            <span nz-icon nzType="inbox" nzTheme="outline" aria-hidden="true"></span>
           </div>
           <div class="summary-text">
             <span class="summary-item-label">{{ 'routeDetail.summary.deliveries' | customTranslate }}</span>
@@ -75,7 +75,7 @@
         </div>
         <div class="summary-item">
           <div class="summary-icon stops">
-            <span nz-icon nzType="flag" nzTheme="outline"></span>
+            <span nz-icon nzType="flag" nzTheme="outline" aria-hidden="true"></span>
           </div>
           <div class="summary-text">
             <span class="summary-item-label">{{ 'routeDetail.metrics.totalStops' | customTranslate }}</span>
@@ -84,7 +84,7 @@
         </div>
         <div class="summary-item">
           <div class="summary-icon distance">
-            <span nz-icon nzType="deployment-unit" nzTheme="outline"></span>
+            <span nz-icon nzType="deployment-unit" nzTheme="outline" aria-hidden="true"></span>
           </div>
           <div class="summary-text">
             <span class="summary-item-label">{{ 'routeDetail.metrics.distance' | customTranslate }}</span>
@@ -95,7 +95,7 @@
         </div>
         <div class="summary-item">
           <div class="summary-icon duration">
-            <span nz-icon nzType="clock-circle" nzTheme="outline"></span>
+            <span nz-icon nzType="clock-circle" nzTheme="outline" aria-hidden="true"></span>
           </div>
           <div class="summary-text">
             <span class="summary-item-label">{{ 'routeDetail.metrics.duration' | customTranslate }}</span>
@@ -106,7 +106,7 @@
         </div>
         <div class="summary-item">
           <div class="summary-icon cost">
-            <span nz-icon nzType="dollar" nzTheme="outline"></span>
+            <span nz-icon nzType="dollar" nzTheme="outline" aria-hidden="true"></span>
           </div>
           <div class="summary-text">
             <span class="summary-item-label">{{ 'routeDetail.metrics.cost' | customTranslate }}</span>
@@ -124,24 +124,27 @@
       <div class="col-span-12 xl:col-span-7 map-card">
         <div class="flex items-center justify-between mb-4">
           <h3 class="subtitle">{{ 'routeDetail.map.title' | customTranslate }}</h3>
-          <div class="legend">
-            <span class="legend-item">
-              <span class="legend-dot pickup"></span>
+          <div class="legend" role="list" aria-label="Leyenda del mapa">
+            <span class="legend-item" role="listitem">
+              <span class="legend-dot pickup" aria-hidden="true"></span>
               {{ 'routeDetail.pickupLabel' | customTranslate }}
             </span>
-            <span class="legend-item">
-              <span class="legend-dot delivery"></span>
+            <span class="legend-item" role="listitem">
+              <span class="legend-dot delivery" aria-hidden="true"></span>
               {{ 'routeDetail.deliveryLabel' | customTranslate }}
             </span>
           </div>
         </div>
-        <div id="routeDetailMap" class="route-map"></div>
+        <div id="routeDetailMap" class="route-map" role="application" [attr.aria-label]="('routeDetail.map.title' | customTranslate) + ': ' + (waypointsWithCoords.length | number) + ' ' + ('routeDetail.map.totalStops' | customTranslate)" [attr.aria-describedby]="'map-description-' + routeDetail.id"></div>
+        <div [id]="'map-description-' + routeDetail.id" class="sr-only">
+          {{ 'routeDetail.map.description' | customTranslate }}: {{ waypointsWithCoords.length }} {{ 'routeDetail.map.totalStops' | customTranslate }}. {{ 'routeDetail.map.interactiveControls' | customTranslate }}
+        </div>
         <div class="map-footer">
           <span class="text-xs text-gray-500">
-            <span nz-icon nzType="environment" nzTheme="outline"></span>
+            <span nz-icon nzType="environment" nzTheme="outline" aria-hidden="true"></span>
             {{ waypointsWithCoords.length }} {{ 'routeDetail.map.totalStops' | customTranslate }}
           </span>
-          <span *ngIf="geocoding" class="text-xs text-gray-400">
+          <span *ngIf="geocoding" class="text-xs text-gray-400" role="status" aria-live="polite">
             <nz-spin nzSimple [nzSize]="'small'"></nz-spin>
             {{ 'routeDetail.map.geocoding' | customTranslate }}
           </span>
@@ -156,10 +159,10 @@
             <table>
               <thead>
                 <tr>
-                  <th style="width: 70px;">#</th>
-                  <th>{{ 'routeDetail.table.type' | customTranslate }}</th>
-                  <th>{{ 'routeDetail.table.name' | customTranslate }}</th>
-                  <th>{{ 'routeDetail.table.address' | customTranslate }}</th>
+                  <th scope="col" style="width: 70px;">#</th>
+                  <th scope="col">{{ 'routeDetail.table.type' | customTranslate }}</th>
+                  <th scope="col">{{ 'routeDetail.table.name' | customTranslate }}</th>
+                  <th scope="col">{{ 'routeDetail.table.address' | customTranslate }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -172,7 +175,9 @@
                   </td>
                   <td>
                     <nz-tag
-                      [ngClass]="waypoint.pickup ? 'pickup-tag' : 'delivery-tag'">
+                      [ngClass]="waypoint.pickup ? 'pickup-tag' : 'delivery-tag'"
+                      role="status"
+                      [attr.aria-label]="getWaypointTypeLabel(waypoint.pickup)">
                       {{ getWaypointTypeLabel(waypoint.pickup) }}
                     </nz-tag>
                   </td>

@@ -1,9 +1,11 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Router} from '@angular/router';
-import {SellersService} from '../../shared/services/sellers.service';
-import {OrdersService} from '../../shared/services/orders.service';
-import {ActivatedRoute} from '@angular/router';
-import {TranslateService} from '@ngx-translate/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { SellersService, Seller, SalesPlan, CreateSalesPlanRequest } from '../../shared/services/sellers.service';
+import { VisitRoutesService, VisitRoute } from '../../shared/services/visit-routes.service';
+import { OrdersService } from '../../shared/services/orders.service';
+import { TranslateService } from '@ngx-translate/core';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -28,38 +30,68 @@ export type ChartOptions = {
   plotOptions: ApexPlotOptions;
 };
 
+interface Tab {
+  id: string;
+  label: string;
+}
+
 @Component({
   selector: 'app-seller-details',
   templateUrl: './seller-details.component.html',
   styleUrls: ['./seller-details.component.scss']
 })
 export class SellerDetailsComponent implements OnInit {
-  showContent = true;
-  activeTab = 'informacion';
 
-  listItemClass = 'cursor-pointer relative inline-flex px-3 text-light dark:text-white/60 py-4 transition-all duration-300 hover:text-primary dark:hover:text-white/[.87] hover:bg-primary/5 dark:hover:bg-primary/10 [&.active]:text-primary [&.active]:after:absolute [&.active]:ltr:after:left-0 [&.active]:rtl:after:right-0 [&.active]:after:bottom-0 [&.active]:after:w-full [&.active]:after:h-0.5 [&.active]:after:bg-primary [&.active]:after:rounded-10';
-
-  // Datos del vendedor (simulados por ahora)
-  sellerData = {
-    id: 1,
-    name: 'Sofía Ramírez',
-    identification: '12345678',
-    status: 'active',
-    email: 'sofia.ramirez@medisupply.com',
-    phone: '+51 987 654 321',
-    address: 'Av. Principal 123, Lima, Perú',
-    commission: 5.5,
-    sales_target: 50000,
-    entry_date: '2023-01-15T00:00:00.000Z',
-    created_at: '2023-01-15T00:00:00.000Z',
-    updated_at: '2024-12-01T00:00:00.000Z'
-  };
-
-  sellerIdParam: string | null = null;
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private sellersService: SellersService,
+    private visitRoutesService: VisitRoutesService,
+    private ordersService: OrdersService,
+    private translateService: TranslateService,
+    private fb: FormBuilder,
+    private notification: NzNotificationService
+  ) {
+    this.initializeChartOptions();
+    this.initializeYears();
+    this.initSalesPlanForm();
+  }
+  seller: Seller | null = null;
+  loading = true;
+  error = '';
+  activeTab = 'information';
+  visitRoutes: VisitRoute[] = [];
+  loadingRoutes = false;
 
   // Fecha actual
   currentYear = new Date().getFullYear();
   currentMonth = new Date().getMonth() + 1;
+
+  // Datos de planes de venta
+  salesPlans: SalesPlan[] = [];
+  loadingSalesPlans = false;
+  selectedMonth = new Date().getMonth() + 1; // 1-12
+  selectedYear = new Date().getFullYear();
+  months = [
+    { value: 1, label: 'Enero' },
+    { value: 2, label: 'Febrero' },
+    { value: 3, label: 'Marzo' },
+    { value: 4, label: 'Abril' },
+    { value: 5, label: 'Mayo' },
+    { value: 6, label: 'Junio' },
+    { value: 7, label: 'Julio' },
+    { value: 8, label: 'Agosto' },
+    { value: 9, label: 'Septiembre' },
+    { value: 10, label: 'Octubre' },
+    { value: 11, label: 'Noviembre' },
+    { value: 12, label: 'Diciembre' }
+  ];
+  years: number[] = [];
+
+  // Modal de creación de plan de ventas
+  isSalesPlanModalVisible = false;
+  isSalesPlanModalLoading = false;
+  salesPlanForm: FormGroup;
 
   // Datos de desempeño
   performanceData = {
@@ -72,69 +104,7 @@ export class SellerDetailsComponent implements OnInit {
       units_compliance: 0,
       revenue_compliance: 0,
     },
-    topProducts: []
-  };
-
-  // Datos de planes de ventas
-  salesPlanData = {
-    selectedMonth: 'Enero',
-    months: [
-      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-    ],
-    plans: [
-      {
-        id: 'MS20251',
-        name: 'Plan de venta Q1 - MS20251',
-        products: 'Mascarillas, Guantes, 2 más',
-        totalUnits: 1500,
-        totalAmount: 500000,
-        region: 'Región Norte',
-        period: 'Enero 2024'
-      },
-      {
-        id: 'MS20258',
-        name: 'Plan de venta Q1 - MS20258',
-        products: 'Mascarillas, Guantes, 2 más',
-        totalUnits: 1800,
-        totalAmount: 580000,
-        region: 'Región Norte',
-        period: 'Enero 2024'
-      },
-      {
-        id: 'MS20255',
-        name: 'Plan de venta Q1 - MS20255',
-        products: 'Mascarillas, Guantes, 2 más',
-        totalUnits: 1100,
-        totalAmount: 430000,
-        region: 'Región Norte',
-        period: 'Enero 2024'
-      }
-    ]
-  };
-
-  // Datos de rutas de visita
-  routesData = {
-    routes: [
-      {
-        id: '#123456',
-        date: '25-07-2025',
-        clients: 'Hospital Central, Clínica san Fernando, 2 más',
-        status: 'planificada'
-      },
-      {
-        id: '#123457',
-        date: '26-07-2025',
-        clients: 'Hospital Central, Clínica san Fernando, 2 más',
-        status: 'en_curso'
-      },
-      {
-        id: '#123458',
-        date: '27-07-2025',
-        clients: 'Hospital Central, Clínica san Fernando, 2 más',
-        status: 'completada'
-      }
-    ]
+    topProducts: [] as Array<{ name: string; quantity: number; sales_amount: number }>
   };
 
   loadingPerformance = false;
@@ -145,15 +115,263 @@ export class SellerDetailsComponent implements OnInit {
 
   @ViewChild('chart') chart: ChartComponent | undefined;
 
-  constructor(
-    private router: Router,
-    private sellersService: SellersService,
-    private ordersService: OrdersService,
-    private route: ActivatedRoute,
-    private translateService: TranslateService
-  ) {
-    this.initializeChartOptions();
+  tabs: Tab[] = [
+    { id: 'information', label: 'Información' },
+    { id: 'performance', label: 'Desempeño' },
+    { id: 'sales-plan', label: 'Plan de ventas' },
+    { id: 'visit-routes', label: 'Rutas de visita' }
+  ];
+
+  // Datos quemados de visitas (mock data)
+  mockVisits = [
+    {
+      id: 1,
+      clientName: 'Hospital San Rafael',
+      visitDate: '28-10-2025',
+      visitTime: '09:00 AM',
+      status: 'completed' as const,
+      observations: 'Revisar nuevos productos de la línea cardiovascular'
+    },
+    {
+      id: 2,
+      clientName: 'Clínica Central',
+      visitDate: '29-10-2025',
+      visitTime: '02:30 PM',
+      status: 'pending' as const,
+      observations: 'Presentación de productos para cadena de frío'
+    },
+    {
+      id: 3,
+      clientName: 'Farmacia Vida',
+      visitDate: '30-10-2025',
+      visitTime: '10:00 AM',
+      status: 'in-progress' as const,
+      observations: 'Seguimiento de pedido anterior y nuevas necesidades'
+    },
+    {
+      id: 4,
+      clientName: 'Hospital del Sur',
+      visitDate: '31-10-2025',
+      visitTime: '11:30 AM',
+      status: 'pending' as const,
+      observations: 'Negociación de contrato anual'
+    },
+    {
+      id: 5,
+      clientName: 'Centro Médico Norte',
+      visitDate: '01-11-2025',
+      visitTime: '03:00 PM',
+      status: 'completed' as const,
+      observations: 'Demostración de equipo médico nuevo'
+    }
+  ];
+
+  // Fechas del formulario (Date objects para nz-date-picker)
+  getDefaultStartMonth(): Date {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
   }
+
+  getDefaultEndMonth(): Date {
+    const now = new Date();
+    const nextMonth = now.getMonth() + 1;
+    const year = nextMonth > 11 ? now.getFullYear() + 1 : now.getFullYear();
+    const month = nextMonth > 11 ? 0 : nextMonth;
+    return new Date(year, month, 1);
+  }
+
+  private initializeYears(): void {
+    const currentYear = new Date().getFullYear();
+    // Generar años desde 5 años atrás hasta 2 años adelante
+    for (let i = currentYear - 5; i <= currentYear + 2; i++) {
+      this.years.push(i);
+    }
+    // Ordenar de mayor a menor
+    this.years.sort((a, b) => b - a);
+  }
+
+  ngOnInit(): void {
+    // Suscribirse a cambios de idioma para actualizar el gráfico
+    this.translateService.onLangChange.subscribe(() => {
+      this.initializeChartOptions();
+      if (this.performanceData.topProducts.length > 0) {
+        this.updateChart();
+      }
+    });
+
+    const sellerId = this.route.snapshot.paramMap.get('id');
+    if (sellerId) {
+      this.loadSellerDetail(sellerId);
+      this.loadVisitRoutes(sellerId);
+    }
+
+    // Inicializar fechas al primer día del mes actual
+    this.performanceData.startDate = new Date(this.currentYear, this.currentMonth - 1, 1);
+    this.performanceData.endDate = new Date(this.currentYear, this.currentMonth - 1, 1);
+
+    // Escuchar cambios en el fragment para activar tab
+    this.route.fragment.subscribe(fragment => {
+      if (fragment === 'visit-routes') {
+        this.activeTab = 'visit-routes';
+      }
+    });
+  }
+
+  loadSellerDetail(sellerId: string): void {
+    this.loading = true;
+    this.sellersService.getSellerById(sellerId).subscribe({
+      next: (seller) => {
+        this.seller = seller;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading seller:', error);
+        this.error = 'No se pudo cargar la información del vendedor';
+        this.loading = false;
+      }
+    });
+  }
+
+  onTabChange(tabId: string): void {
+    this.activeTab = tabId;
+
+    // Si cambia a la tab de performance, cargar datos
+    if (tabId === 'performance') {
+      this.fetchPerformance();
+    }
+
+    // Si cambia a la tab de rutas de visita, recargar datos
+    if (tabId === 'visit-routes' && this.seller) {
+      this.loadVisitRoutes(this.seller.id);
+    }
+
+    // Si cambia a la tab de planes de venta, cargar datos
+    if (tabId === 'sales-plan' && this.seller) {
+      this.loadSalesPlans();
+    }
+  }
+
+  loadVisitRoutes(sellerId: string): void {
+    this.loadingRoutes = true;
+
+    this.visitRoutesService.getVisitRoutes({ sellerId: parseInt(sellerId) }).subscribe({
+      next: (response) => {
+        this.visitRoutes = response.routes;
+        this.loadingRoutes = false;
+      },
+      error: (error) => {
+        console.error('Error loading visit routes:', error);
+        this.loadingRoutes = false;
+      }
+    });
+  }
+
+  goBack(): void {
+    this.router.navigate(['/dashboard/sellers']);
+  }
+
+  getStatusColor(): string {
+    if (!this.seller) { return ''; }
+
+    switch (this.seller.status) {
+      case 'active':
+        return 'status-active';
+      case 'inactive':
+        return 'status-inactive';
+      case 'suspended':
+        return 'status-suspended';
+      default:
+        return '';
+    }
+  }
+
+  getStatusText(): string {
+    if (!this.seller) { return ''; }
+
+    switch (this.seller.status) {
+      case 'active':
+        return 'Activo';
+      case 'inactive':
+        return 'Inactivo';
+      case 'suspended':
+        return 'Suspendido';
+      default:
+        return this.seller.status;
+    }
+  }
+
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  }
+
+  createVisitRoute(): void {
+    if (this.seller) {
+      this.router.navigate(['/dashboard/visit-routes/create'], {
+        queryParams: { sellerId: this.seller.id }
+      });
+    }
+  }
+
+  viewRouteDetail(routeId: string): void {
+    // Por ahora solo mostrar en consola
+    // Después se puede crear una vista de detalle
+    console.log('Ver detalle de ruta:', routeId);
+    alert(`Vista de detalle de ruta #${routeId} - Por implementar`);
+  }
+
+  getRouteStatusColor(status: string): string {
+    switch (status) {
+      case 'confirmed': return 'blue';
+      case 'in_progress': return 'orange';
+      case 'completed': return 'green';
+      case 'cancelled': return 'red';
+      default: return 'default';
+    }
+  }
+
+  getRouteStatusText(status: string): string {
+    switch (status) {
+      case 'draft': return 'Borrador';
+      case 'confirmed': return 'Planificada';
+      case 'in_progress': return 'En progreso';
+      case 'completed': return 'Completada';
+      case 'cancelled': return 'Cancelada';
+      default: return status;
+    }
+  }
+
+  getClientNamesShort(route: VisitRoute): string {
+    if (!route.stops || route.stops.length === 0) {
+      return `${route.totalClients} clientes`;
+    }
+
+    const names = route.stops.map(stop => stop.clientName);
+
+    // Si son 1-2 clientes, mostrar nombres completos
+    if (names.length <= 2) {
+      return names.join(', ');
+    }
+
+    // Si son 3 o más, mostrar los primeros 2 y "X más"
+    const firstTwo = names.slice(0, 2).join(', ');
+    const remaining = names.length - 2;
+    return `${firstTwo} y ${remaining} más`;
+  }
+
+  getClientNamesForTooltip(route: VisitRoute): string {
+    if (!route.stops || route.stops.length === 0) {
+      return '';
+    }
+
+    return route.stops.map((stop, idx) => `${idx + 1}. ${stop.clientName}`).join('\n');
+  }
+
+  // ========== MÉTODOS DE PERFORMANCE ==========
 
   private initializeChartOptions(): void {
     const locale = this.translateService.currentLang || 'es-CO';
@@ -227,46 +445,12 @@ export class SellerDetailsComponent implements OnInit {
     };
   }
 
-  ngOnInit(): void {
-    // Suscribirse a cambios de idioma para actualizar el gráfico
-    this.translateService.onLangChange.subscribe(() => {
-      this.initializeChartOptions();
-      if (this.performanceData.topProducts.length > 0) {
-        this.updateChart();
-      }
-    });
-
-    this.route.paramMap.subscribe(params => {
-      this.sellerIdParam = params.get('id');
-      if (this.activeTab === 'desempeno') {
-        this.fetchPerformance();
-      }
-    });
-    // Inicializar inicio al primer día del mes actual y fin al mes actual
-    this.performanceData.startDate = new Date(this.currentYear, this.currentMonth - 1, 1);
-    this.performanceData.endDate = new Date(this.currentYear, this.currentMonth - 1, 1);
-    if (this.activeTab === 'desempeno') {
-      this.fetchPerformance();
-    }
-  }
-
-  switchTab(tab: string): void {
-    this.activeTab = tab;
-    if (tab === 'desempeno') {
-      this.fetchPerformance();
-    }
-  }
-
-  goBack(): void {
-    this.router.navigate(['/dashboard/sellers']);
-  }
-
   onStartDateChange(date: Date): void {
     this.performanceData.startDate = date;
     if (this.isMonthAfter(this.performanceData.startDate, this.performanceData.endDate)) {
       this.performanceData.endDate = new Date(this.performanceData.startDate);
     }
-    if (this.activeTab === 'desempeno') {
+    if (this.activeTab === 'performance') {
       this.fetchPerformance();
     }
   }
@@ -276,58 +460,8 @@ export class SellerDetailsComponent implements OnInit {
     if (this.isMonthAfter(this.performanceData.startDate, this.performanceData.endDate)) {
       this.performanceData.startDate = new Date(this.performanceData.endDate);
     }
-    if (this.activeTab === 'desempeno') {
+    if (this.activeTab === 'performance') {
       this.fetchPerformance();
-    }
-  }
-
-  formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0
-    }).format(amount);
-  }
-
-  exportOrders(): void {
-    console.log('Exportar pedidos');
-  }
-
-  onMonthChange(month: string): void {
-    this.salesPlanData.selectedMonth = month;
-  }
-
-  createPlan(): void {
-    console.log('Crear nuevo plan de ventas');
-  }
-
-  generateRoute(): void {
-    this.router.navigate(['/dashboard/routes/create-route']);
-  }
-
-  getStatusBadgeClass(status: string): string {
-    switch (status) {
-      case 'planificada':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
-      case 'en_curso':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-      case 'completada':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
-    }
-  }
-
-  getStatusText(status: string): string {
-    switch (status) {
-      case 'planificada':
-        return 'Planificada';
-      case 'en_curso':
-        return 'En curso';
-      case 'completada':
-        return 'Completada';
-      default:
-        return status;
     }
   }
 
@@ -339,6 +473,33 @@ export class SellerDetailsComponent implements OnInit {
     const m = current.getMonth();
     if (y > now.getFullYear()) { return true; }
     if (y === now.getFullYear() && m > now.getMonth()) { return true; }
+    return false;
+  }
+
+  // Deshabilitar fechas fuera del rango permitido para el plan de ventas
+  // Permite desde el mes actual hasta 6 meses en el futuro
+  disableFutureMonthsForSalesPlan = (current: Date): boolean => {
+    if (!current) { return false; }
+    const now = new Date();
+    const currentYear = current.getFullYear();
+    const currentMonth = current.getMonth();
+    const nowYear = now.getFullYear();
+    const nowMonth = now.getMonth();
+
+    // Calcular la fecha máxima permitida (6 meses después)
+    const maxDate = new Date(now);
+    maxDate.setMonth(maxDate.getMonth() + 6);
+    const maxYear = maxDate.getFullYear();
+    const maxMonth = maxDate.getMonth();
+
+    // Deshabilitar fechas anteriores al mes actual
+    if (currentYear < nowYear) { return true; }
+    if (currentYear === nowYear && currentMonth < nowMonth) { return true; }
+
+    // Deshabilitar fechas posteriores a 6 meses
+    if (currentYear > maxYear) { return true; }
+    if (currentYear === maxYear && currentMonth > maxMonth) { return true; }
+
     return false;
   }
 
@@ -369,14 +530,16 @@ export class SellerDetailsComponent implements OnInit {
   }
 
   private fetchPerformance(): void {
-    const sellerId = this.sellerIdParam ? parseInt(this.sellerIdParam) : this.sellerData.id;
+    if (!this.seller) { return; }
+
+    const sellerId = parseInt(this.seller.id);
     const startMonthFirst = this.firstDayOfMonth(this.performanceData.startDate);
     const endMonthLast = this.lastDayOfMonth(this.performanceData.endDate);
     const start = this.formatDateYYYYMMDD(startMonthFirst);
     const end = this.formatDateYYYYMMDD(endMonthLast);
 
     this.loadingPerformance = true;
-    this.sellersService.getSellerPerformance(sellerId as any, start, end).subscribe({
+    this.sellersService.getSellerPerformance(sellerId, start, end).subscribe({
       next: (resp) => {
         this.performanceData.kpis = {
           total_revenue: resp.total_revenue ?? 0,
@@ -479,4 +642,374 @@ export class SellerDetailsComponent implements OnInit {
       };
     }
   }
+
+  // ========== MÉTODOS DE PLANES DE VENTA ==========
+
+  loadSalesPlans(): void {
+    if (!this.seller) { return; }
+
+    this.loadingSalesPlans = true;
+    this.sellersService.getSalesPlans(this.seller.id, this.selectedMonth, this.selectedYear).subscribe({
+      next: (response) => {
+        this.salesPlans = response.sales_plans;
+        this.loadingSalesPlans = false;
+      },
+      error: (error) => {
+        console.error('Error loading sales plans:', error);
+        this.salesPlans = [];
+        this.loadingSalesPlans = false;
+      }
+    });
+  }
+
+  onMonthChange(): void {
+    this.loadSalesPlans();
+  }
+
+  onYearChange(): void {
+    this.loadSalesPlans();
+  }
+
+  initSalesPlanForm(): void {
+    this.salesPlanForm = this.fb.group({
+      name: [null, [Validators.required, Validators.minLength(1), Validators.maxLength(255)]],
+      start_month: [this.getDefaultStartMonth(), [Validators.required, this.startDateValidator.bind(this)]],
+      end_month: [this.getDefaultEndMonth(), [Validators.required, this.endDateValidator.bind(this)]],
+      total_units_target: [null, [Validators.required, Validators.min(1)]],
+      total_value_target: [null, [Validators.required, Validators.min(0.01)]],
+      visits_target: [null, [Validators.required, Validators.min(1)]]
+    }, { validators: this.dateRangeValidator });
+
+    // Suscribirse a cambios en las fechas para validar en tiempo real
+    this.salesPlanForm.get('start_month')?.valueChanges.subscribe(() => {
+      this.validateDateRange();
+      // Revalidar el campo de fin cuando cambia el inicio
+      this.salesPlanForm.get('end_month')?.updateValueAndValidity({ emitEvent: false });
+    });
+    this.salesPlanForm.get('end_month')?.valueChanges.subscribe(() => {
+      this.validateDateRange();
+    });
+  }
+
+  // Validador personalizado para fecha de inicio
+  startDateValidator(control: any): { [key: string]: any } | null {
+    if (!control.value) {
+      return null; // La validación required se encarga de esto
+    }
+
+    const date = control.value instanceof Date ? control.value : new Date(control.value);
+    if (isNaN(date.getTime())) {
+      return { invalidDate: true };
+    }
+
+    const now = new Date();
+    const nowYear = now.getFullYear();
+    const nowMonth = now.getMonth();
+    const dateYear = date.getFullYear();
+    const dateMonth = date.getMonth();
+
+    // Validar que no sea una fecha pasada (anterior al mes actual)
+    if (dateYear < nowYear || (dateYear === nowYear && dateMonth < nowMonth)) {
+      return { dateInPast: true };
+    }
+
+    // Validar que no sea más de 6 meses en el futuro
+    const maxDate = new Date(now);
+    maxDate.setMonth(maxDate.getMonth() + 6);
+    const maxYear = maxDate.getFullYear();
+    const maxMonth = maxDate.getMonth();
+
+    if (dateYear > maxYear || (dateYear === maxYear && dateMonth > maxMonth)) {
+      return { dateTooFar: true };
+    }
+
+    return null;
+  }
+
+  // Validador personalizado para fecha de fin
+  endDateValidator(control: any): { [key: string]: any } | null {
+    if (!control.value) {
+      return null; // La validación required se encarga de esto
+    }
+
+    const date = control.value instanceof Date ? control.value : new Date(control.value);
+    if (isNaN(date.getTime())) {
+      return { invalidDate: true };
+    }
+
+    const now = new Date();
+    const nowYear = now.getFullYear();
+    const nowMonth = now.getMonth();
+    const dateYear = date.getFullYear();
+    const dateMonth = date.getMonth();
+
+    // Validar que no sea una fecha pasada (anterior al mes actual)
+    if (dateYear < nowYear || (dateYear === nowYear && dateMonth < nowMonth)) {
+      return { dateInPast: true };
+    }
+
+    // Validar que no sea más de 6 meses en el futuro
+    const maxDate = new Date(now);
+    maxDate.setMonth(maxDate.getMonth() + 6);
+    const maxYear = maxDate.getFullYear();
+    const maxMonth = maxDate.getMonth();
+
+    if (dateYear > maxYear || (dateYear === maxYear && dateMonth > maxMonth)) {
+      return { dateTooFar: true };
+    }
+
+    // Validar que la fecha de fin sea posterior a la de inicio
+    const startMonthValue = this.salesPlanForm?.get('start_month')?.value;
+    if (startMonthValue) {
+      const startDate = startMonthValue instanceof Date ? startMonthValue : new Date(startMonthValue);
+      if (date <= startDate) {
+        return { endBeforeStart: true };
+      }
+    }
+
+    return null;
+  }
+
+  validateDateRange(): void {
+    if (!this.salesPlanForm) {
+      return;
+    }
+
+    const startMonthValue = this.salesPlanForm.get('start_month')?.value;
+    const endMonthValue = this.salesPlanForm.get('end_month')?.value;
+
+    if (!startMonthValue || !endMonthValue) {
+      return;
+    }
+
+    const start = startMonthValue instanceof Date ? startMonthValue : new Date(startMonthValue);
+    const end = endMonthValue instanceof Date ? endMonthValue : new Date(endMonthValue);
+
+    // Validar que ambas fechas sean válidas
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return;
+    }
+
+    const startField = this.salesPlanForm.get('start_month');
+    const endField = this.salesPlanForm.get('end_month');
+
+    // Si la fecha de fin es anterior o igual a la de inicio
+    if (end <= start) {
+      // Marcar error en el campo de fin
+      const endErrors = endField?.errors || {};
+      endField?.setErrors({ ...endErrors, dateRange: true });
+
+      // También marcar error en el campo de inicio si es necesario
+      const startErrors = startField?.errors || {};
+      if (end < start) {
+        startField?.setErrors({ ...startErrors, dateRange: true });
+      }
+    } else {
+      // Limpiar errores de rango si la validación pasa
+      if (endField?.errors?.dateRange) {
+        const endErrors = { ...endField.errors };
+        delete endErrors.dateRange;
+        endField.setErrors(Object.keys(endErrors).length > 0 ? endErrors : null);
+      }
+      if (startField?.errors?.dateRange) {
+        const startErrors = { ...startField.errors };
+        delete startErrors.dateRange;
+        startField.setErrors(Object.keys(startErrors).length > 0 ? startErrors : null);
+      }
+    }
+  }
+
+  dateRangeValidator = (control: FormGroup): { [s: string]: boolean } => {
+    const startMonthValue = control.get('start_month')?.value;
+    const endMonthValue = control.get('end_month')?.value;
+
+    if (!startMonthValue || !endMonthValue) {
+      return {};
+    }
+
+    const start = startMonthValue instanceof Date ? startMonthValue : new Date(startMonthValue);
+    const end = endMonthValue instanceof Date ? endMonthValue : new Date(endMonthValue);
+
+    // Validar que ambas fechas sean válidas
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return {};
+    }
+
+    if (end <= start) {
+      return { dateRange: true };
+    }
+    return {};
+  }
+
+  getFieldStatus(fieldName: string): string {
+    const field = this.salesPlanForm.get(fieldName);
+    if (field && (field.dirty || field.touched) && field.invalid) {
+      return 'error';
+    }
+    if (field && (field.dirty || field.touched) && field.valid) {
+      return 'success';
+    }
+    return '';
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.salesPlanForm.get(fieldName);
+    if (field && field.errors && (field.dirty || field.touched)) {
+      if (field.errors.required) {
+        return 'Este campo es obligatorio';
+      }
+      if (field.errors.min) {
+        return fieldName === 'total_value_target'
+          ? 'El valor debe ser mayor a 0'
+          : 'El valor debe ser mayor a 0';
+      }
+      if (field.errors.minlength) {
+        return 'Este campo es demasiado corto';
+      }
+      if (field.errors.maxlength) {
+        return 'Este campo es demasiado largo';
+      }
+      if (field.errors.invalidDate) {
+        return 'La fecha seleccionada no es válida';
+      }
+      if (field.errors.dateInPast) {
+        return 'No se puede seleccionar una fecha anterior al mes actual';
+      }
+      if (field.errors.dateTooFar) {
+        return 'No se puede seleccionar una fecha más de 6 meses en el futuro';
+      }
+      if (field.errors.endBeforeStart) {
+        return 'La fecha de fin debe ser posterior a la fecha de inicio';
+      }
+      if (field.errors.dateRange) {
+        if (fieldName === 'start_month') {
+          return 'La fecha de inicio no puede ser posterior a la fecha de fin';
+        }
+        if (fieldName === 'end_month') {
+          return 'La fecha de fin debe ser posterior a la fecha de inicio';
+        }
+      }
+    }
+    return '';
+  }
+
+  validateFormFields(): boolean {
+    for (const i in this.salesPlanForm.controls) {
+      this.salesPlanForm.controls[i].markAsDirty();
+      this.salesPlanForm.controls[i].updateValueAndValidity();
+    }
+    return this.salesPlanForm.valid;
+  }
+
+  onCreatePlan(): void {
+    // Establecer valores por defecto al abrir el modal
+    this.salesPlanForm.patchValue({
+      start_month: this.getDefaultStartMonth(),
+      end_month: this.getDefaultEndMonth()
+    });
+
+    this.isSalesPlanModalVisible = true;
+  }
+
+  handleSalesPlanModalCancel(): void {
+    this.isSalesPlanModalVisible = false;
+    this.salesPlanForm.reset();
+    // Restablecer valores por defecto
+    this.salesPlanForm.patchValue({
+      start_month: this.getDefaultStartMonth(),
+      end_month: this.getDefaultEndMonth()
+    });
+  }
+
+  handleSalesPlanModalOk(): void {
+    if (!this.validateFormFields()) {
+      return;
+    }
+
+    if (!this.seller) {
+      this.notification.error('Error', 'No se encontró información del vendedor');
+      return;
+    }
+
+    this.isSalesPlanModalLoading = true;
+
+    const formData = this.salesPlanForm.value;
+    // nz-date-picker devuelve un objeto Date, usar directamente
+    const startDateObj = formData.start_month instanceof Date
+      ? formData.start_month
+      : new Date(formData.start_month);
+    const endDateObj = formData.end_month instanceof Date
+      ? formData.end_month
+      : new Date(formData.end_month);
+
+    // start_date: primer día del mes seleccionado
+    const startDate = new Date(startDateObj.getFullYear(), startDateObj.getMonth(), 1);
+
+    // end_date: último día del mes seleccionado
+    // new Date(year, month + 1, 0) devuelve el último día del mes anterior (que es el último día del mes que queremos)
+    const endDate = new Date(endDateObj.getFullYear(), endDateObj.getMonth() + 1, 0);
+
+    const planData: CreateSalesPlanRequest = {
+      name: formData.name,
+      start_date: this.formatDateForAPI(startDate),
+      end_date: this.formatDateForAPI(endDate),
+      total_units_target: formData.total_units_target,
+      total_value_target: formData.total_value_target,
+      visits_target: formData.visits_target
+    };
+
+    this.sellersService.createSalesPlan(this.seller.id, planData).subscribe({
+      next: (response) => {
+        this.isSalesPlanModalVisible = false;
+        this.isSalesPlanModalLoading = false;
+        this.salesPlanForm.reset();
+
+        // Recargar planes de venta
+        this.loadSalesPlans();
+
+        this.notification.create(
+          'success',
+          '¡Plan de venta creado exitosamente!',
+          `El plan "${planData.name}" ha sido creado correctamente.`
+        );
+      },
+      error: (error) => {
+        this.isSalesPlanModalLoading = false;
+        const errorMessage = error?.error?.detail || error?.message || 'Error al crear el plan de venta';
+        this.notification.create(
+          'error',
+          'Error al crear plan de venta',
+          errorMessage
+        );
+      }
+    });
+  }
+
+  formatDateForAPI(date: Date | string): string {
+    if (!date) { return ''; }
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  formatPeriod(startDate: string, endDate: string): string {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const startMonth = this.months[start.getMonth()].label;
+    const endMonth = this.months[end.getMonth()].label;
+    const year = start.getFullYear();
+
+    if (startMonth === endMonth && start.getFullYear() === end.getFullYear()) {
+      return `${startMonth} ${year}`;
+    }
+
+    if (start.getFullYear() === end.getFullYear()) {
+      return `${startMonth} - ${endMonth} ${year}`;
+    }
+
+    return `${startMonth} ${start.getFullYear()} - ${endMonth} ${end.getFullYear()}`;
+  }
 }
+

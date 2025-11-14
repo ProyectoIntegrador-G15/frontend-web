@@ -13,10 +13,12 @@
     <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="handleWarehouseModalOk()">
       <nz-form-item>
         <nz-form-control [nzValidateStatus]="getFieldStatus('name')" [nzErrorTip]="getFieldError('name')">
-          <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+          <nz-form-label id="name-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
             {{ 'warehouses.warehouseName' | customTranslate }}: <span class="text-red-500">*</span>
           </nz-form-label>
           <input class="{{inputClass}}" type="text" nz-input 
+                 id="name-input"
+                 [attr.aria-labelledby]="'name-label'"
                  [placeholder]="'warehouses.warehouseNamePlaceholder' | customTranslate" 
                  formControlName="name">
         </nz-form-control>
@@ -26,10 +28,12 @@
         <div nz-col nzXs="24" nzSm="12">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('city')" [nzErrorTip]="getFieldError('city')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+              <nz-form-label id="city-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 {{ 'warehouses.city' | customTranslate }}: <span class="text-red-500">*</span>
               </nz-form-label>
               <input class="{{inputClass}}" type="text" nz-input 
+                     id="city-input"
+                     [attr.aria-labelledby]="'city-label'"
                      [placeholder]="'warehouses.cityPlaceholder' | customTranslate" 
                      formControlName="city">
             </nz-form-control>
@@ -38,12 +42,18 @@
         <div nz-col nzXs="24" nzSm="12">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('country')" [nzErrorTip]="getFieldError('country')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+              <nz-form-label id="country-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 {{ 'warehouses.country' | customTranslate }}: <span class="text-red-500">*</span>
               </nz-form-label>
+              <label for="country-select" class="sr-only">{{ 'warehouses.country' | customTranslate }}</label>
               <nz-select
                 class="w-full"
+                nzId="country-select"
+                nzLabelId="country-label"
                 [nzPlaceHolder]="'warehouses.selectCountry' | customTranslate"
+                [attr.aria-label]="('warehouses.country' | customTranslate) + ' (requerido)'"
+                [attr.aria-labelledby]="'country-label'"
+                [attr.aria-describedby]="'country-label'"
                 nzAllowClear
                 formControlName="country">
                 <nz-option *ngFor="let country of countries" [nzValue]="country" [nzLabel]="country"></nz-option>
@@ -55,12 +65,14 @@
 
       <nz-form-item>
         <nz-form-control [nzValidateStatus]="getFieldStatus('address')" [nzErrorTip]="getFieldError('address')">
-          <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+          <nz-form-label id="address-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
             {{ 'warehouses.address' | customTranslate }}: <span class="text-red-500">*</span>
           </nz-form-label>
           <textarea
             class="w-full min-h-[100px] rounded-[6px] text-[16px] dark:bg-white/10 px-[16px] py-[12px] outline-none"
             nz-input
+            id="address-input"
+            [attr.aria-labelledby]="'address-label'"
             [placeholder]="'warehouses.addressPlaceholder' | customTranslate"
             formControlName="address"></textarea>
         </nz-form-control>
@@ -74,7 +86,7 @@
         {{ 'common.cancel' | customTranslate }}
       </button>
       <button class="btn-primary-sm" (click)="handleWarehouseModalOk()" [nzLoading]="isWarehouseModalLoading">
-        <span nz-icon nzType="plus" nzTheme="outline"></span>
+        <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
         {{ 'warehouses.createWarehouse' | customTranslate }}
       </button>
     </div>
@@ -99,15 +111,19 @@
         />
       </nz-input-group>
       <ng-template #suffixIconNameSearch>
-        <span *ngIf="nameFilter" nz-icon nzType="close-circle" nzTheme="outline" (click)="clearNameSearch()" class="cursor-pointer hover:text-red-500 text-sm"></span>
+        <span *ngIf="nameFilter" nz-icon nzType="close-circle" nzTheme="outline" (click)="clearNameSearch()" class="cursor-pointer hover:text-red-500 text-sm" role="button" tabindex="0" [attr.aria-label]="'common.clearSearch' | customTranslate" (keydown.enter)="clearNameSearch()" (keydown.space)="clearNameSearch()"></span>
       </ng-template>
     </div>
 
     <!-- Filtro por país -->
     <div class="w-full sm:w-auto sm:min-w-[200px] sm:max-w-[250px]">
+      <label for="country-filter-select" id="country-filter-label" class="sr-only">{{ 'warehouses.filterByCountry' | customTranslate }}</label>
       <nz-select
         class="w-full"
+        nzId="country-filter-select"
         [nzPlaceHolder]="'warehouses.filterByCountry' | customTranslate"
+        [attr.aria-label]="'warehouses.filterByCountry' | customTranslate"
+        [attr.aria-labelledby]="'country-filter-label'"
         nzAllowClear
         nzSize="small"
         [(ngModel)]="countryFilter"
@@ -120,7 +136,7 @@
     <!-- Botón crear bodega -->
     <div class="w-full sm:w-auto">
       <button class="btn-primary-sm w-full sm:w-auto" (click)="showWarehouseModal()">
-        <span nz-icon nzType="plus" nzTheme="outline"></span>
+        <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
         {{ 'warehouses.createWarehouse' | customTranslate }}
       </button>
     </div>
@@ -200,8 +216,10 @@
               class="inline-flex items-center justify-center w-[44px] h-[44px] rounded-[6px] border-none cursor-pointer transition-all duration-200"
               style="background-color: var(--blue-violet-extralight, #E8ECFF); color: var(--blue-violet-dark, #3749B3);"
               onmouseover="this.style.backgroundColor='var(--blue-violet-dark, #3749B3)'; this.style.color='white';"
-              onmouseout="this.style.backgroundColor='var(--blue-violet-extralight, #E8ECFF)'; this.style.color='var(--blue-violet-dark, #3749B3)';">
-              <span class="text-[18px]" nz-icon nzType="dropbox" nzTheme="outline"></span>
+              onmouseout="this.style.backgroundColor='var(--blue-violet-extralight, #E8ECFF)'; this.style.color='var(--blue-violet-dark, #3749B3)';"
+              [attr.aria-label]="'Ver productos de la bodega: ' + data.name"
+              type="button">
+              <span class="text-[18px]" nz-icon nzType="dropbox" nzTheme="outline" aria-hidden="true"></span>
             </button>
           </td>
         </tr>
