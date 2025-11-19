@@ -149,16 +149,19 @@
   },
   "auth": {
     "signInTitle": "Iniciar sesión en MediSupply",
-    "usernameOrEmail": "Usuario o Email",
-    "usernameOrEmailPlaceholder": "Usuario o Email",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "ejemplo@gmail.com",
+    "emailError": "Por favor ingresa un correo electrónico válido",
     "password": "Contraseña",
-    "passwordPlaceholder": "Contraseña",
+    "passwordPlaceholder": "Ingresa tu contraseña",
+    "passwordError": "Por favor ingresa tu contraseña",
     "keepLoggedIn": "Mantener sesión iniciada",
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "loginButton": "Iniciar sesión",
     "or": "o",
     "dontHaveAccount": "¿No tienes una cuenta?",
-    "signUp": "Registrarse"
+    "signUp": "Registrarse",
+    "signOut": "Cerrar sesión"
   },
   "createRoute": {
     "title": "Generar ruta de entrega",
