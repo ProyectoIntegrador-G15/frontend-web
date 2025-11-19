@@ -1,9 +1,11 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ProductsComponent } from './products.component';
 import { ProductsService } from '../../shared/services/products.service';
 import { WarehousesService } from '../../shared/services/warehouses.service';
+import { SuppliersService } from '../../shared/services/suppliers.service';
 import { Router } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -39,6 +41,7 @@ describe('ProductsComponent - Specific Methods', () => {
   let component: ProductsComponent;
   let productsService: jasmine.SpyObj<ProductsService>;
   let warehousesService: jasmine.SpyObj<WarehousesService>;
+  let suppliersService: jasmine.SpyObj<SuppliersService>;
   let messageService: jasmine.SpyObj<NzMessageService>;
   let notificationService: jasmine.SpyObj<NzNotificationService>;
   let router: jasmine.SpyObj<Router>;
@@ -81,6 +84,15 @@ describe('ProductsComponent - Specific Methods', () => {
     const warehousesServiceSpy = jasmine.createSpyObj('WarehousesService', ['getWarehouses']);
     warehousesServiceSpy.getWarehouses.and.returnValue(of(mockWarehouses));
 
+    const suppliersServiceSpy = jasmine.createSpyObj('SuppliersService', ['getSuppliersPaginated']);
+    suppliersServiceSpy.getSuppliersPaginated.and.returnValue(of({
+      suppliers: [],
+      total: 0,
+      total_pages: 0,
+      page: 1,
+      page_size: 10
+    }));
+
     const messageServiceSpy = jasmine.createSpyObj('NzMessageService', [
       'success',
       'error',
@@ -97,12 +109,14 @@ describe('ProductsComponent - Specific Methods', () => {
     translateServiceSpy.instant.and.callFake((key: string) => key);
 
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [MockCustomTranslatePipe, MockCurrencyFormatPipe, MockCurrencyPlaceholderPipe],
       providers: [
         ProductsComponent,
         FormBuilder,
         { provide: ProductsService, useValue: productsServiceSpy },
         { provide: WarehousesService, useValue: warehousesServiceSpy },
+        { provide: SuppliersService, useValue: suppliersServiceSpy },
         { provide: NzMessageService, useValue: messageServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: NzNotificationService, useValue: notificationServiceSpy },
@@ -112,6 +126,7 @@ describe('ProductsComponent - Specific Methods', () => {
 
     productsService = TestBed.inject(ProductsService) as jasmine.SpyObj<ProductsService>;
     warehousesService = TestBed.inject(WarehousesService) as jasmine.SpyObj<WarehousesService>;
+    suppliersService = TestBed.inject(SuppliersService) as jasmine.SpyObj<SuppliersService>;
     messageService = TestBed.inject(NzMessageService) as jasmine.SpyObj<NzMessageService>;
     notificationService = TestBed.inject(NzNotificationService) as jasmine.SpyObj<NzNotificationService>;
     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
@@ -474,10 +489,10 @@ describe('ProductsComponent - Specific Methods', () => {
 
       expect(productsService.createProduct).toHaveBeenCalledWith(jasmine.objectContaining({
         name: 'New Product',
-        price: 150,
-        supplier: 'Supplier XYZ',
-        requiresColdChain: true,
-        temperatureRange: '2°F - 8°F'
+        purchase_price: 150,
+        supplier_id: 'Supplier XYZ',
+        requires_cold_chain: true,
+        temperature_range: '2°F - 8°F'
       }));
       expect(component.isProductModalVisible).toBe(false);
       expect(component.isProductModalLoading).toBe(false);
@@ -515,7 +530,7 @@ describe('ProductsComponent - Specific Methods', () => {
       component.handleProductModalOk();
 
       expect(productsService.createProduct).toHaveBeenCalledWith(jasmine.objectContaining({
-        requiresColdChain: false
+        requires_cold_chain: false
       }));
     });
 

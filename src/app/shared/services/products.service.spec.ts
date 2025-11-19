@@ -45,7 +45,8 @@ describe('ProductsService', () => {
       name: 'Paracetamol 500mg',
       description: 'Analgésico y antipirético',
       purchase_price: 0.85,
-      supplier: 'Proveedor 1',
+      supplier: null, // En los tests, no incluimos información del supplier
+      supplier_id: 1,
       requires_cold_chain: false,
       status: true,
       storageInstructions: 'Almacenar en lugar seco, protegido de la luz y humedad'
@@ -55,7 +56,8 @@ describe('ProductsService', () => {
       name: 'Insulina Humana Regular',
       description: 'Hormona para el control de la diabetes',
       purchase_price: 12.5,
-      supplier: 'Proveedor 2',
+      supplier: null, // En los tests, no incluimos información del supplier
+      supplier_id: 2,
       requires_cold_chain: true,
       status: true,
       storageInstructions: 'Refrigerar entre 2-8°C. No congelar. Proteger de la luz'

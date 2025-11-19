@@ -160,7 +160,8 @@ describe('ProductsWarehouseService', () => {
           expect(product.purchase_price).toBe(5000);
           expect(product.requires_cold_chain).toBe(false);
           expect(product.status).toBe(true);
-          expect(product.supplier).toBe('1');
+          expect(product.supplier).toBeNull(); // El endpoint de warehouse no incluye información del supplier
+          expect(product.supplier_id).toBe(1);
           expect(product.warehouseId).toBe('1');
           done();
         });

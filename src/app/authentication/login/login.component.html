@@ -15,40 +15,46 @@
               <nz-form-item class="block mb-0">
                 <nz-form-label
                   class="text-[14px] w-full leading-[1.4285714286] font-medium [&>label]:text-dark [&>label]:dark:text-white/[.87] mb-[8px] capitalize inline-block"
-                  nzRequired nzFor="userName">Username or Email Address</nz-form-label>
-                <nz-form-control nzErrorTip="The input is not valid E-mail!">
+                  nzRequired nzFor="email">{{ 'auth.email' | customTranslate }}</nz-form-label>
+                <nz-form-control [nzErrorTip]="'auth.emailError' | customTranslate">
                   <input
+                    type="email"
                     class="flex items-center shadow-none py-[10px] px-[20px] h-[48px] border-1 border-regular dark:border-white/10 rounded-4 w-full text-[14px] font-normal leading-[1.5] placeholder:text-[#A0A0A0] dark:bg-white/10 dark:text-white/60"
-                    nz-input formControlName="userName" placeholder="Username or Email" id="userName" />
+                    nz-input formControlName="email" [placeholder]="'auth.emailPlaceholder' | customTranslate" id="email" />
                 </nz-form-control>
               </nz-form-item>
               <nz-form-item class="block mb-0 mt-[25px]">
                 <nz-form-label
-                  class=" text-[14px] leading-[1.4285714286] font-medium [&>label]:text-dark [&>label]:dark:text-white/[.87] capitalize inline-block"
-                  nzRequired nzFor="password">Password</nz-form-label>
-                <nz-form-control nzErrorTip="Please input your Password!">
-                  <nz-input-group
-                    class="flex items-center shadow-none py-[10px] px-[20px] h-[48px] border-1 border-regular dark:border-white/10 rounded-4 w-full text-[14px] font-normal leading-[1.5] dark:bg-white/10"
-                    [nzSuffix]="suffixTemplate">
+                  class="text-[14px] w-full leading-[1.4285714286] font-medium [&>label]:text-dark [&>label]:dark:text-white/[.87] mb-[8px] capitalize inline-block"
+                  nzRequired nzFor="password">{{ 'auth.password' | customTranslate }}</nz-form-label>
+                <nz-form-control [nzErrorTip]="'auth.passwordError' | customTranslate">
+                  <div class="relative flex items-center shadow-none py-[10px] px-[20px] h-[48px] border-1 border-regular dark:border-white/10 rounded-4 w-full text-[14px] font-normal leading-[1.5] dark:bg-white/10">
                     <input nz-input formControlName="password" [type]="passwordVisible ? 'text' : 'password'"
-                      id="password" placeholder="Password" class="placeholder:text-[#A0A0A0] dark:bg-transparent bg-transparent dark:text-white/60" />
-                  </nz-input-group>
-                  <ng-template #suffixTemplate>
-                    <span class="[&>svg]:text-theme-gray dark:[&>svg]:text-white/60" nz-icon [nzType]="passwordVisible ? 'eye' : 'eye-invisible'"
+                      id="password" [placeholder]="'auth.passwordPlaceholder' | customTranslate" 
+                      class="flex-1 w-full text-[14px] font-normal leading-[1.5] placeholder:text-[#A0A0A0] dark:bg-white/10 bg-transparent dark:text-white/60 border-none outline-none pr-[30px]" />
+                    <span class="absolute right-[20px] [&>svg]:text-theme-gray dark:[&>svg]:text-white/60 cursor-pointer" nz-icon [nzType]="passwordVisible ? 'eye' : 'eye-invisible'"
                       (click)="passwordVisible = !passwordVisible"></span>
-                  </ng-template>
+                  </div>
                 </nz-form-control>
               </nz-form-item>
               <div class="flex items-center justify-between capitalize mb-[19px] mt-[23px] ">
                 <label nz-checkbox formControlName="remember" class="font-normal text-13 leading-[22px] text-light dark:text-white/60">
-                  <span>Keep me logged in</span>
+                  <span>{{ 'auth.keepLoggedIn' | customTranslate }}</span>
                 </label>
               </div>
               <button type="submit" class="btn-primary w-full" [disabled]="isLoading">
                 <i class="fas fa-cog fa-spin" [hidden]="!isLoading"></i>
-                Log in
+                {{ 'auth.loginButton' | customTranslate }}
               </button>
             </form>
+            <!-- Separador -->
+            <div class="flex items-center my-[25px]">
+              <div class="flex-1 border-t border-regular dark:border-white/10"></div>
+            </div>
+            <!-- Selector de idioma -->
+            <div class="flex justify-center">
+              <app-language-selector></app-language-selector>
+            </div>
           </div>
         </div>
       </div>

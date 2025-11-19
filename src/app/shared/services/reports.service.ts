@@ -12,6 +12,7 @@ export interface ReportApiResponse {
   month: number;
   year: number;
   created_by: number;
+  created_by_name?: string | null;  // Nombre del usuario que creó el reporte
   status: string;
   created_at: string;
   completed_at?: string | null;
@@ -58,7 +59,6 @@ export class ReportsService {
   }
 
   createReport(reportData: { month: number; year: number; created_by: number }): Observable<ReportApiResponse> {
-    reportData.created_by = 1;
     return this.apiService.postDirect<ReportApiResponse>(
       `${this.endpointsService.getEndpointPath('reports')}/orders-by-seller`, reportData)
       .pipe(catchError(this.handleError));
@@ -74,7 +74,7 @@ export class ReportsService {
       reportMonth: '',
       reportMonthNumber: apiReport.month,
       reportYear: apiReport.year,
-      generatedBy: `User ${apiReport.created_by}`,
+      generatedBy: apiReport.created_by_name || `User ${apiReport.created_by}`,  // Usar el nombre si está disponible
       status: this.mapStatus(apiReport.status),
       downloadUrl: apiReport.report_url ?? undefined
     };

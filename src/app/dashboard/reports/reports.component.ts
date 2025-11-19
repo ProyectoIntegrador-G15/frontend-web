@@ -5,6 +5,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {NzNotificationService} from 'ng-zorro-antd/notification';
 
 import {ReportsService, Report, ReportsPaginatedResponse} from '../../shared/services/reports.service';
+import {AuthenticationService} from '../../shared/services/authentication.service';
 
 @Component({
   selector: 'app-reports',
@@ -36,7 +37,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private translateService: TranslateService,
     private reportsService: ReportsService,
-    private notification: NzNotificationService
+    private notification: NzNotificationService,
+    private authService: AuthenticationService
   ) {
   }
 
@@ -115,7 +117,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       reportMonth: '', // Se llenará con traducciones
       reportMonthNumber: apiReport.month,
       reportYear: apiReport.year,
-      generatedBy: `User ${apiReport.created_by}`,
+      generatedBy: apiReport.created_by_name || `User ${apiReport.created_by}`,  // Usar el nombre si está disponible
       status: this.mapStatus(apiReport.status),
       downloadUrl
     };
@@ -211,10 +213,21 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this.isGenerateReportModalLoading = true;
 
     const formData = this.generateReportForm.value;
+    const userId = this.authService.getUserId();
+    
+    if (!userId) {
+      this.notification.error(
+        this.translateService.instant('common.error'),
+        'No se pudo obtener el ID del usuario. Por favor, inicia sesión nuevamente.'
+      );
+      this.isGenerateReportModalLoading = false;
+      return;
+    }
+
     const reportData = {
       month: formData.month,
       year: formData.year,
-      created_by: 1,
+      created_by: userId,
     };
 
     const createReportSubscription = this.reportsService.createReport(reportData)

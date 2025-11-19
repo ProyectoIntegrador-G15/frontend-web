@@ -25,8 +25,12 @@ export class LoginComponent {
       this.isLoading = true;
       this.error = false;
 
-      const email = this.validateForm.get('userName')?.value;
+      const email = this.validateForm.get('email')?.value;
       const password = this.validateForm.get('password')?.value;
+      const remember = this.validateForm.get('remember')?.value || false;
+
+      // Guardar la preferencia de "remember me" para usarla después del TOTP
+      sessionStorage.setItem('rememberMe', String(remember));
 
       this.auth.firebaseLogin(email, password).subscribe({
         next: (resp) => {
@@ -49,8 +53,14 @@ export class LoginComponent {
   }
 
   ngOnInit(): void {
+    // Si el usuario ya está autenticado, redirigir al dashboard
+    if (this.auth.isAuthenticated()) {
+      this.router.navigate(['/dashboard/products']);
+      return;
+    }
+
     this.validateForm = this.fb.group({
-      userName: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
       remember: [true],
     });

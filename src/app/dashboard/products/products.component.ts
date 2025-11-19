@@ -3,6 +3,7 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 import {ProductsService} from '../../shared/services/products.service';
 import {WarehousesService, Warehouse} from '../../shared/services/warehouses.service';
+import {SuppliersService, Supplier} from '../../shared/services/suppliers.service';
 import {Subscription} from 'rxjs';
 import {Router} from '@angular/router';
 import {NzNotificationService} from 'ng-zorro-antd/notification';
@@ -45,6 +46,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
   warehouses: Warehouse[] = [];
   isLoadingWarehouses = false;
 
+  // Proveedores
+  suppliers: Supplier[] = [];
+  isLoadingSuppliers = false;
+  supplierSearchTerm = '';
+  filteredSuppliers: Supplier[] = [];
+
   // Formulario reactivo para validaciones
   validateForm: FormGroup;
   inputClass = 'w-full rounded-[6px] text-[16px] dark:bg-white/10 px-[16px] py-[12px] min-h-[50px] outline-none';
@@ -55,6 +62,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private router: Router,
     private productsService: ProductsService,
     private warehousesService: WarehousesService,
+    private suppliersService: SuppliersService,
     private fb: FormBuilder,
     private notification: NzNotificationService,
     private msg: NzMessageService
@@ -65,6 +73,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.subscribeToProducts();
     this.getProducts();
     this.getWarehouses();
+    this.getSuppliers();
     this.initForm();
     this.setupSearch();
   }
@@ -114,6 +123,49 @@ export class ProductsComponent implements OnInit, OnDestroy {
         this.isLoadingWarehouses = false;
       }
     });
+  }
+
+  getSuppliers(): void {
+    this.isLoadingSuppliers = true;
+    // Cargar todos los proveedores (páginas múltiples si es necesario)
+    this.loadAllSuppliers(1, []);
+  }
+
+  private loadAllSuppliers(page: number, accumulatedSuppliers: Supplier[]): void {
+    const suppliersSubscription = this.suppliersService.getSuppliersPaginated(page).subscribe({
+      next: (response) => {
+        const allSuppliers = [...accumulatedSuppliers, ...response.suppliers];
+        
+        if (page < response.total_pages) {
+          // Hay más páginas, cargar la siguiente
+          this.loadAllSuppliers(page + 1, allSuppliers);
+        } else {
+          // Todas las páginas cargadas
+          this.suppliers = allSuppliers;
+          this.filteredSuppliers = allSuppliers;
+          this.isLoadingSuppliers = false;
+        }
+      },
+      error: (error) => {
+        console.error('Error al cargar proveedores:', error);
+        this.isLoadingSuppliers = false;
+      }
+    });
+    
+    this.subscription.add(suppliersSubscription);
+  }
+
+  onSupplierSearch(value: string): void {
+    this.supplierSearchTerm = value;
+    if (!value || value.trim() === '') {
+      this.filteredSuppliers = this.suppliers;
+    } else {
+      const searchLower = value.toLowerCase().trim();
+      this.filteredSuppliers = this.suppliers.filter(supplier =>
+        supplier.name.toLowerCase().includes(searchLower) ||
+        supplier.nit.toLowerCase().includes(searchLower)
+      );
+    }
   }
 
   navigateToInventory(productId: string): void {
@@ -243,12 +295,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
     const formData = this.validateForm.value;
     const productData = {
       name: formData.name,
-      price: formData.price,
-      supplier: formData.supplier,
-      requiresColdChain: formData.requiresColdChain === 'si',
-      temperatureRange: `${formData.tempMin}°F - ${formData.tempMax}°F`,
+      purchase_price: formData.price,
+      supplier_id: formData.supplier, // Enviar supplier_id como número
+      requires_cold_chain: formData.requiresColdChain === 'si',
+      temperature_range: `${formData.tempMin}°F - ${formData.tempMax}°F`,
       description: formData.description,
-      storageInstructions: formData.storageInstructions,
+      storage_instructions: formData.storageInstructions,
     };
 
     this.productsService.createProduct(productData).subscribe({
@@ -281,6 +333,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   resetProductForm(): void {
     this.validateForm.reset();
+    this.supplierSearchTerm = '';
+    this.filteredSuppliers = this.suppliers;
   }
 
   onPageIndexChange(page: number): void {

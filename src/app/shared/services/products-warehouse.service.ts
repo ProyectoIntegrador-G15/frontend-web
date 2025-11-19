@@ -63,7 +63,8 @@ export class ProductsWarehouseService {
           id: product.id.toString(),
           name: product.name,
           purchase_price: product.purchase_price,
-          supplier: product.supplier_id.toString(), // Se puede mejorar obteniendo el nombre del supplier
+          supplier: null, // El endpoint de warehouse no incluye información del supplier
+          supplier_id: product.supplier_id,
           requires_cold_chain: product.requires_cold_chain,
           status: product.status ?? true,
           description: product.description,
