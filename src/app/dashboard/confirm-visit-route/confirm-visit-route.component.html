@@ -2,7 +2,7 @@
   <!-- Header -->
   <div class="flex items-center mb-6">
     <app-back-button (backClick)="goBack()" class="mr-4"></app-back-button>
-    <h1 class="screen-title">Confirmar ruta</h1>
+    <h1 class="screen-title">{{ 'confirmVisitRoute.title' | customTranslate }}</h1>
   </div>
 
   <!-- Error Alert -->
@@ -13,8 +13,8 @@
   <!-- Loading State -->
   <div *ngIf="loading" class="loading-container">
     <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
-    <p class="mt-4 text-gray-500">Geocodificando direcciones...</p>
-    <p class="text-xs text-gray-400 mt-2">Esto puede tomar unos segundos</p>
+    <p class="mt-4 text-gray-500">{{ 'confirmVisitRoute.loading.geocoding' | customTranslate }}</p>
+    <p class="text-xs text-gray-400 mt-2">{{ 'confirmVisitRoute.loading.hint' | customTranslate }}</p>
   </div>
 
   <!-- Content -->
@@ -23,7 +23,7 @@
     <div class="grid grid-cols-2 gap-6 mb-6">
       <!-- Mapa -->
       <div class="map-container">
-        <h3 class="subtitle">Mapa de la ruta</h3>
+        <h3 class="subtitle">{{ 'confirmVisitRoute.mapTitle' | customTranslate }}</h3>
         
         <!-- Mapa Google Maps -->
         <div id="routeMap" class="leaflet-map"></div>
@@ -31,22 +31,22 @@
         <div class="map-footer">
           <span class="text-xs text-gray-500">
             <span nz-icon nzType="environment" nzTheme="outline"></span>
-            {{ visitRoute?.totalClients }} paradas programadas
+            {{ visitRoute?.totalClients }} {{ 'confirmVisitRoute.scheduledStops' | customTranslate }}
           </span>
         </div>
       </div>
 
       <!-- Tabla de paradas -->
       <div class="stops-section">
-        <h3 class="subtitle">Ruta</h3>
+        <h3 class="subtitle">{{ 'confirmVisitRoute.routeTitle' | customTranslate }}</h3>
         
         <div class="table-container">
           <table>
             <thead>
               <tr>
                 <th style="width: 80px; text-align: center;">#</th>
-                <th>Nombre</th>
-                <th>Dirección</th>
+                <th>{{ 'confirmVisitRoute.table.name' | customTranslate }}</th>
+                <th>{{ 'confirmVisitRoute.table.address' | customTranslate }}</th>
               </tr>
             </thead>
             <tbody>
@@ -76,10 +76,10 @@
         class="btn-primary" 
         (click)="confirmRoute()"
         [disabled]="confirming || visitRoute.status !== 'draft'">
-        <span *ngIf="!confirming">Confirmar ruta</span>
+        <span *ngIf="!confirming">{{ 'confirmVisitRoute.confirmButton' | customTranslate }}</span>
         <span *ngIf="confirming">
           <nz-spin nzSimple [nzSize]="'small'" class="mr-2"></nz-spin>
-          Confirmando...
+          {{ 'confirmVisitRoute.confirming' | customTranslate }}
         </span>
       </button>
     </div>

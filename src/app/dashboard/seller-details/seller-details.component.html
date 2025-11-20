@@ -1,26 +1,26 @@
 <!-- Header outside container -->
 <div class="seller-header">
   <app-back-button (backClick)="goBack()"></app-back-button>
-  <h1 class="screen-title">Perfil del vendedor</h1>
+  <h1 class="screen-title">{{ 'sellerDetails.title' | customTranslate }}</h1>
 </div>
 
 <!-- Loading State -->
 <div *ngIf="loading" class="loading-container">
   <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
-  <p>Cargando información del vendedor...</p>
+  <p>{{ 'sellerDetails.loadingSeller' | customTranslate }}</p>
 </div>
 
 <!-- Error State -->
 <div *ngIf="!loading && error" class="error-container">
   <span nz-icon nzType="exclamation-circle" nzTheme="outline" class="error-icon"></span>
   <p>{{ error }}</p>
-  <button class="btn-primary" (click)="goBack()">Volver a vendedores</button>
+  <button class="btn-primary" (click)="goBack()">{{ 'sellerDetails.backToSellers' | customTranslate }}</button>
 </div>
 
 <!-- Content -->
 <div *ngIf="!loading && !error && seller" class="seller-detail-container">
   <!-- Subtitle inside white container -->
-  <p class="subtitle">Consulta el desempeño y plan de ventas de cada vendedor</p>
+  <p class="subtitle">{{ 'sellerDetails.subtitle' | customTranslate }}</p>
   
   <!-- Tabs -->
   <app-tabs
@@ -57,27 +57,27 @@
           <div class="detail-card">
             <h3 class="detail-card-title">
               <span nz-icon nzType="idcard" nzTheme="outline"></span>
-              Información Personal
+              {{ 'sellerDetails.personalInfo.title' | customTranslate }}
             </h3>
             <div class="detail-grid">
               <div class="detail-item">
-                <span class="detail-label">Identificación</span>
+                <span class="detail-label">{{ 'sellerDetails.personalInfo.identification' | customTranslate }}</span>
                 <span class="detail-value">{{ seller.identification }}</span>
               </div>
               <div class="detail-item">
-                <span class="detail-label">Email</span>
+                <span class="detail-label">{{ 'sellerDetails.personalInfo.email' | customTranslate }}</span>
                 <span class="detail-value">{{ seller.email }}</span>
               </div>
               <div class="detail-item">
-                <span class="detail-label">Teléfono</span>
+                <span class="detail-label">{{ 'sellerDetails.personalInfo.phone' | customTranslate }}</span>
                 <span class="detail-value">{{ seller.phone }}</span>
               </div>
               <div class="detail-item">
-                <span class="detail-label">Dirección</span>
-                <span class="detail-value">{{ seller.address || 'No especificada' }}</span>
+                <span class="detail-label">{{ 'sellerDetails.personalInfo.address' | customTranslate }}</span>
+                <span class="detail-value">{{ seller.address ? seller.address : ('sellerDetails.personalInfo.notSpecified' | customTranslate) }}</span>
               </div>
               <div class="detail-item">
-                <span class="detail-label">Fecha de Ingreso</span>
+                <span class="detail-label">{{ 'sellerDetails.personalInfo.entryDate' | customTranslate }}</span>
                 <span class="detail-value">{{ seller.entryDate }}</span>
               </div>
             </div>
@@ -87,16 +87,16 @@
           <div class="detail-card">
             <h3 class="detail-card-title">
               <span nz-icon nzType="dollar" nzTheme="outline"></span>
-              Información Comercial
+              {{ 'sellerDetails.commercialInfo.title' | customTranslate }}
             </h3>
             <div class="detail-grid">
               <div class="detail-item">
-                <span class="detail-label">Comisión</span>
-                <span class="detail-value highlight">{{ seller.commission ? seller.commission + '%' : 'No definida' }}</span>
+                <span class="detail-label">{{ 'sellerDetails.commercialInfo.commission' | customTranslate }}</span>
+                <span class="detail-value highlight">{{ seller.commission ? seller.commission + '%' : ('sellerDetails.commercialInfo.notDefined' | customTranslate) }}</span>
               </div>
               <div class="detail-item">
-                <span class="detail-label">Meta de Ventas</span>
-                <span class="detail-value highlight">{{ seller.salesTarget ? formatCurrency(seller.salesTarget) : 'No definida' }}</span>
+                <span class="detail-label">{{ 'sellerDetails.commercialInfo.salesTarget' | customTranslate }}</span>
+                <span class="detail-value highlight">{{ seller.salesTarget ? formatCurrency(seller.salesTarget) : ('sellerDetails.commercialInfo.notDefined' | customTranslate) }}</span>
               </div>
             </div>
           </div>
@@ -309,33 +309,33 @@
       <div *ngIf="activeTab === 'sales-plan'" class="sales-plan-tab">
         <!-- Header con título, filtro y botón -->
         <div class="sales-plan-header">
-          <h3 class="sales-plan-title">Plan de ventas de {{ seller?.name }}</h3>
+          <h3 class="sales-plan-title">{{ 'sellerDetails.salesPlan.title' | customTranslate }} {{ seller?.name }}</h3>
           <div class="sales-plan-controls-row">
             <div class="filters-group">
               <div class="month-filter">
-                <label class="filter-label">Mes del plan:</label>
+                <label class="filter-label">{{ 'sellerDetails.salesPlan.monthLabel' | customTranslate }}</label>
                 <nz-select
                   class="month-select"
                   [(ngModel)]="selectedMonth"
                   (ngModelChange)="onMonthChange()"
-                  nzPlaceHolder="Seleccionar mes">
+                  [nzPlaceHolder]="'sellerDetails.salesPlan.selectMonth' | customTranslate">
                   <nz-option *ngFor="let month of months" [nzValue]="month.value" [nzLabel]="month.label"></nz-option>
                 </nz-select>
               </div>
               <div class="year-filter">
-                <label class="filter-label">Año del plan:</label>
+                <label class="filter-label">{{ 'sellerDetails.salesPlan.yearLabel' | customTranslate }}</label>
                 <nz-select
                   class="year-select"
                   [(ngModel)]="selectedYear"
                   (ngModelChange)="onYearChange()"
-                  nzPlaceHolder="Seleccionar año">
+                  [nzPlaceHolder]="'sellerDetails.salesPlan.selectYear' | customTranslate">
                   <nz-option *ngFor="let year of years" [nzValue]="year" [nzLabel]="year.toString()"></nz-option>
                 </nz-select>
               </div>
             </div>
             <button class="btn-primary" (click)="onCreatePlan()">
               <span nz-icon nzType="plus" nzTheme="outline"></span>
-              Crear plan
+              {{ 'sellerDetails.salesPlan.createPlan' | customTranslate }}
             </button>
           </div>
         </div>
@@ -343,15 +343,15 @@
         <!-- Loading -->
         <div *ngIf="loadingSalesPlans" class="text-center py-8">
           <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
-          <p class="mt-4 text-gray-500">Cargando planes de venta...</p>
+          <p class="mt-4 text-gray-500">{{ 'sellerDetails.salesPlan.loadingPlans' | customTranslate }}</p>
         </div>
 
         <!-- Sin planes -->
         <div *ngIf="!loadingSalesPlans && salesPlans.length === 0" class="empty-state-wrapper">
           <div class="empty-state">
             <span nz-icon nzType="dollar" nzTheme="outline" class="empty-icon"></span>
-            <h3>Sin planes de venta</h3>
-            <p>Aún no hay planes de venta creados para este vendedor en el mes y año seleccionados.</p>
+            <h3>{{ 'sellerDetails.salesPlan.noPlans' | customTranslate }}</h3>
+            <p>{{ 'sellerDetails.salesPlan.noPlansDescription' | customTranslate }}</p>
           </div>
         </div>
 
@@ -371,19 +371,19 @@
                   <tr>
                     <th
                       class="bg-regularBG dark:bg-[#323440] px-[20px] py-[16px] text-start text-dark dark:text-white/[.87] text-15px font-medium border-none before:hidden rounded-s-[10px] capitalize">
-                      Nombre del plan
+                      {{ 'sellerDetails.salesPlan.tableHeaders.planName' | customTranslate }}
                     </th>
                     <th
                       class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
-                      Meta total (unidades)
+                      {{ 'sellerDetails.salesPlan.tableHeaders.totalUnits' | customTranslate }}
                     </th>
                     <th
                       class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
-                      Meta total ($)
+                      {{ 'sellerDetails.salesPlan.tableHeaders.totalValue' | customTranslate }}
                     </th>
                     <th
                       class="bg-regularBG dark:bg-[#323440] px-[20px] py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden rounded-e-[10px] capitalize">
-                      Periodo
+                      {{ 'sellerDetails.salesPlan.tableHeaders.period' | customTranslate }}
                     </th>
                   </tr>
                 </thead>
@@ -417,24 +417,24 @@
       <div *ngIf="activeTab === 'visit-routes'" class="visit-routes-tab">
         <!-- Header con botón -->
         <div class="visits-header">
-          <h3 class="visits-title">Rutas de visita programadas</h3>
+          <h3 class="visits-title">{{ 'sellerDetails.visitRoutes.title' | customTranslate }}</h3>
           <button class="btn-primary" (click)="createVisitRoute()">
             <span nz-icon nzType="plus" nzTheme="outline"></span>
-            Generar ruta de visita
+            {{ 'sellerDetails.visitRoutes.generateRoute' | customTranslate }}
           </button>
         </div>
 
         <!-- Loading -->
         <div *ngIf="loadingRoutes" class="text-center py-8">
           <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
-          <p class="mt-4 text-gray-500">Cargando rutas...</p>
+          <p class="mt-4 text-gray-500">{{ 'sellerDetails.visitRoutes.loadingRoutes' | customTranslate }}</p>
         </div>
 
         <!-- Sin rutas -->
         <div *ngIf="!loadingRoutes && visitRoutes.length === 0" class="empty-state text-center py-12">
           <span nz-icon nzType="calendar" nzTheme="outline" class="empty-icon text-6xl mb-4 block text-gray-300"></span>
-          <h3 class="text-lg font-semibold text-dark dark:text-white mb-2">Sin rutas de visita</h3>
-          <p class="text-gray-500">Aún no hay rutas de visita generadas para este vendedor.</p>
+          <h3 class="text-lg font-semibold text-dark dark:text-white mb-2">{{ 'sellerDetails.visitRoutes.noRoutes' | customTranslate }}</h3>
+          <p class="text-gray-500">{{ 'sellerDetails.visitRoutes.noRoutesDescription' | customTranslate }}</p>
         </div>
 
         <!-- Tabla de rutas -->
@@ -442,11 +442,11 @@
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Fecha</th>
-                <th>Clientes</th>
-                <th>Duración</th>
-                <th>Estado</th>
+                <th>{{ 'sellerDetails.visitRoutes.tableHeaders.id' | customTranslate }}</th>
+                <th>{{ 'sellerDetails.visitRoutes.tableHeaders.date' | customTranslate }}</th>
+                <th>{{ 'sellerDetails.visitRoutes.tableHeaders.clients' | customTranslate }}</th>
+                <th>{{ 'sellerDetails.visitRoutes.tableHeaders.duration' | customTranslate }}</th>
+                <th>{{ 'sellerDetails.visitRoutes.tableHeaders.status' | customTranslate }}</th>
               </tr>
             </thead>
             <tbody>
@@ -464,11 +464,11 @@
                     {{ getClientNamesShort(route) }}
                   </p>
                   <p class="font-medium" *ngIf="!route.stops || route.stops.length === 0">
-                    {{ route.totalClients }} clientes
+                    {{ route.totalClients }} {{ 'sellerDetails.visitRoutes.clients' | customTranslate }}
                   </p>
                 </td>
                 <td>
-                  <p>{{ route.estimatedDurationMinutes ? (route.estimatedDurationMinutes + ' min') : '--' }}</p>
+                  <p>{{ route.estimatedDurationMinutes ? (route.estimatedDurationMinutes + ' ' + ('sellerDetails.visitRoutes.minutes' | customTranslate)) : '--' }}</p>
                 </td>
                 <td>
                   <nz-tag [nzColor]="getRouteStatusColor(route.status)">
@@ -492,20 +492,20 @@
   (nzOnCancel)="handleSalesPlanModalCancel()"
   nzWidth="75%"
 >
-  <ng-template #salesPlanModalTitle>Crear plan de ventas</ng-template>
+  <ng-template #salesPlanModalTitle>{{ 'sellerDetails.salesPlan.modal.title' | customTranslate }}</ng-template>
 
   <ng-template #salesPlanModalContent>
     <form nz-form nzLayout="vertical" [formGroup]="salesPlanForm" (ngSubmit)="handleSalesPlanModalOk()">
       <nz-form-item>
         <nz-form-control [nzValidateStatus]="getFieldStatus('name')" [nzErrorTip]="getFieldError('name')">
           <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
-            Nombre del plan: <span class="text-red-500">*</span>
+            {{ 'sellerDetails.salesPlan.modal.planName' | customTranslate }} <span class="text-red-500">*</span>
           </nz-form-label>
           <input 
             class="w-full rounded-[6px] text-[16px] dark:bg-white/10 px-[16px] py-[12px] min-h-[50px] outline-none" 
             type="text" 
             nz-input 
-            placeholder="Ej: Plan de ventas Q1 2025" 
+            [placeholder]="'sellerDetails.salesPlan.modal.planNamePlaceholder' | customTranslate" 
             formControlName="name">
         </nz-form-control>
       </nz-form-item>
@@ -515,13 +515,13 @@
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('start_month')" [nzErrorTip]="getFieldError('start_month')">
               <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
-                Mes de inicio: <span class="text-red-500">*</span>
+                {{ 'sellerDetails.salesPlan.modal.startMonth' | customTranslate }} <span class="text-red-500">*</span>
               </nz-form-label>
               <nz-date-picker
                 [formControl]="salesPlanForm.get('start_month')"
                 nzMode="month"
                 nzFormat="yyyy-MM"
-                [nzPlaceHolder]="'Seleccionar mes y año'"
+                [nzPlaceHolder]="'sellerDetails.salesPlan.modal.selectMonthYear' | customTranslate"
                 [nzDisabledDate]="disableFutureMonthsForSalesPlan"
                 class="w-full">
               </nz-date-picker>
@@ -532,13 +532,13 @@
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('end_month')" [nzErrorTip]="getFieldError('end_month')">
               <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
-                Mes de fin: <span class="text-red-500">*</span>
+                {{ 'sellerDetails.salesPlan.modal.endMonth' | customTranslate }} <span class="text-red-500">*</span>
               </nz-form-label>
               <nz-date-picker
                 [formControl]="salesPlanForm.get('end_month')"
                 nzMode="month"
                 nzFormat="yyyy-MM"
-                [nzPlaceHolder]="'Seleccionar mes y año'"
+                [nzPlaceHolder]="'sellerDetails.salesPlan.modal.selectMonthYear' | customTranslate"
                 [nzDisabledDate]="disableFutureMonthsForSalesPlan"
                 class="w-full">
               </nz-date-picker>
@@ -552,13 +552,13 @@
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('total_units_target')" [nzErrorTip]="getFieldError('total_units_target')">
               <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
-                Meta total (unidades): <span class="text-red-500">*</span>
+                {{ 'sellerDetails.salesPlan.modal.totalUnits' | customTranslate }} <span class="text-red-500">*</span>
               </nz-form-label>
               <input 
                 class="w-full rounded-[6px] text-[16px] dark:bg-white/10 px-[16px] py-[12px] min-h-[50px] outline-none" 
                 type="number" 
                 nz-input 
-                placeholder="Ej: 1000" 
+                [placeholder]="'sellerDetails.salesPlan.modal.totalUnitsPlaceholder' | customTranslate" 
                 formControlName="total_units_target"
                 min="1">
             </nz-form-control>
@@ -568,13 +568,13 @@
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('total_value_target')" [nzErrorTip]="getFieldError('total_value_target')">
               <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
-                Meta total (valor $): <span class="text-red-500">*</span>
+                {{ 'sellerDetails.salesPlan.modal.totalValue' | customTranslate }} <span class="text-red-500">*</span>
               </nz-form-label>
               <input 
                 class="w-full rounded-[6px] text-[16px] dark:bg-white/10 px-[16px] py-[12px] min-h-[50px] outline-none" 
                 type="number" 
                 nz-input 
-                placeholder="Ej: 5000000" 
+                [placeholder]="'sellerDetails.salesPlan.modal.totalValuePlaceholder' | customTranslate" 
                 formControlName="total_value_target"
                 step="0.01"
                 min="0.01">
@@ -586,13 +586,13 @@
       <nz-form-item>
         <nz-form-control [nzValidateStatus]="getFieldStatus('visits_target')" [nzErrorTip]="getFieldError('visits_target')">
           <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
-            Meta de visitas: <span class="text-red-500">*</span>
+            {{ 'sellerDetails.salesPlan.modal.visitsTarget' | customTranslate }} <span class="text-red-500">*</span>
           </nz-form-label>
           <input 
             class="w-full rounded-[6px] text-[16px] dark:bg-white/10 px-[16px] py-[12px] min-h-[50px] outline-none" 
             type="number" 
             nz-input 
-            placeholder="Ej: 50" 
+            [placeholder]="'sellerDetails.salesPlan.modal.visitsTargetPlaceholder' | customTranslate" 
             formControlName="visits_target"
             min="1">
         </nz-form-control>
@@ -602,10 +602,10 @@
 
   <ng-template #salesPlanModalFooter>
     <div class="flex justify-center gap-3 w-full">
-      <button class="btn-secondary-sm" (click)="handleSalesPlanModalCancel()">Cancelar</button>
+      <button class="btn-secondary-sm" (click)="handleSalesPlanModalCancel()">{{ 'sellerDetails.salesPlan.modal.cancel' | customTranslate }}</button>
       <button class="btn-primary-sm" (click)="handleSalesPlanModalOk()" [nzLoading]="isSalesPlanModalLoading">
         <span nz-icon nzType="plus" nzTheme="outline"></span>
-        Crear plan
+        {{ 'sellerDetails.salesPlan.modal.create' | customTranslate }}
       </button>
     </div>
   </ng-template>

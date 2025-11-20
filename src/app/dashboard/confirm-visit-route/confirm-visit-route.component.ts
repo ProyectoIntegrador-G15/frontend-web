@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { VisitRoutesService, VisitRoute } from '../../shared/services/visit-routes.service';
 import { SnackService } from '../../shared/services/snack.service';
 import { environment } from '../../../environments/environment';
@@ -29,7 +30,8 @@ export class ConfirmVisitRouteComponent implements OnInit, AfterViewInit {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private visitRoutesService: VisitRoutesService,
-    private snackService: SnackService
+    private snackService: SnackService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -65,7 +67,7 @@ export class ConfirmVisitRouteComponent implements OnInit, AfterViewInit {
       },
       error: (error) => {
         console.error('Error loading route:', error);
-        this.error = 'No se pudo cargar la ruta';
+        this.error = this.translateService.instant('confirmVisitRoute.error.loadRoute');
         this.loading = false;
       }
     });
@@ -85,7 +87,7 @@ export class ConfirmVisitRouteComponent implements OnInit, AfterViewInit {
 
     if (!google || !google.maps) {
       console.error('Google Maps no está cargado');
-      this.error = 'Error cargando Google Maps';
+      this.error = this.translateService.instant('confirmVisitRoute.error.loadGoogleMaps');
       return;
     }
 
@@ -254,7 +256,7 @@ export class ConfirmVisitRouteComponent implements OnInit, AfterViewInit {
       const pendingData = sessionStorage.getItem('pendingVisitRoute');
       
       if (!pendingData) {
-        this.error = 'No se encontraron datos de la ruta';
+        this.error = this.translateService.instant('confirmVisitRoute.error.noRouteData');
         this.loading = false;
         return;
       }
@@ -298,7 +300,7 @@ export class ConfirmVisitRouteComponent implements OnInit, AfterViewInit {
       }, 200);
     } catch (error) {
       console.error('Error al cargar vista previa:', error);
-      this.error = 'Error al cargar la vista previa de la ruta';
+      this.error = this.translateService.instant('confirmVisitRoute.error.loadPreview');
       this.loading = false;
     }
   }
@@ -372,9 +374,11 @@ export class ConfirmVisitRouteComponent implements OnInit, AfterViewInit {
           this.visitRoutesService.confirmVisitRoute(createdRoute.id).subscribe({
             next: (confirmedRoute) => {
               sessionStorage.removeItem('pendingVisitRoute');
-              this.snackService.success(
-                `Ruta de visita #${confirmedRoute.id} confirmada exitosamente. Total: ${confirmedRoute.totalClients} clientes.`
-              );
+              const successMessage = this.translateService.instant('confirmVisitRoute.success.confirmed', {
+                id: confirmedRoute.id,
+                total: confirmedRoute.totalClients
+              });
+              this.snackService.success(successMessage);
               
               this.router.navigate(['/dashboard/sellers', confirmedRoute.sellerId], {
                 fragment: 'visit-routes'
@@ -382,16 +386,16 @@ export class ConfirmVisitRouteComponent implements OnInit, AfterViewInit {
             },
             error: (error) => {
               console.error('Error confirming route:', error);
-              this.error = error.message || 'No se pudo confirmar la ruta';
-              this.snackService.error('Error al confirmar la ruta');
+              this.error = error.message || this.translateService.instant('confirmVisitRoute.error.confirmRoute');
+              this.snackService.error(this.translateService.instant('confirmVisitRoute.error.confirmRoute'));
               this.confirming = false;
             }
           });
         },
         error: (error) => {
           console.error('Error creating route:', error);
-          this.error = error.message || 'No se pudo crear la ruta';
-          this.snackService.error('Error al crear la ruta');
+          this.error = error.message || this.translateService.instant('confirmVisitRoute.error.createRoute');
+          this.snackService.error(this.translateService.instant('confirmVisitRoute.error.createRoute'));
           this.confirming = false;
         }
       });
@@ -399,9 +403,11 @@ export class ConfirmVisitRouteComponent implements OnInit, AfterViewInit {
       // Ya existe, solo confirmar
       this.visitRoutesService.confirmVisitRoute(this.visitRoute.id).subscribe({
         next: (confirmedRoute) => {
-          this.snackService.success(
-            `Ruta de visita #${confirmedRoute.id} confirmada exitosamente. Total: ${confirmedRoute.totalClients} clientes.`
-          );
+          const successMessage = this.translateService.instant('confirmVisitRoute.success.confirmed', {
+            id: confirmedRoute.id,
+            total: confirmedRoute.totalClients
+          });
+          this.snackService.success(successMessage);
           
           this.router.navigate(['/dashboard/sellers', this.visitRoute!.sellerId], {
             fragment: 'visit-routes'
@@ -409,8 +415,8 @@ export class ConfirmVisitRouteComponent implements OnInit, AfterViewInit {
         },
         error: (error) => {
           console.error('Error confirming route:', error);
-          this.error = error.message || 'No se pudo confirmar la ruta';
-          this.snackService.error('Error al confirmar la ruta');
+          this.error = error.message || this.translateService.instant('confirmVisitRoute.error.confirmRoute');
+          this.snackService.error(this.translateService.instant('confirmVisitRoute.error.confirmRoute'));
           this.confirming = false;
         }
       });
