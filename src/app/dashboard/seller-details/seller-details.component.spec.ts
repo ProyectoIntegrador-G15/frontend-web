@@ -82,7 +82,30 @@ describe('SellerDetailsComponent', () => {
 
     // Configurar TranslateService
     translateService.currentLang = 'es-CO';
-    spyOn(translateService, 'instant').and.returnValue('Mocked translation');
+    spyOn(translateService, 'instant').and.callFake((key: string) => {
+      const translations: { [key: string]: string } = {
+        'sellers.statusActive': 'Activo',
+        'sellers.statusInactive': 'Inactivo',
+        'sellers.statusSuspended': 'Suspendido',
+        'common.active': 'Activo',
+        'common.inactive': 'Inactivo',
+        'common.error': 'Error',
+        'sellerDetails.error.loadSeller': 'No se pudo cargar la información del vendedor',
+        'sellerDetails.error.noSellerInfo': 'No se pudo cargar la información del vendedor',
+        'sellerDetails.salesPlan.error.loadSeller': 'No se encontró información del vendedor',
+        'sellerDetails.tabs.information': 'Información',
+        'sellerDetails.tabs.performance': 'Desempeño',
+        'sellerDetails.tabs.salesPlan': 'Plan de ventas',
+        'sellerDetails.tabs.visitRoutes': 'Rutas de visita',
+        'sellerDetails.salesPlan.errors.required': 'Este campo es obligatorio',
+        'sellerDetails.salesPlan.errors.min': 'El valor debe ser mayor a 0',
+        'sellerDetails.salesPlan.errors.dateInPast': 'No se puede seleccionar una fecha anterior al mes actual',
+        'sellerDetails.salesPlan.errors.dateTooFar': 'No se puede seleccionar una fecha más de 6 meses en el futuro',
+        'sellerDetails.salesPlan.errors.endBeforeStart': 'La fecha de fin debe ser posterior a la fecha de inicio',
+        'sellerDetails.salesPlan.errors.startAfterEnd': 'La fecha de inicio no puede ser posterior a la fecha de fin'
+      };
+      return translations[key] || key;
+    });
     // Mock onLangChange como EventEmitter
     const langChangeEmitter = new EventEmitter<LangChangeEvent>();
     Object.defineProperty(translateService, 'onLangChange', {
@@ -116,6 +139,8 @@ describe('SellerDetailsComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+    // Inicializar tabs después de crear el componente
+    component.ngOnInit();
   });
 
   describe('ngOnInit', () => {
@@ -251,6 +276,7 @@ describe('SellerDetailsComponent', () => {
 
   describe('Tabs configuration', () => {
     it('should have correct tabs configured', () => {
+      component.ngOnInit(); // Asegurar que los tabs se inicialicen
       expect(component.tabs.length).toBe(4);
       expect(component.tabs[0].id).toBe('information');
       expect(component.tabs[1].id).toBe('performance');

@@ -3,11 +3,21 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder } from '@angular/forms';
 import { of, throwError, Subject } from 'rxjs';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { TranslateService } from '@ngx-translate/core';
+import { Pipe, PipeTransform } from '@angular/core';
 
 import { WarehouseInventoryComponent } from './warehouse-inventory.component';
 import { ProductsWarehouseService, WarehouseProductsResponse } from '../../shared/services/products-warehouse.service';
 import { ProductsService } from '../../shared/services/products.service';
 import { Product } from '../../shared/interfaces/product.type';
+
+// Mock pipe for customTranslate
+@Pipe({ name: 'customTranslate' })
+class MockCustomTranslatePipe implements PipeTransform {
+  transform(key: string): string {
+    return key; // Return the key as the translation for testing
+  }
+}
 
 describe('WarehouseInventoryComponent', () => {
   let component: WarehouseInventoryComponent;
@@ -63,20 +73,33 @@ describe('WarehouseInventoryComponent', () => {
     const productsServiceSpy = jasmine.createSpyObj('ProductsService', ['getProductsPaginated', 'addInventoryToProduct']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     const notificationSpy = jasmine.createSpyObj('NzNotificationService', ['create']);
+    const translateServiceSpy = jasmine.createSpyObj('TranslateService', ['instant']);
+
+    // Configurar el mock de TranslateService para devolver valores específicos
+    translateServiceSpy.instant.and.callFake((key: string) => {
+      const translations: { [key: string]: string } = {
+        'common.active': 'Activo',
+        'common.inactive': 'Inactivo',
+        'warehouseInventory.error.loadProducts': 'Error al buscar productos.',
+        'warehouseInventory.errorLoadingProducts': 'Error al buscar productos.' // Mantener compatibilidad
+      };
+      return translations[key] || key;
+    });
 
     mockActivatedRoute = {
       params: of({ id: '1' })
     };
 
     await TestBed.configureTestingModule({
-      declarations: [WarehouseInventoryComponent],
+      declarations: [WarehouseInventoryComponent, MockCustomTranslatePipe],
       providers: [
         FormBuilder,
         { provide: ProductsWarehouseService, useValue: productsWarehouseServiceSpy },
         { provide: ProductsService, useValue: productsServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: NzNotificationService, useValue: notificationSpy }
+        { provide: NzNotificationService, useValue: notificationSpy },
+        { provide: TranslateService, useValue: translateServiceSpy }
       ]
     }).compileComponents();
 

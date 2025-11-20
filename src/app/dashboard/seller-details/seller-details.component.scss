@@ -317,6 +317,22 @@
   .month-select,
   .year-select {
     min-width: 180px;
+
+    // Mejorar accesibilidad del input de búsqueda interno
+    ::ng-deep {
+      .ant-select-search__field {
+        &::placeholder {
+          color: #999;
+        }
+      }
+
+      // Asegurar que el input tenga atributos de accesibilidad
+      input[nz-select-search] {
+        &[placeholder] {
+          // El placeholder ya está configurado via nzSearchPlaceholder
+        }
+      }
+    }
   }
 
   // Estilos para el botón Crear plan

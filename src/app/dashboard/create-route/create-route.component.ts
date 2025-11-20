@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { OrdersService, Order } from '../../shared/services/orders.service';
@@ -16,7 +16,7 @@ export interface SelectableOrder extends Order {
   templateUrl: './create-route.component.html',
   styleUrls: ['./create-route.component.scss']
 })
-export class CreateRouteComponent implements OnInit {
+export class CreateRouteComponent implements OnInit, AfterViewInit {
 
   // Pedidos pendientes para la tabla
   pendingOrders: SelectableOrder[] = [];
@@ -47,6 +47,44 @@ export class CreateRouteComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadData();
+  }
+
+  ngAfterViewInit(): void {
+    // Agregar atributos de accesibilidad al input de búsqueda del nz-select si existe
+    setTimeout(() => {
+      this.addAccessibilityToSelectSearchInput();
+    }, 100);
+  }
+
+  private addAccessibilityToSelectSearchInput(): void {
+    const vehicleSelect = document.querySelector('#vehicle-select');
+    if (vehicleSelect) {
+      // Buscar el input de búsqueda
+      const searchInput = vehicleSelect.querySelector('input.ant-select-selection-search-input') as HTMLInputElement ||
+                        vehicleSelect.querySelector('.ant-select-selection-search input') as HTMLInputElement;
+      
+      if (searchInput) {
+        const label = this.translateService.instant('createRoute.vehicleDriver');
+        searchInput.setAttribute('aria-label', label);
+        searchInput.setAttribute('title', label);
+        if (!searchInput.getAttribute('placeholder')) {
+          const placeholder = label + ' - ' + this.translateService.instant('common.search');
+          searchInput.setAttribute('placeholder', placeholder);
+        }
+      }
+
+      // Usar MutationObserver para detectar cuando se renderiza el input de búsqueda
+      const observer = new MutationObserver(() => {
+        const searchInput = vehicleSelect.querySelector('input.ant-select-selection-search-input') as HTMLInputElement ||
+                          vehicleSelect.querySelector('.ant-select-selection-search input') as HTMLInputElement;
+        if (searchInput) {
+          const label = this.translateService.instant('createRoute.vehicleDriver');
+          searchInput.setAttribute('aria-label', label);
+          searchInput.setAttribute('title', label);
+        }
+      });
+      observer.observe(vehicleSelect, { childList: true, subtree: true, attributes: true });
+    }
   }
 
   loadData(): void {

@@ -39,7 +39,7 @@
                 nzId="supplier-select"
                 nzLabelId="supplier-label"
                 [nzPlaceHolder]="'products.selectSupplier' | customTranslate"
-                [attr.aria-label]="('products.supplier' | customTranslate) + ' (requerido)'"
+                [attr.aria-label]="('products.supplier' | customTranslate) + ' ' + ('common.required' | customTranslate)"
                 [attr.aria-labelledby]="'supplier-label'"
                 [attr.aria-describedby]="'supplier-label'"
                 nzAllowClear
@@ -77,7 +77,7 @@
                 nzId="requiresColdChain-select"
                 nzLabelId="requiresColdChain-label"
                 [nzPlaceHolder]="'products.selectOption' | customTranslate"
-                [attr.aria-label]="('products.requiresColdChain' | customTranslate) + ' (requerido)'"
+                [attr.aria-label]="('products.requiresColdChain' | customTranslate) + ' ' + ('common.required' | customTranslate)"
                 [attr.aria-labelledby]="'requiresColdChain-label'"
                 [attr.aria-describedby]="'requiresColdChain-label'"
                 nzAllowClear

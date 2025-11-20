@@ -2,8 +2,8 @@
   <!-- Header con título y botón crear vendedor -->
   <div class="flex items-center justify-between mb-6">
     <h1 class="screen-title">{{ 'sellers.title' | customTranslate }}</h1>
-    <button class="btn-primary" (click)="createSeller()">
-      <span nz-icon nzType="plus" nzTheme="outline"></span>
+    <button type="button" class="btn-primary" (click)="createSeller()" [attr.aria-label]="'sellers.createSeller' | customTranslate">
+      <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
       {{ 'sellers.createSeller' | customTranslate }}
     </button>
   </div>
@@ -16,7 +16,7 @@
   <!-- Mensaje de error -->
   <div *ngIf="error && !loading" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
     <p class="font-medium">{{ error }}</p>
-    <button class="mt-2 text-sm underline" (click)="loadSellers()">{{ 'sellers.retry' | customTranslate }}</button>
+    <button type="button" class="mt-2 text-sm underline" (click)="loadSellers()" [attr.aria-label]="'sellers.retry' | customTranslate">{{ 'sellers.retry' | customTranslate }}</button>
   </div>
 
   <!-- Tabla de vendedores con estilos globales -->
@@ -74,23 +74,29 @@
                 <div class="flex items-center gap-2">
                   <button
                     (click)="viewSeller(seller.id)"
+                    type="button"
+                    [attr.aria-label]="('sellers.viewDetails' | customTranslate) + ': ' + seller.name"
                     class="inline-flex items-center justify-center w-[44px] h-[44px] rounded-[6px] border-none cursor-pointer transition-all duration-200"
                     style="background-color: var(--blue-violet-extralight, #E8ECFF); color: var(--blue-violet-dark, #3749B3);"
                     onmouseover="this.style.backgroundColor='var(--blue-violet-dark, #3749B3)'; this.style.color='white';"
                     onmouseout="this.style.backgroundColor='var(--blue-violet-extralight, #E8ECFF)'; this.style.color='var(--blue-violet-dark, #3749B3)';"
                     [nzTooltipTitle]="'sellers.viewDetails' | customTranslate"
                     nz-tooltip>
-                    <span class="text-[18px]" nz-icon nzType="eye" nzTheme="outline"></span>
+                    <span class="text-[18px]" nz-icon nzType="eye" nzTheme="outline" aria-hidden="true"></span>
+                    <span class="sr-only">{{ 'sellers.viewDetails' | customTranslate }}</span>
                   </button>
                   <button
                     (click)="manageClients(seller.id)"
+                    type="button"
+                    [attr.aria-label]="('sellers.manageClients' | customTranslate) + ': ' + seller.name"
                     class="inline-flex items-center justify-center w-[44px] h-[44px] rounded-[6px] border-none cursor-pointer transition-all duration-200"
                     style="background-color: var(--blue-violet-extralight, #E8ECFF); color: var(--blue-violet-dark, #3749B3);"
                     onmouseover="this.style.backgroundColor='var(--blue-violet-dark, #3749B3)'; this.style.color='white';"
                     onmouseout="this.style.backgroundColor='var(--blue-violet-extralight, #E8ECFF)'; this.style.color='var(--blue-violet-dark, #3749B3)';"
                     [nzTooltipTitle]="'sellers.manageClients' | customTranslate"
                     nz-tooltip>
-                    <span class="text-[18px]" nz-icon nzType="team" nzTheme="outline"></span>
+                    <span class="text-[18px]" nz-icon nzType="team" nzTheme="outline" aria-hidden="true"></span>
+                    <span class="sr-only">{{ 'sellers.manageClients' | customTranslate }}</span>
                   </button>
                 </div>
               </td>
