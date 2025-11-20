@@ -15,20 +15,22 @@
     <div class="p-[25px]">
       <!-- Info del Vendedor -->
       <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-        <p class="text-sm text-gray-500 dark:text-gray-400">{{ 'createVisitRoute.seller' | customTranslate }}</p>
+        <p class="text-sm text-gray-600 dark:text-gray-300">{{ 'createVisitRoute.seller' | customTranslate }}</p>
         <p class="text-lg font-semibold text-dark dark:text-white">{{ sellerName || ('createVisitRoute.loading' | customTranslate) }}</p>
       </div>
 
       <!-- Campo de Fecha -->
       <div class="mb-6">
-        <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+        <label for="visit-route-date-picker" class="block text-sm font-medium text-dark dark:text-white mb-2">
           {{ 'createVisitRoute.routeDate' | customTranslate }}
         </label>
         <nz-date-picker
+          id="visit-route-date-picker"
           [(ngModel)]="selectedDate"
           [nzDisabledDate]="disabledDate"
           [nzFormat]="'dd-MM-yyyy'"
           [nzPlaceHolder]="'createVisitRoute.selectDate' | customTranslate"
+          [attr.aria-label]="'createVisitRoute.routeDate' | customTranslate"
           class="w-full">
         </nz-date-picker>
       </div>
@@ -39,7 +41,7 @@
           <h3 class="text-lg font-semibold text-dark dark:text-white">
             {{ 'createVisitRoute.clientsToVisit' | customTranslate }}
           </h3>
-          <span class="text-sm text-gray-500">
+          <span class="text-sm text-gray-600 dark:text-gray-300">
             {{ getSelectedClientsText() }}
           </span>
         </div>
@@ -47,7 +49,7 @@
         <!-- Loading spinner -->
         <div *ngIf="loadingClients" class="text-center py-8">
           <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
-          <p class="mt-4 text-gray-500">{{ 'createVisitRoute.loadingClients' | customTranslate }}</p>
+          <p class="mt-4 text-gray-600 dark:text-gray-300">{{ 'createVisitRoute.loadingClients' | customTranslate }}</p>
         </div>
 
         <!-- Tabla -->
@@ -65,7 +67,8 @@
               <tr *ngFor="let client of paginatedClients">
                 <td class="text-center">
                   <label nz-checkbox 
-                    [(ngModel)]="client.selected">
+                    [(ngModel)]="client.selected"
+                    [attr.aria-label]="('createVisitRoute.table.select' | customTranslate) + ': ' + client.name">
                   </label>
                 </td>
                 <td>
@@ -75,7 +78,7 @@
                   <p>{{ client.address }}</p>
                 </td>
                 <td>
-                  <p>{{ client.email }}</p>
+                  <p class="text-gray-700 dark:text-gray-200">{{ client.email }}</p>
                 </td>
               </tr>
             </tbody>
@@ -96,10 +99,10 @@
 
       <!-- Botones de acción -->
       <div class="flex justify-end gap-4 mt-8">
-        <button class="btn-secondary" (click)="goBack()" [disabled]="loading">
+        <button type="button" class="btn-secondary" (click)="goBack()" [disabled]="loading" [attr.aria-label]="'createVisitRoute.cancel' | customTranslate">
           {{ 'createVisitRoute.cancel' | customTranslate }}
         </button>
-        <button class="btn-primary" (click)="generateVisitRoute()" [disabled]="loading || loadingClients">
+        <button type="button" class="btn-primary" (click)="generateVisitRoute()" [disabled]="loading || loadingClients" [attr.aria-label]="'createVisitRoute.generateRoute' | customTranslate">
           <span *ngIf="!loading">{{ 'createVisitRoute.generateRoute' | customTranslate }}</span>
           <span *ngIf="loading">
             <nz-spin nzSimple [nzSize]="'small'"></nz-spin>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SellersService, Seller, SalesPlan, CreateSalesPlanRequest } from '../../shared/services/sellers.service';
@@ -40,7 +40,7 @@ interface Tab {
   templateUrl: './seller-details.component.html',
   styleUrls: ['./seller-details.component.scss']
 })
-export class SellerDetailsComponent implements OnInit {
+export class SellerDetailsComponent implements OnInit, AfterViewInit {
 
   constructor(
     private route: ActivatedRoute,
@@ -203,6 +203,73 @@ export class SellerDetailsComponent implements OnInit {
         this.activeTab = 'visit-routes';
       }
     });
+  }
+
+  ngAfterViewInit(): void {
+    // Agregar atributos de accesibilidad a los inputs de búsqueda de nz-select
+    setTimeout(() => {
+      this.addAccessibilityToSelectSearchInputs();
+    }, 100);
+  }
+
+  private addAccessibilityToSelectSearchInputs(): void {
+    // Función auxiliar para agregar atributos de accesibilidad
+    const addAccessibilityAttributes = (selectId: string, labelKey: string) => {
+      const selectElement = document.querySelector(`#${selectId}`);
+      if (selectElement) {
+        // Buscar el input de búsqueda - el selector correcto según el HTML renderizado
+        const searchInput = selectElement.querySelector('input.ant-select-selection-search-input') as HTMLInputElement ||
+                          selectElement.querySelector('.ant-select-selection-search input') as HTMLInputElement ||
+                          selectElement.querySelector('nz-select-search input') as HTMLInputElement;
+        
+        if (searchInput) {
+          const label = this.translateService.instant(labelKey);
+          searchInput.setAttribute('aria-label', label);
+          searchInput.setAttribute('title', label);
+          const placeholder = label + ' - ' + this.translateService.instant('common.search');
+          searchInput.setAttribute('placeholder', placeholder);
+        }
+      }
+    };
+
+    // Agregar atributos inicialmente
+    addAccessibilityAttributes('sales-plan-month-select', 'sellerDetails.salesPlan.monthLabel');
+    addAccessibilityAttributes('sales-plan-year-select', 'sellerDetails.salesPlan.yearLabel');
+
+    // Usar MutationObserver para detectar cuando se renderiza el input de búsqueda
+    const monthSelect = document.querySelector('#sales-plan-month-select');
+    const yearSelect = document.querySelector('#sales-plan-year-select');
+
+    if (monthSelect) {
+      const observer = new MutationObserver(() => {
+        addAccessibilityAttributes('sales-plan-month-select', 'sellerDetails.salesPlan.monthLabel');
+      });
+      observer.observe(monthSelect, { childList: true, subtree: true, attributes: true });
+    }
+
+    if (yearSelect) {
+      const observer = new MutationObserver(() => {
+        addAccessibilityAttributes('sales-plan-year-select', 'sellerDetails.salesPlan.yearLabel');
+      });
+      observer.observe(yearSelect, { childList: true, subtree: true, attributes: true });
+    }
+
+    // También escuchar eventos de apertura del select para asegurar que se agreguen los atributos
+    if (monthSelect) {
+      monthSelect.addEventListener('click', () => {
+        setTimeout(() => {
+          addAccessibilityAttributes('sales-plan-month-select', 'sellerDetails.salesPlan.monthLabel');
+        }, 50);
+      });
+    }
+
+    if (yearSelect) {
+      yearSelect.addEventListener('click', () => {
+        setTimeout(() => {
+          addAccessibilityAttributes('sales-plan-year-select', 'sellerDetails.salesPlan.yearLabel');
+        }, 50);
+      });
+    }
   }
 
   private updateTabs(): void {

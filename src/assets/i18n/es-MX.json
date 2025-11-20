@@ -188,9 +188,9 @@
     "loadingError": "No se pudieron cargar las órdenes pendientes. Por favor, intente nuevamente.",
     "selectOrdersError": "Por favor, selecciona al menos una orden para generar la ruta.",
     "selectDateError": "Por favor, selecciona una fecha para la ruta.",
-    "routeCreatedSuccess": "¡Ruta #{id} generada exitosamente!",
+    "routeCreatedSuccess": "¡Ruta #{{id}} generada exitosamente!",
     "routeCreatedError": "No se pudo generar la ruta. Por favor, intente nuevamente.",
-    "routeError": "Error al generar la ruta: {error}"
+    "routeError": "Error al generar la ruta: {{error}}"
   },
   "routes": {
     "title": "Rutas de Entrega",
@@ -423,7 +423,7 @@
       },
       "success": {
         "created": "¡Plan de venta creado exitosamente!",
-        "createdDescription": "El plan \"{name}\" ha sido creado correctamente."
+        "createdDescription": "El plan \"{{name}}\" ha sido creado correctamente."
       },
       "error": {
         "create": "Error al crear plan de venta",
@@ -445,7 +445,7 @@
       },
       "clients": "clientes",
       "minutes": "min",
-      "andMore": "y {count} más",
+      "andMore": "y {{count}} más",
       "status": {
         "draft": "Borrador",
         "confirmed": "Planificada",
@@ -500,7 +500,7 @@
     },
     "success": {
       "addInventory": "¡Inventario agregado exitosamente!",
-      "addInventoryMessage": "Se ha agregado {quantity} unidades del producto al almacén."
+      "addInventoryMessage": "Se ha agregado {{quantity}} unidades del producto al almacén."
     },
     "validation": {
       "required": "Este campo es obligatorio",
@@ -531,7 +531,7 @@
       "createRoute": "No se pudo crear la ruta"
     },
     "success": {
-      "confirmed": "Ruta de visita #{id} confirmada exitosamente. Total: {total} clientes."
+      "confirmed": "Ruta de visita #{{id}} confirmada exitosamente. Total: {{total}} clientes."
     }
   },
   "createVisitRoute": {
@@ -541,7 +541,7 @@
     "routeDate": "Fecha de la ruta de visita",
     "selectDate": "Selecciona la fecha",
     "clientsToVisit": "Clientes para visitar",
-    "selectedClients": "{count} cliente(s) seleccionado(s)",
+    "selectedClients": "{{count}} cliente(s) seleccionado(s)",
     "loadingClients": "Cargando clientes...",
     "table": {
       "select": "Seleccionar",
@@ -559,10 +559,10 @@
       "noClientsAssigned": "Este vendedor no tiene clientes asignados.",
       "loadClients": "No se pudieron cargar los clientes. Por favor, intente nuevamente.",
       "confirmRoute": "No se pudo confirmar la ruta",
-      "confirmRouteError": "Error al confirmar la ruta: {error}"
+      "confirmRouteError": "Error al confirmar la ruta: {{error}}"
     },
     "success": {
-      "confirmed": "Ruta de visita #{id} confirmada exitosamente para {sellerName}. Total: {total} clientes."
+      "confirmed": "Ruta de visita #{{id}} confirmada exitosamente para {{sellerName}}. Total: {{total}} clientes."
     }
   },
   "sellerClients": {

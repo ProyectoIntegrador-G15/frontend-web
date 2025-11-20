@@ -13,10 +13,10 @@
           <div class="py-[30px] px-[40px] content">
             <form [formGroup]="otpForm" (ngSubmit)="submitOTP()" class="otp-form">
               <div class="mb-[25px]">
-                <label class="text-[14px] leading-[1.4285714286] font-medium text-dark dark:text-white/[.87] mb-[8px] block">
+                <label id="otp-label" for="otp-digit-0" class="text-[14px] leading-[1.4285714286] font-medium text-dark dark:text-white/[.87] mb-[8px] block">
                   Código de seguridad
                 </label>
-                <div class="otp-input-container" (paste)="onPaste($event)">
+                <div class="otp-input-container" (paste)="onPaste($event)" role="group" aria-labelledby="otp-label" aria-describedby="otp-help-text">
                   <input
                     #firstInput
                     id="otp-digit-0"
@@ -28,7 +28,9 @@
                     [class.error]="hasFieldError(0)"
                     (input)="onDigitInput($event, 0)"
                     (keydown)="onKeyDown($event, 0)"
-                    autocomplete="off"
+                    autocomplete="one-time-code"
+                    [attr.aria-label]="'Dígito 1 de 6 del código de seguridad'"
+                    aria-required="true"
                     autofocus
                   />
                   <input
@@ -41,7 +43,9 @@
                     [class.error]="hasFieldError(1)"
                     (input)="onDigitInput($event, 1)"
                     (keydown)="onKeyDown($event, 1)"
-                    autocomplete="off"
+                    autocomplete="one-time-code"
+                    [attr.aria-label]="'Dígito 2 de 6 del código de seguridad'"
+                    aria-required="true"
                   />
                   <input
                     id="otp-digit-2"
@@ -53,9 +57,11 @@
                     [class.error]="hasFieldError(2)"
                     (input)="onDigitInput($event, 2)"
                     (keydown)="onKeyDown($event, 2)"
-                    autocomplete="off"
+                    autocomplete="one-time-code"
+                    [attr.aria-label]="'Dígito 3 de 6 del código de seguridad'"
+                    aria-required="true"
                   />
-                  <span class="otp-separator">-</span>
+                  <span class="otp-separator" aria-hidden="true">-</span>
                   <input
                     id="otp-digit-3"
                     type="text"
@@ -66,7 +72,9 @@
                     [class.error]="hasFieldError(3)"
                     (input)="onDigitInput($event, 3)"
                     (keydown)="onKeyDown($event, 3)"
-                    autocomplete="off"
+                    autocomplete="one-time-code"
+                    [attr.aria-label]="'Dígito 4 de 6 del código de seguridad'"
+                    aria-required="true"
                   />
                   <input
                     id="otp-digit-4"
@@ -78,7 +86,9 @@
                     [class.error]="hasFieldError(4)"
                     (input)="onDigitInput($event, 4)"
                     (keydown)="onKeyDown($event, 4)"
-                    autocomplete="off"
+                    autocomplete="one-time-code"
+                    [attr.aria-label]="'Dígito 5 de 6 del código de seguridad'"
+                    aria-required="true"
                   />
                   <input
                     id="otp-digit-5"
@@ -90,7 +100,9 @@
                     [class.error]="hasFieldError(5)"
                     (input)="onDigitInput($event, 5)"
                     (keydown)="onKeyDown($event, 5)"
-                    autocomplete="off"
+                    autocomplete="one-time-code"
+                    [attr.aria-label]="'Dígito 6 de 6 del código de seguridad'"
+                    aria-required="true"
                   />
                 </div>
                 <div *ngIf="error" class="error-message mt-[8px]">
@@ -105,7 +117,7 @@
                   </span>
                 </div>
                 <div *ngIf="!error && !codeSentMessage && !isSendingCode" class="help-text mt-[8px]">
-                  <span class="text-[13px] text-[#8c8c8c] dark:text-white/60">Ingrese el código de 6 dígitos enviado a su correo electrónico</span>
+                  <span id="otp-help-text" class="text-[13px] text-[#595959] dark:text-white/70">Ingrese el código de 6 dígitos enviado a su correo electrónico</span>
                 </div>
               </div>
               <button type="submit" class="btn-primary w-full mb-[15px]" [disabled]="isLoading || isSendingCode">

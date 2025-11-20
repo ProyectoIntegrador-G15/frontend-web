@@ -14,11 +14,11 @@
   display: inline-block;
   margin-left: 6px;
   font-size: 0.75em;
-  color: #8c8c8c;
+  color: #595959;
   font-weight: bold;
 
   &.loading-text {
-    color: #bfbfbf;
+    color: #737373;
   }
 }
 
@@ -113,7 +113,7 @@
 
 .panel-count {
   font-size: 13px;
-  color: #8c8c8c;
+  color: #595959;
   font-weight: 400;
 }
 
@@ -285,7 +285,7 @@
 
 .client-email {
   font-size: 13px;
-  color: #8c8c8c;
+  color: #595959;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -394,14 +394,14 @@
 
 .empty-text {
   font-size: 15px;
-  color: #8c8c8c;
+  color: #595959;
   margin: 0 0 8px 0;
   font-weight: 500;
 }
 
 .empty-hint {
   font-size: 13px;
-  color: #bfbfbf;
+  color: #737373;
   margin: 0;
   font-style: italic;
 }
@@ -456,11 +456,11 @@
   }
 
   .empty-text {
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.7);
   }
 
   .empty-hint {
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.6);
   }
 }
 

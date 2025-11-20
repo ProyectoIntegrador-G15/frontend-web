@@ -112,26 +112,30 @@
         <!-- Selectores de fecha -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div class="space-y-2">
-            <label class="text-sm font-medium text-dark dark:text-white/[.87]">{{ 'performance.startDate' | customTranslate }}</label>
+            <label for="performance-start-date" class="text-sm font-medium text-dark dark:text-white/[.87]">{{ 'performance.startDate' | customTranslate }}</label>
             <nz-date-picker
+              id="performance-start-date"
               [(ngModel)]="performanceData.startDate"
               (ngModelChange)="onStartDateChange($event)"
               nzMode="month"
               nzFormat="MM/yyyy"
               [nzDisabledDate]="disableFutureMonths"
               [nzPlaceHolder]="'performance.selectMonthYear' | customTranslate"
+              [attr.aria-label]="'performance.startDate' | customTranslate"
               class="w-full">
             </nz-date-picker>
           </div>
           <div class="space-y-2">
-            <label class="text-sm font-medium text-dark dark:text-white/[.87]">{{ 'performance.endDate' | customTranslate }}</label>
+            <label for="performance-end-date" class="text-sm font-medium text-dark dark:text-white/[.87]">{{ 'performance.endDate' | customTranslate }}</label>
             <nz-date-picker
+              id="performance-end-date"
               [(ngModel)]="performanceData.endDate"
               (ngModelChange)="onEndDateChange($event)"
               nzMode="month"
               nzFormat="MM/yyyy"
               [nzDisabledDate]="disableFutureMonths"
               [nzPlaceHolder]="'performance.selectMonthYear' | customTranslate"
+              [attr.aria-label]="'performance.endDate' | customTranslate"
               class="w-full">
             </nz-date-picker>
           </div>
@@ -313,22 +317,32 @@
           <div class="sales-plan-controls-row">
             <div class="filters-group">
               <div class="month-filter">
-                <label class="filter-label">{{ 'sellerDetails.salesPlan.monthLabel' | customTranslate }}</label>
+                <label for="sales-plan-month-select" class="filter-label">{{ 'sellerDetails.salesPlan.monthLabel' | customTranslate }}</label>
                 <nz-select
+                  id="sales-plan-month-select"
                   class="month-select"
                   [(ngModel)]="selectedMonth"
                   (ngModelChange)="onMonthChange()"
-                  [nzPlaceHolder]="'sellerDetails.salesPlan.selectMonth' | customTranslate">
+                  [nzPlaceHolder]="'sellerDetails.salesPlan.selectMonth' | customTranslate"
+                  [nzShowSearch]="true"
+                  [nzSearchPlaceholder]="('sellerDetails.salesPlan.monthLabel' | customTranslate) + ' - ' + ('common.search' | customTranslate)"
+                  [attr.aria-label]="'sellerDetails.salesPlan.monthLabel' | customTranslate"
+                  [attr.title]="'sellerDetails.salesPlan.monthLabel' | customTranslate">
                   <nz-option *ngFor="let month of months" [nzValue]="month.value" [nzLabel]="month.label"></nz-option>
                 </nz-select>
               </div>
               <div class="year-filter">
-                <label class="filter-label">{{ 'sellerDetails.salesPlan.yearLabel' | customTranslate }}</label>
+                <label for="sales-plan-year-select" class="filter-label">{{ 'sellerDetails.salesPlan.yearLabel' | customTranslate }}</label>
                 <nz-select
+                  id="sales-plan-year-select"
                   class="year-select"
                   [(ngModel)]="selectedYear"
                   (ngModelChange)="onYearChange()"
-                  [nzPlaceHolder]="'sellerDetails.salesPlan.selectYear' | customTranslate">
+                  [nzPlaceHolder]="'sellerDetails.salesPlan.selectYear' | customTranslate"
+                  [nzShowSearch]="true"
+                  [nzSearchPlaceholder]="('sellerDetails.salesPlan.yearLabel' | customTranslate) + ' - ' + ('common.search' | customTranslate)"
+                  [attr.aria-label]="'sellerDetails.salesPlan.yearLabel' | customTranslate"
+                  [attr.title]="'sellerDetails.salesPlan.yearLabel' | customTranslate">
                   <nz-option *ngFor="let year of years" [nzValue]="year" [nzLabel]="year.toString()"></nz-option>
                 </nz-select>
               </div>
@@ -498,14 +512,16 @@
     <form nz-form nzLayout="vertical" [formGroup]="salesPlanForm" (ngSubmit)="handleSalesPlanModalOk()">
       <nz-form-item>
         <nz-form-control [nzValidateStatus]="getFieldStatus('name')" [nzErrorTip]="getFieldError('name')">
-          <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+          <nz-form-label [nzFor]="'sales-plan-name'" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
             {{ 'sellerDetails.salesPlan.modal.planName' | customTranslate }} <span class="text-red-500">*</span>
           </nz-form-label>
           <input 
+            id="sales-plan-name"
             class="w-full rounded-[6px] text-[16px] dark:bg-white/10 px-[16px] py-[12px] min-h-[50px] outline-none" 
             type="text" 
             nz-input 
             [placeholder]="'sellerDetails.salesPlan.modal.planNamePlaceholder' | customTranslate" 
+            [attr.aria-label]="'sellerDetails.salesPlan.modal.planName' | customTranslate"
             formControlName="name">
         </nz-form-control>
       </nz-form-item>
@@ -514,15 +530,17 @@
         <div nz-col nzXs="24" nzSm="12">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('start_month')" [nzErrorTip]="getFieldError('start_month')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+              <nz-form-label [nzFor]="'sales-plan-start-month'" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 {{ 'sellerDetails.salesPlan.modal.startMonth' | customTranslate }} <span class="text-red-500">*</span>
               </nz-form-label>
               <nz-date-picker
+                id="sales-plan-start-month"
                 [formControl]="salesPlanForm.get('start_month')"
                 nzMode="month"
                 nzFormat="yyyy-MM"
                 [nzPlaceHolder]="'sellerDetails.salesPlan.modal.selectMonthYear' | customTranslate"
                 [nzDisabledDate]="disableFutureMonthsForSalesPlan"
+                [attr.aria-label]="'sellerDetails.salesPlan.modal.startMonth' | customTranslate"
                 class="w-full">
               </nz-date-picker>
             </nz-form-control>
@@ -531,15 +549,17 @@
         <div nz-col nzXs="24" nzSm="12">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('end_month')" [nzErrorTip]="getFieldError('end_month')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+              <nz-form-label [nzFor]="'sales-plan-end-month'" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 {{ 'sellerDetails.salesPlan.modal.endMonth' | customTranslate }} <span class="text-red-500">*</span>
               </nz-form-label>
               <nz-date-picker
+                id="sales-plan-end-month"
                 [formControl]="salesPlanForm.get('end_month')"
                 nzMode="month"
                 nzFormat="yyyy-MM"
                 [nzPlaceHolder]="'sellerDetails.salesPlan.modal.selectMonthYear' | customTranslate"
                 [nzDisabledDate]="disableFutureMonthsForSalesPlan"
+                [attr.aria-label]="'sellerDetails.salesPlan.modal.endMonth' | customTranslate"
                 class="w-full">
               </nz-date-picker>
             </nz-form-control>
@@ -551,14 +571,16 @@
         <div nz-col nzXs="24" nzSm="12">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('total_units_target')" [nzErrorTip]="getFieldError('total_units_target')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+              <nz-form-label [nzFor]="'sales-plan-total-units'" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 {{ 'sellerDetails.salesPlan.modal.totalUnits' | customTranslate }} <span class="text-red-500">*</span>
               </nz-form-label>
               <input 
+                id="sales-plan-total-units"
                 class="w-full rounded-[6px] text-[16px] dark:bg-white/10 px-[16px] py-[12px] min-h-[50px] outline-none" 
                 type="number" 
                 nz-input 
                 [placeholder]="'sellerDetails.salesPlan.modal.totalUnitsPlaceholder' | customTranslate" 
+                [attr.aria-label]="'sellerDetails.salesPlan.modal.totalUnits' | customTranslate"
                 formControlName="total_units_target"
                 min="1">
             </nz-form-control>
@@ -567,14 +589,16 @@
         <div nz-col nzXs="24" nzSm="12">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('total_value_target')" [nzErrorTip]="getFieldError('total_value_target')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+              <nz-form-label [nzFor]="'sales-plan-total-value'" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
                 {{ 'sellerDetails.salesPlan.modal.totalValue' | customTranslate }} <span class="text-red-500">*</span>
               </nz-form-label>
               <input 
+                id="sales-plan-total-value"
                 class="w-full rounded-[6px] text-[16px] dark:bg-white/10 px-[16px] py-[12px] min-h-[50px] outline-none" 
                 type="number" 
                 nz-input 
                 [placeholder]="'sellerDetails.salesPlan.modal.totalValuePlaceholder' | customTranslate" 
+                [attr.aria-label]="'sellerDetails.salesPlan.modal.totalValue' | customTranslate"
                 formControlName="total_value_target"
                 step="0.01"
                 min="0.01">
@@ -585,14 +609,16 @@
 
       <nz-form-item>
         <nz-form-control [nzValidateStatus]="getFieldStatus('visits_target')" [nzErrorTip]="getFieldError('visits_target')">
-          <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+          <nz-form-label [nzFor]="'sales-plan-visits-target'" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
             {{ 'sellerDetails.salesPlan.modal.visitsTarget' | customTranslate }} <span class="text-red-500">*</span>
           </nz-form-label>
           <input 
+            id="sales-plan-visits-target"
             class="w-full rounded-[6px] text-[16px] dark:bg-white/10 px-[16px] py-[12px] min-h-[50px] outline-none" 
             type="number" 
             nz-input 
             [placeholder]="'sellerDetails.salesPlan.modal.visitsTargetPlaceholder' | customTranslate" 
+            [attr.aria-label]="'sellerDetails.salesPlan.modal.visitsTarget' | customTranslate"
             formControlName="visits_target"
             min="1">
         </nz-form-control>

@@ -188,9 +188,9 @@
     "loadingError": "Could not load pending orders. Please try again.",
     "selectOrdersError": "Please select at least one order to generate the route.",
     "selectDateError": "Please select a date for the route.",
-    "routeCreatedSuccess": "Route #{id} generated successfully!",
+    "routeCreatedSuccess": "Route #{{id}} generated successfully!",
     "routeCreatedError": "Could not generate the route. Please try again.",
-    "routeError": "Error generating route: {error}"
+    "routeError": "Error generating route: {{error}}"
   },
   "routes": {
     "title": "Delivery Routes",
@@ -423,7 +423,7 @@
       },
       "success": {
         "created": "Sales plan created successfully!",
-        "createdDescription": "The plan \"{name}\" has been created successfully."
+        "createdDescription": "The plan \"{{name}}\" has been created successfully."
       },
       "error": {
         "create": "Error creating sales plan",
@@ -445,7 +445,7 @@
       },
       "clients": "clients",
       "minutes": "min",
-      "andMore": "and {count} more",
+      "andMore": "and {{count}} more",
       "status": {
         "draft": "Draft",
         "confirmed": "Planned",
@@ -500,7 +500,7 @@
     },
     "success": {
       "addInventory": "Inventory added successfully!",
-      "addInventoryMessage": "{quantity} units of the product have been added to the warehouse."
+      "addInventoryMessage": "{{quantity}} units of the product have been added to the warehouse."
     },
     "validation": {
       "required": "This field is required",
@@ -531,7 +531,7 @@
       "createRoute": "Could not create route"
     },
     "success": {
-      "confirmed": "Visit route #{id} confirmed successfully. Total: {total} clients."
+      "confirmed": "Visit route #{{id}} confirmed successfully. Total: {{total}} clients."
     }
   },
   "createVisitRoute": {
@@ -541,7 +541,7 @@
     "routeDate": "Visit route date",
     "selectDate": "Select date",
     "clientsToVisit": "Clients to visit",
-    "selectedClients": "{count} client(s) selected",
+    "selectedClients": "{{count}} client(s) selected",
     "loadingClients": "Loading clients...",
     "table": {
       "select": "Select",
@@ -559,10 +559,10 @@
       "noClientsAssigned": "This seller has no assigned clients.",
       "loadClients": "Could not load clients. Please try again.",
       "confirmRoute": "Could not confirm route",
-      "confirmRouteError": "Error confirming route: {error}"
+      "confirmRouteError": "Error confirming route: {{error}}"
     },
     "success": {
-      "confirmed": "Visit route #{id} confirmed successfully for {sellerName}. Total: {total} clients."
+      "confirmed": "Visit route #{{id}} confirmed successfully for {{sellerName}}. Total: {{total}} clients."
     }
   },
   "sellerClients": {
