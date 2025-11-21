@@ -446,6 +446,148 @@ describe('RoutesService', () => {
     });
   });
 
+  describe('getRouteDetail', () => {
+    it('should fetch route detail successfully', (done) => {
+      service.getRouteDetail('1').subscribe({
+        next: (route) => {
+          expect(route).toBeTruthy();
+          expect(route.id).toBe('1');
+          expect(route.originWarehouse).toBe('Bodega Central Bogotá');
+          expect(route.assignedTruck).toBe('VEH-001');
+          expect(route.waypoints.length).toBe(1);
+          done();
+        },
+        error: done.fail
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}/1`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockApiRoutes[0]);
+    });
+
+    it('should parse metrics correctly when valid JSON', (done) => {
+      const routeWithMetrics = {
+        ...mockApiRoutes[0],
+        gmaps_metrics: JSON.stringify({
+          performed_shipment_count: 5,
+          total_duration: 3600,
+          travel_distance_meters: 15000,
+          total_cost: 50000
+        })
+      };
+
+      service.getRouteDetail('1').subscribe({
+        next: (route) => {
+          expect(route.metrics).toBeTruthy();
+          expect(route.metrics?.performedShipmentCount).toBe(5);
+          expect(route.metrics?.totalDuration).toBe(3600);
+          expect(route.metrics?.travelDistanceMeters).toBe(15000);
+          expect(route.metrics?.totalCost).toBe(50000);
+          done();
+        },
+        error: done.fail
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}/1`);
+      req.flush(routeWithMetrics);
+    });
+
+    it('should handle metrics with null values', (done) => {
+      const routeWithNullMetrics = {
+        ...mockApiRoutes[0],
+        gmaps_metrics: JSON.stringify({
+          performed_shipment_count: null,
+          total_duration: null,
+          travel_distance_meters: null,
+          total_cost: null
+        })
+      };
+
+      service.getRouteDetail('1').subscribe({
+        next: (route) => {
+          expect(route.metrics).toBeTruthy();
+          expect(route.metrics?.performedShipmentCount).toBeNull();
+          expect(route.metrics?.totalDuration).toBeNull();
+          expect(route.metrics?.travelDistanceMeters).toBeNull();
+          expect(route.metrics?.totalCost).toBeNull();
+          done();
+        },
+        error: done.fail
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}/1`);
+      req.flush(routeWithNullMetrics);
+    });
+
+    it('should handle metrics with non-numeric values', (done) => {
+      const routeWithInvalidMetrics = {
+        ...mockApiRoutes[0],
+        gmaps_metrics: JSON.stringify({
+          performed_shipment_count: 'not a number',
+          total_duration: 'invalid',
+          travel_distance_meters: Infinity,
+          total_cost: NaN
+        })
+      };
+
+      service.getRouteDetail('1').subscribe({
+        next: (route) => {
+          expect(route.metrics).toBeTruthy();
+          expect(route.metrics?.performedShipmentCount).toBeNull();
+          expect(route.metrics?.totalDuration).toBeNull();
+          expect(route.metrics?.travelDistanceMeters).toBeNull();
+          expect(route.metrics?.totalCost).toBeNull();
+          done();
+        },
+        error: done.fail
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}/1`);
+      req.flush(routeWithInvalidMetrics);
+    });
+
+    it('should handle route with waypoints that are not pickups', (done) => {
+      const routeWithDeliveryWaypoints = {
+        ...mockApiRoutes[0],
+        waypoints: [
+          {
+            id: 1,
+            order_id: 1,
+            sequence: 0,
+            point_name: 'Bodega Central Bogotá',
+            point_address: 'Calle 123 #45-67',
+            arrival_time: null,
+            pickup: true
+          },
+          {
+            id: 2,
+            order_id: 2,
+            sequence: 1,
+            point_name: 'Cliente 1',
+            point_address: 'Calle 100 #50-30',
+            arrival_time: '2025-10-14T10:00:00',
+            pickup: false
+          }
+        ]
+      };
+
+      service.getRouteDetail('1').subscribe({
+        next: (route) => {
+          expect(route.originWarehouse).toBe('Bodega Central Bogotá');
+          expect(route.waypoints.length).toBe(2);
+          expect(route.waypoints[0].pickup).toBe(true);
+          expect(route.waypoints[1].pickup).toBe(false);
+          done();
+        },
+        error: done.fail
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}/1`);
+      req.flush(routeWithDeliveryWaypoints);
+    });
+
+  });
+
   describe('createRoute', () => {
     it('should create a new route successfully', (done) => {
       const routeData = {
@@ -495,6 +637,30 @@ describe('RoutesService', () => {
       const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
       req.flush({ detail: 'Debe incluir al menos una orden' }, { status: 400, statusText: 'Bad Request' });
     });
+
+    it('should handle error when vehicle not found', (done) => {
+      const routeData = {
+        vehicle_id: 999,
+        date: '2025-10-27',
+        orders: [1, 2]
+      };
+
+      service.createRoute(routeData).subscribe({
+        next: () => {
+          fail('Should have failed');
+          done();
+        },
+        error: (error) => {
+          expect(error).toBeTruthy();
+          expect(error.message).toBeTruthy();
+          done();
+        }
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
+      expect(req.request.method).toBe('POST');
+      req.flush({ detail: 'Vehículo no encontrado' }, { status: 404, statusText: 'Not Found' });
+    });
   });
 
   describe('Error Handling', () => {
@@ -509,6 +675,91 @@ describe('RoutesService', () => {
 
       const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}`);
       req.flush({ detail: 'Error en el backend' }, { status: 500, statusText: 'Server Error' });
+    });
+
+    it('should handle routes with null metrics', (done) => {
+      const routeWithNullMetrics = {
+        ...mockApiRoutes[0],
+        gmaps_metrics: null
+      };
+
+      service.getRouteDetail('1').subscribe((route) => {
+        expect(route.metrics).toBeNull();
+        done();
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}/1`);
+      req.flush(routeWithNullMetrics);
+    });
+
+    it('should handle routes with invalid JSON metrics', (done) => {
+      const routeWithInvalidMetrics = {
+        ...mockApiRoutes[0],
+        gmaps_metrics: 'invalid json'
+      };
+
+      service.getRouteDetail('1').subscribe((route) => {
+        expect(route.metrics).toBeNull();
+        done();
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}/1`);
+      req.flush(routeWithInvalidMetrics);
+    });
+
+    it('should handle routes with empty waypoints', (done) => {
+      const routeWithNoWaypoints = {
+        ...mockApiRoutes[0],
+        waypoints: []
+      };
+
+      service.getRouteDetail('1').subscribe((route) => {
+        expect(route.waypoints.length).toBe(0);
+        expect(route.originWarehouse).toBe('No asignado');
+        done();
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}/1`);
+      req.flush(routeWithNoWaypoints);
+    });
+
+    it('should map unknown status to planned', (done) => {
+      const routeWithUnknownStatus = {
+        ...mockApiRoutes[0],
+        state: 'unknown_status'
+      };
+
+      service.getRouteDetail('1').subscribe((route) => {
+        expect(route.status).toBe('planned');
+        done();
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}/1`);
+      req.flush(routeWithUnknownStatus);
+    });
+
+    it('should handle routes with all status types', (done) => {
+      const statuses = ['scheduled', 'in_transit', 'delivered', 'failed', 'cancelled'];
+      let completed = 0;
+
+      statuses.forEach((status, index) => {
+        const route = {
+          ...mockApiRoutes[0],
+          id: index + 10,
+          state: status
+        };
+
+        service.getRouteDetail((index + 10).toString()).subscribe((r) => {
+          expect(r.status).toBeDefined();
+          completed++;
+          if (completed === statuses.length) {
+            done();
+          }
+        });
+
+        const req = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.routes}/${index + 10}`);
+        req.flush(route);
+      });
     });
   });
 });
