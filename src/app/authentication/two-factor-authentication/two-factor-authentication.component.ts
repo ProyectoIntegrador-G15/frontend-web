@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, OnDestroy } fr
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthenticationService } from '../../shared/services/authentication.service';
+import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -28,7 +29,8 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit, 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private auth: AuthenticationService
+    private auth: AuthenticationService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -156,7 +158,7 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit, 
       next: () => {
         this.isSendingCode = false;
         this.codeSent = true;
-        this.codeSentMessage = 'Código de verificación enviado a tu correo electrónico';
+        this.codeSentMessage = this.translate.instant('auth.twoFactorAuth.codeSent');
         // Limpiar el mensaje después de 5 segundos
         setTimeout(() => {
           this.codeSentMessage = '';
@@ -164,7 +166,8 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit, 
       },
       error: (err) => {
         this.isSendingCode = false;
-        this.showError(err.message || 'Error al enviar el código de verificación. Por favor, intente nuevamente.');
+        const errorMessage = err.message || this.translate.instant('auth.twoFactorAuth.errors.sendError');
+        this.showError(errorMessage);
         // Si hay error al enviar, redirigir al login después de un tiempo
         setTimeout(() => {
           this.redirectToLogin();
@@ -193,7 +196,7 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit, 
           control.updateValueAndValidity({ onlySelf: true });
         }
       });
-      this.showError('Por favor, complete todos los campos del código de seguridad.');
+      this.showError(this.translate.instant('auth.twoFactorAuth.errors.completeFields'));
       return;
     }
 
@@ -202,7 +205,7 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit, 
     
     // Validar que todos los dígitos estén diligenciados
     if (otpCode.length !== 6) {
-      this.showError('Por favor, complete todos los campos del código de seguridad.');
+      this.showError(this.translate.instant('auth.twoFactorAuth.errors.completeFields'));
       return;
     }
 
@@ -226,34 +229,38 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit, 
         // Manejar diferentes tipos de errores
         if (err.status === 423) {
           // Sesión bloqueada
-          this.showError('Sesión bloqueada por múltiples intentos fallidos. Serás redirigido al login.');
+          this.showError(this.translate.instant('auth.twoFactorAuth.errors.sessionBlocked'));
           setTimeout(() => {
             this.redirectToLogin();
           }, 2000);
         } else if (err.status === 401) {
           // Código inválido o expirado
           if (this.failedAttempts >= this.MAX_ATTEMPTS) {
-            this.showError('Has excedido el número máximo de intentos. Serás redirigido al login.');
+            this.showError(this.translate.instant('auth.twoFactorAuth.errors.maxAttemptsReached'));
             setTimeout(() => {
               this.redirectToLogin();
             }, 2000);
           } else {
             const remainingAttempts = this.MAX_ATTEMPTS - this.failedAttempts;
-            this.showError(
-              err.message || 
-              `Código inválido. Te quedan ${remainingAttempts} intento${remainingAttempts > 1 ? 's' : ''}.`
-            );
+            const plural = remainingAttempts > 1 ? 's' : '';
+            let errorMessage = err.message;
+            if (!errorMessage) {
+              const translated = this.translate.instant('auth.twoFactorAuth.errors.invalidCode');
+              errorMessage = translated.replace('{{remaining}}', remainingAttempts.toString()).replace('{{plural}}', plural);
+            }
+            this.showError(errorMessage);
             this.clearOTPFields();
           }
         } else {
           // Otro error
           if (this.failedAttempts >= this.MAX_ATTEMPTS) {
-            this.showError('Has excedido el número máximo de intentos. Serás redirigido al login.');
+            this.showError(this.translate.instant('auth.twoFactorAuth.errors.maxAttemptsReached'));
             setTimeout(() => {
               this.redirectToLogin();
             }, 2000);
           } else {
-            this.showError(err.message || 'Error al validar el código. Por favor, intente nuevamente.');
+            const errorMessage = err.message || this.translate.instant('auth.twoFactorAuth.errors.validateError');
+            this.showError(errorMessage);
             this.clearOTPFields();
           }
         }
@@ -313,6 +320,13 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit, 
   hasFieldError(index: number): boolean {
     const control = this.otpForm.get(`digit${index}`);
     return !!(control && control.invalid && (control.dirty || control.touched));
+  }
+
+  /**
+   * Obtiene el label traducido para un dígito del código OTP
+   */
+  getDigitLabel(index: number): string {
+    return this.translate.instant('auth.twoFactorAuth.digitLabel', { number: index + 1 });
   }
 }
 

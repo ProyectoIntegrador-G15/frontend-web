@@ -146,7 +146,17 @@
     "filterByCountry": "Filter by country",
     "searchByName": "Search suppliers by name",
     "searchByNit": "Search suppliers by NIT",
-    "searchByCountry": "Search suppliers by country"
+    "searchByCountry": "Search suppliers by country",
+    "bulkUpload": "Bulk Upload",
+    "downloadTemplate": "Download Template",
+    "excelTemplate": "Excel Template",
+    "excelFormat": ".xlsx format",
+    "csvTemplate": "CSV Template",
+    "csvFormat": ".csv format",
+    "dragFileHere": "Drag file here or click to select",
+    "supportedFormats": "Supported formats: CSV (.csv) or Excel (.xlsx)",
+    "errorsFound": "Errors found",
+    "uploadFile": "Upload File"
   },
   "auth": {
     "signInTitle": "Sign in MediSupply",
@@ -162,7 +172,28 @@
     "or": "or",
     "dontHaveAccount": "Don't have an account?",
     "signUp": "Sign up",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "twoFactorAuth": {
+      "title": "2FA Authentication",
+      "securityCode": "Security code",
+      "securityCodeLabel": "Security code",
+      "digitLabel": "Digit {{number}} of 6 of the security code",
+      "helpText": "Enter the 6-digit code sent to your email",
+      "confirm": "Confirm",
+      "validating": "Validating...",
+      "resendCode": "Resend code",
+      "sending": "Sending...",
+      "sendingCode": "Sending verification code...",
+      "codeSent": "Verification code sent to your email",
+      "errors": {
+        "completeFields": "Please complete all security code fields.",
+        "invalidCode": "Invalid code. You have {{remaining}} attempt {{plural}} remaining.",
+        "maxAttemptsReached": "You have exceeded the maximum number of attempts. You will be redirected to login.",
+        "sessionBlocked": "Session blocked due to multiple failed attempts. You will be redirected to login.",
+        "sendError": "Error sending verification code. Please try again.",
+        "validateError": "Error validating code. Please try again."
+      }
+    }
   },
   "createRoute": {
     "title": "Generate delivery route",
