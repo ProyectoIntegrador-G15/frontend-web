@@ -438,6 +438,9 @@ describe('ApiService', () => {
                !request.params.has('filter') &&
                request.params.get('search') === 'test';
       });
+      expect(req.request.params.get('page')).toBe('1');
+      expect(req.request.params.has('filter')).toBe(false);
+      expect(req.request.params.get('search')).toBe('test');
       req.flush({ success: true, message: 'OK' });
     });
 

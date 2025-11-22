@@ -182,7 +182,7 @@ describe('LoginComponent', () => {
       authService.firebaseLogin.and.returnValue(throwError(() => error));
       component.submitForm();
       expect(component.error).toBe(true);
-      expect(component.errorMessage).toContain('Ocurrió un error');
+      expect(component.errorMessage).toBe('Ocurrió un error al intentar iniciar sesión. Por favor, intente nuevamente.');
     });
   });
 

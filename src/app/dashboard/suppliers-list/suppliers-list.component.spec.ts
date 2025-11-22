@@ -1,5 +1,5 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { SuppliersListComponent } from './suppliers-list.component';
 import { SuppliersService, Supplier } from '../../shared/services/suppliers.service';
@@ -7,6 +7,15 @@ import { Router } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { of, throwError, Subscription } from 'rxjs';
 import { Pipe, PipeTransform } from '@angular/core';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzGridModule } from 'ng-zorro-antd/grid';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 // Mock pipe for customTranslate
 @Pipe({ name: 'customTranslate' })
@@ -76,6 +85,19 @@ describe('SuppliersListComponent', () => {
     translateServiceSpy.instant.and.callFake((key: string) => key);
 
     TestBed.configureTestingModule({
+      imports: [
+        ReactiveFormsModule,
+        FormsModule,
+        NzModalModule,
+        NzFormModule,
+        NzInputModule,
+        NzSelectModule,
+        NzTableModule,
+        NzButtonModule,
+        NzIconModule,
+        NzGridModule,
+        BrowserAnimationsModule
+      ],
       declarations: [SuppliersListComponent, MockCustomTranslatePipe],
       providers: [
         FormBuilder,
