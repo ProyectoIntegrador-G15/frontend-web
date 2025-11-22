@@ -40,10 +40,18 @@ export class AuthTokenInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         // Si recibimos un 401 (Unauthorized), el token es inválido o expirado
         if (error.status === 401 && isApiRequest) {
-          // Limpiar la autenticación
-          this.authService.logout();
-          // Redirigir al login
-          this.router.navigate(['/authentication/login']);
+          // Excluir la validación de TOTP del manejo automático del 401
+          // porque el componente debe manejar los errores de validación de TOTP
+          const isTotpValidation = req.url.includes('/auth/totp/validate');
+          const hasPendingToken = this.authService.getPendingToken();
+          
+          // Solo redirigir si NO es una validación de TOTP o si no hay token pendiente
+          if (!isTotpValidation || !hasPendingToken) {
+            // Limpiar la autenticación
+            this.authService.logout();
+            // Redirigir al login
+            this.router.navigate(['/authentication/login']);
+          }
         }
         return throwError(() => error);
       })

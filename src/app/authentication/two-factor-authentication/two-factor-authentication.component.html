@@ -8,13 +8,13 @@
       <div nz-col nzXs="24" nzSm="18" nzMd="12" nzXl="8" nzXXl="6">
         <div class="rounded-6 mt-[25px] shadow_[0px_5px_20px_rgba(173,181,217, 0.03)] dark:shadow_[0px_5px_15px_rgba(0, 0, 0, .1)] bg-white dark:bg-[#1b1d2a]">
           <div class="p-[25px] text-center border-b border-regular dark:border-white/[.05] top">
-            <h2 class="text-18 font-semibold leading-[1] mb-0 text-dark dark:text-white/[.87] title">Autenticación 2FA</h2>
+            <h2 class="text-18 font-semibold leading-[1] mb-0 text-dark dark:text-white/[.87] title">{{ 'auth.twoFactorAuth.title' | customTranslate }}</h2>
           </div>
           <div class="py-[30px] px-[40px] content">
             <form [formGroup]="otpForm" (ngSubmit)="submitOTP()" class="otp-form">
               <div class="mb-[25px]">
                 <label id="otp-label" for="otp-digit-0" class="text-[14px] leading-[1.4285714286] font-medium text-dark dark:text-white/[.87] mb-[8px] block">
-                  Código de seguridad
+                  {{ 'auth.twoFactorAuth.securityCodeLabel' | customTranslate }}
                 </label>
                 <div class="otp-input-container" (paste)="onPaste($event)" role="group" aria-labelledby="otp-label" aria-describedby="otp-help-text">
                   <input
@@ -29,7 +29,7 @@
                     (input)="onDigitInput($event, 0)"
                     (keydown)="onKeyDown($event, 0)"
                     autocomplete="one-time-code"
-                    [attr.aria-label]="'Dígito 1 de 6 del código de seguridad'"
+                    [attr.aria-label]="getDigitLabel(0)"
                     aria-required="true"
                     autofocus
                   />
@@ -44,7 +44,7 @@
                     (input)="onDigitInput($event, 1)"
                     (keydown)="onKeyDown($event, 1)"
                     autocomplete="one-time-code"
-                    [attr.aria-label]="'Dígito 2 de 6 del código de seguridad'"
+                    [attr.aria-label]="getDigitLabel(1)"
                     aria-required="true"
                   />
                   <input
@@ -58,7 +58,7 @@
                     (input)="onDigitInput($event, 2)"
                     (keydown)="onKeyDown($event, 2)"
                     autocomplete="one-time-code"
-                    [attr.aria-label]="'Dígito 3 de 6 del código de seguridad'"
+                    [attr.aria-label]="getDigitLabel(2)"
                     aria-required="true"
                   />
                   <span class="otp-separator" aria-hidden="true">-</span>
@@ -73,7 +73,7 @@
                     (input)="onDigitInput($event, 3)"
                     (keydown)="onKeyDown($event, 3)"
                     autocomplete="one-time-code"
-                    [attr.aria-label]="'Dígito 4 de 6 del código de seguridad'"
+                    [attr.aria-label]="getDigitLabel(3)"
                     aria-required="true"
                   />
                   <input
@@ -87,7 +87,7 @@
                     (input)="onDigitInput($event, 4)"
                     (keydown)="onKeyDown($event, 4)"
                     autocomplete="one-time-code"
-                    [attr.aria-label]="'Dígito 5 de 6 del código de seguridad'"
+                    [attr.aria-label]="getDigitLabel(4)"
                     aria-required="true"
                   />
                   <input
@@ -101,7 +101,7 @@
                     (input)="onDigitInput($event, 5)"
                     (keydown)="onKeyDown($event, 5)"
                     autocomplete="one-time-code"
-                    [attr.aria-label]="'Dígito 6 de 6 del código de seguridad'"
+                    [attr.aria-label]="getDigitLabel(5)"
                     aria-required="true"
                   />
                 </div>
@@ -113,23 +113,23 @@
                 </div>
                 <div *ngIf="isSendingCode && !error" class="info-message mt-[8px]">
                   <span class="text-[13px] text-[#1890ff] dark:text-[#40a9ff]">
-                    <i class="fas fa-spinner fa-spin"></i> Enviando código de verificación...
+                    <i class="fas fa-spinner fa-spin"></i> {{ 'auth.twoFactorAuth.sendingCode' | customTranslate }}
                   </span>
                 </div>
                 <div *ngIf="!error && !codeSentMessage && !isSendingCode" class="help-text mt-[8px]">
-                  <span id="otp-help-text" class="text-[13px] text-[#595959] dark:text-white/70">Ingrese el código de 6 dígitos enviado a su correo electrónico</span>
+                  <span id="otp-help-text" class="text-[13px] text-[#595959] dark:text-white/70">{{ 'auth.twoFactorAuth.helpText' | customTranslate }}</span>
                 </div>
               </div>
               <button type="submit" class="btn-primary w-full mb-[15px]" [disabled]="isLoading || isSendingCode">
                 <i class="fas fa-cog fa-spin" [hidden]="!isLoading"></i>
-                <span [hidden]="isLoading">Confirmar</span>
-                <span [hidden]="!isLoading">Validando...</span>
+                <span [hidden]="isLoading">{{ 'auth.twoFactorAuth.confirm' | customTranslate }}</span>
+                <span [hidden]="!isLoading">{{ 'auth.twoFactorAuth.validating' | customTranslate }}</span>
               </button>
               <button type="button" class="btn-secondary w-full" (click)="sendTotpCode()" [disabled]="isSendingCode || isLoading">
                 <i class="fas fa-paper-plane" [hidden]="isSendingCode"></i>
                 <i class="fas fa-spinner fa-spin" [hidden]="!isSendingCode"></i>
-                <span [hidden]="isSendingCode">Reenviar código</span>
-                <span [hidden]="!isSendingCode">Enviando...</span>
+                <span [hidden]="isSendingCode">{{ 'auth.twoFactorAuth.resendCode' | customTranslate }}</span>
+                <span [hidden]="!isSendingCode">{{ 'auth.twoFactorAuth.sending' | customTranslate }}</span>
               </button>
             </form>
           </div>

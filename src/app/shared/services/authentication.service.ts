@@ -27,7 +27,7 @@ export class AuthenticationService {
     const user = storedUser ? JSON.parse(storedUser) : null;
     this.currentUserSubject = new BehaviorSubject<User>(user);
     this.currentUser = this.currentUserSubject.asObservable();
-    
+
     // Inicializar token en ApiService si existe (buscar en ambos storages)
     const token = this.getToken();
     if (token) {
@@ -78,7 +78,7 @@ export class AuthenticationService {
     if (!token) {
       return '';
     }
-    
+
     const decoded = this.decodeToken(token);
     if (!decoded) {
       return '';
@@ -96,7 +96,7 @@ export class AuthenticationService {
     if (!token) {
       return '';
     }
-    
+
     const decoded = this.decodeToken(token);
     if (!decoded) {
       return '';
@@ -114,7 +114,7 @@ export class AuthenticationService {
     if (!token) {
       return null;
     }
-    
+
     const decoded = this.decodeToken(token);
     if (!decoded) {
       return null;
@@ -139,7 +139,7 @@ export class AuthenticationService {
       const email = this.getAuthEmail() || '';
       return email.charAt(0).toUpperCase();
     }
-    
+
     const parts = name.trim().split(' ');
     if (parts.length >= 2) {
       return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
@@ -156,13 +156,13 @@ export class AuthenticationService {
     let token = localStorage.getItem('idToken');
     let expiryAt = localStorage.getItem('tokenExpiryAt');
     let storage = localStorage;
-    
+
     if (!token) {
       token = sessionStorage.getItem('idToken');
       expiryAt = sessionStorage.getItem('tokenExpiryAt');
       storage = sessionStorage;
     }
-    
+
     if (!token) {
       return false;
     }
@@ -189,13 +189,13 @@ export class AuthenticationService {
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('tokenExpiryAt');
     localStorage.removeItem('authEmail');
-    
+
     sessionStorage.removeItem('currentUser');
     sessionStorage.removeItem('idToken');
     sessionStorage.removeItem('refreshToken');
     sessionStorage.removeItem('tokenExpiryAt');
     sessionStorage.removeItem('authEmail');
-    
+
     this.apiService.removeAuthToken();
     this.currentUserSubject.next(null);
   }
@@ -232,6 +232,9 @@ export class AuthenticationService {
           sessionStorage.setItem('pendingAuthEmail', resp.email);
         }
         return resp;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return throwError(() => error);
       })
     );
   }
@@ -304,7 +307,7 @@ export class AuthenticationService {
     const authUrl = `${environment.apiUrl}${environment.apiEndpoints.authentication}/totp/send`;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`
     });
 
     return this.http.post<any>(authUrl, {}, { headers }).pipe(
@@ -332,7 +335,7 @@ export class AuthenticationService {
     const authUrl = `${environment.apiUrl}${environment.apiEndpoints.authentication}/totp/validate`;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`
     });
 
     return this.http.post<any>(authUrl, { code }, { headers }).pipe(
