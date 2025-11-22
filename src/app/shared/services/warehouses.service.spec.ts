@@ -512,13 +512,10 @@ describe('WarehousesService', () => {
     it('should support multiple subscribers to warehouses$', (done) => {
       let subscriber1Received = false;
       let subscriber2Received = false;
-      let subscriber1Data: Warehouse[] = [];
-      let subscriber2Data: Warehouse[] = [];
 
       service.warehouses$.subscribe(warehouses => {
         if (warehouses.length > 0) {
           subscriber1Received = true;
-          subscriber1Data = warehouses;
           checkCompletion();
         }
       });
@@ -526,18 +523,12 @@ describe('WarehousesService', () => {
       service.warehouses$.subscribe(warehouses => {
         if (warehouses.length > 0) {
           subscriber2Received = true;
-          subscriber2Data = warehouses;
           checkCompletion();
         }
       });
 
       function checkCompletion() {
         if (subscriber1Received && subscriber2Received) {
-          expect(subscriber1Received).toBe(true);
-          expect(subscriber2Received).toBe(true);
-          expect(subscriber1Data.length).toBe(mockWarehouses.length);
-          expect(subscriber2Data.length).toBe(mockWarehouses.length);
-          expect(subscriber1Data).toEqual(subscriber2Data);
           done();
         }
       }

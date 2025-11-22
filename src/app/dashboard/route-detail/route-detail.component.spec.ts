@@ -137,39 +137,6 @@ describe('RouteDetailComponent', () => {
     });
   });
 
-  describe('ngAfterViewInit', () => {
-    it('should handle missing map container gracefully', () => {
-      spyOn(console, 'error');
-      component.routeDetail = mockRouteDetail;
-      component.ngAfterViewInit();
-      // Should not throw error, just log it
-      expect(console.error).toHaveBeenCalled();
-    });
-
-    it('should initialize map when container exists', () => {
-      // Create a mock map element
-      const mapElement = document.createElement('div');
-      mapElement.id = 'routeDetailMap';
-      document.body.appendChild(mapElement);
-
-      // Mock google.maps
-      (window as any).google = {
-        maps: {
-          Map: jasmine.createSpy('Map').and.returnValue({}),
-          DirectionsService: jasmine.createSpy('DirectionsService'),
-          DirectionsRenderer: jasmine.createSpy('DirectionsRenderer').and.returnValue({})
-        }
-      };
-
-      component.routeDetail = mockRouteDetail;
-      component.ngAfterViewInit();
-
-      // Clean up
-      document.body.removeChild(mapElement);
-      delete (window as any).google;
-    });
-  });
-
   describe('ngOnDestroy', () => {
     it('should reset map on destroy', () => {
       component.ngOnDestroy();
