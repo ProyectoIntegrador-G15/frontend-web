@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 })
 export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('firstInput', { static: false }) firstInput!: ElementRef<HTMLInputElement>;
-  
+
   otpForm!: FormGroup;
   isLoading = false;
   isSendingCode = false;
@@ -20,7 +20,7 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit, 
   errorMessage = '';
   codeSent = false;
   codeSentMessage = '';
-  
+
   // Contador de intentos fallidos
   private failedAttempts = 0;
   private readonly MAX_ATTEMPTS = 3;
@@ -129,7 +129,7 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit, 
    */
   onKeyDown(event: KeyboardEvent, index: number): void {
     const input = event.target as HTMLInputElement;
-    
+
     if (event.key === 'Backspace' && !input.value && index > 0) {
       const prevInput = document.getElementById(`otp-digit-${index - 1}`) as HTMLInputElement;
       if (prevInput) {
@@ -202,7 +202,7 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit, 
 
     // Obtener el código completo
     const otpCode = this.getOTPCode();
-    
+
     // Validar que todos los dígitos estén diligenciados
     if (otpCode.length !== 6) {
       this.showError(this.translate.instant('auth.twoFactorAuth.errors.completeFields'));
@@ -245,8 +245,10 @@ export class TwoFactorAuthenticationComponent implements OnInit, AfterViewInit, 
             const plural = remainingAttempts > 1 ? 's' : '';
             let errorMessage = err.message;
             if (!errorMessage) {
-              const translated = this.translate.instant('auth.twoFactorAuth.errors.invalidCode');
-              errorMessage = translated.replace('{{remaining}}', remainingAttempts.toString()).replace('{{plural}}', plural);
+              errorMessage = this.translate.instant('auth.twoFactorAuth.errors.invalidCode', {
+                remaining: remainingAttempts,
+                plural
+              });
             }
             this.showError(errorMessage);
             this.clearOTPFields();

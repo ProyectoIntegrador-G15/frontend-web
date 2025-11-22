@@ -5,9 +5,18 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of, throwError } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
+import { Pipe, PipeTransform } from '@angular/core';
 import { TwoFactorAuthenticationComponent } from './two-factor-authentication.component';
 import { AuthenticationService } from '../../shared/services/authentication.service';
 import { ApiService } from '../../shared/services/api/api.service';
+
+// Mock pipe for customTranslate
+@Pipe({ name: 'customTranslate' })
+class MockCustomTranslatePipe implements PipeTransform {
+  transform(key: string): string {
+    return key; // Return the key as the translation for testing
+  }
+}
 
 describe('TwoFactorAuthenticationComponent', () => {
   let component: TwoFactorAuthenticationComponent;
@@ -45,16 +54,16 @@ describe('TwoFactorAuthenticationComponent', () => {
         'auth.twoFactorAuth.errors.validateError': 'Error al validar el código. Por favor, intente nuevamente.',
         'auth.twoFactorAuth.digitLabel': 'Dígito {{number}} de 6 del código de seguridad'
       };
-      
+
       let translation = translations[key] || key;
-      
+
       // Reemplazar parámetros si existen
       if (params) {
         Object.keys(params).forEach(paramKey => {
           translation = translation.replace(`{{${paramKey}}}`, params[paramKey]);
         });
       }
-      
+
       return translation;
     });
 
@@ -66,7 +75,7 @@ describe('TwoFactorAuthenticationComponent', () => {
     }));
 
     await TestBed.configureTestingModule({
-      declarations: [TwoFactorAuthenticationComponent],
+      declarations: [TwoFactorAuthenticationComponent, MockCustomTranslatePipe],
       imports: [ReactiveFormsModule, HttpClientTestingModule],
       providers: [
         { provide: AuthenticationService, useValue: authServiceSpy },
@@ -401,14 +410,14 @@ describe('TwoFactorAuthenticationComponent', () => {
 
     it('should move to next field when digit is entered', () => {
       fixture.detectChanges(); // Renderizar el componente para que los inputs estén en el DOM
-      
+
       const event = {
         target: { value: '1' }
       } as any;
-      
+
       const nextInput = document.getElementById('otp-digit-1') as HTMLInputElement;
       expect(nextInput).toBeTruthy(); // Verificar que el elemento existe
-      
+
       spyOn(nextInput, 'focus');
       spyOn(nextInput, 'select');
 
@@ -507,10 +516,10 @@ describe('TwoFactorAuthenticationComponent', () => {
 
     it('should move to previous field on backspace when current is empty', () => {
       fixture.detectChanges(); // Renderizar el componente para que los inputs estén en el DOM
-      
+
       const prevInput = document.getElementById('otp-digit-0') as HTMLInputElement;
       expect(prevInput).toBeTruthy(); // Verificar que el elemento existe
-      
+
       spyOn(prevInput, 'focus');
       spyOn(prevInput, 'select');
 
@@ -527,10 +536,10 @@ describe('TwoFactorAuthenticationComponent', () => {
 
     it('should not move to previous field if current has value', () => {
       fixture.detectChanges(); // Renderizar el componente para que los inputs estén en el DOM
-      
+
       const prevInput = document.getElementById('otp-digit-0') as HTMLInputElement;
       expect(prevInput).toBeTruthy(); // Verificar que el elemento existe
-      
+
       spyOn(prevInput, 'focus');
 
       const event = {
@@ -604,14 +613,14 @@ describe('TwoFactorAuthenticationComponent', () => {
 
     it('should return translated label for digit', () => {
       const label = component.getDigitLabel(0);
-      
+
       expect(label).toBe('Dígito 1 de 6 del código de seguridad');
       expect(translateService.instant).toHaveBeenCalledWith('auth.twoFactorAuth.digitLabel', { number: 1 });
     });
 
     it('should return correct label for different digits', () => {
       const label = component.getDigitLabel(5);
-      
+
       expect(label).toBe('Dígito 6 de 6 del código de seguridad');
       expect(translateService.instant).toHaveBeenCalledWith('auth.twoFactorAuth.digitLabel', { number: 6 });
     });
