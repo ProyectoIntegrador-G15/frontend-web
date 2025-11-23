@@ -17,7 +17,8 @@
     "inactive": "Inactive",
     "warning": "Warning",
     "back": "Back",
-    "required": "(required)"
+    "required": "(required)",
+    "errors": "errors"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -156,7 +157,8 @@
     "dragFileHere": "Drag file here or click to select",
     "supportedFormats": "Supported formats: CSV (.csv) or Excel (.xlsx)",
     "errorsFound": "Errors found",
-    "uploadFile": "Upload File"
+    "uploadFile": "Upload File",
+    "tableScrollableRegion": "Suppliers table with horizontal scrolling"
   },
   "auth": {
     "signInTitle": "Sign in MediSupply",

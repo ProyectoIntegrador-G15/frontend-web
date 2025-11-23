@@ -17,7 +17,8 @@
     "inactive": "Inactivo",
     "warning": "Advertencia",
     "back": "Regresar",
-    "required": "(requerido)"
+    "required": "(requerido)",
+    "errors": "errores"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -156,7 +157,8 @@
     "dragFileHere": "Arrastra el archivo aquí o haz clic para seleccionar",
     "supportedFormats": "Formatos soportados: CSV (.csv) o Excel (.xlsx)",
     "errorsFound": "Errores encontrados",
-    "uploadFile": "Cargar Archivo"
+    "uploadFile": "Cargar Archivo",
+    "tableScrollableRegion": "Tabla de proveedores con desplazamiento horizontal"
   },
   "auth": {
     "signInTitle": "Iniciar sesión en MediSupply",

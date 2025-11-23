@@ -22,3 +22,20 @@
   border-width: 0;
 }
 
+// Estilos de accesibilidad para elementos desplazables con teclado
+[role="region"]:focus,
+[role="list"]:focus {
+  outline: 2px solid #1890ff;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+// Mejora visual para la lista de errores con scroll
+[role="list"] {
+  scroll-behavior: smooth;
+  
+  &:focus {
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+}
+
