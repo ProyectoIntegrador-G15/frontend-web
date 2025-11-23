@@ -9,6 +9,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { ReportsComponent } from './reports.component';
 import { ReportsService, Report, ReportApiResponse, ReportsPaginatedResponse } from '../../shared/services/reports.service';
+import { AuthenticationService } from '../../shared/services/authentication.service';
 
 @Pipe({ name: 'customTranslate' })
 class MockCustomTranslatePipe implements PipeTransform {
@@ -23,6 +24,7 @@ describe('ReportsComponent', () => {
   let mockTranslateService: jasmine.SpyObj<TranslateService>;
   let mockReportsService: jasmine.SpyObj<ReportsService>;
   let mockNotificationService: jasmine.SpyObj<NzNotificationService>;
+  let mockAuthService: jasmine.SpyObj<AuthenticationService>;
   let windowOpenSpy: jasmine.Spy;
 
   const mockReportsPaginatedResponse: ReportsPaginatedResponse = {
@@ -77,6 +79,8 @@ describe('ReportsComponent', () => {
     ]);
 
     const notificationSpy = jasmine.createSpyObj('NzNotificationService', ['success', 'error', 'warning']);
+    const authServiceSpy = jasmine.createSpyObj('AuthenticationService', ['getUserId']);
+    authServiceSpy.getUserId.and.returnValue(1); // Mock para retornar ID de usuario
 
     // Mock window.open para prevenir descargas reales durante los tests
     windowOpenSpy = spyOn(window, 'open').and.returnValue(null);
@@ -107,7 +111,8 @@ describe('ReportsComponent', () => {
         FormBuilder,
         { provide: TranslateService, useValue: translateSpy },
         { provide: ReportsService, useValue: reportsServiceSpy },
-        { provide: NzNotificationService, useValue: notificationSpy }
+        { provide: NzNotificationService, useValue: notificationSpy },
+        { provide: AuthenticationService, useValue: authServiceSpy }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -117,6 +122,7 @@ describe('ReportsComponent', () => {
     mockTranslateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
     mockReportsService = TestBed.inject(ReportsService) as jasmine.SpyObj<ReportsService>;
     mockNotificationService = TestBed.inject(NzNotificationService) as jasmine.SpyObj<NzNotificationService>;
+    mockAuthService = TestBed.inject(AuthenticationService) as jasmine.SpyObj<AuthenticationService>;
 
     // Setup default mocks
     mockReportsService.getReportsPaginated.and.returnValue(of(mockReportsPaginatedResponse));

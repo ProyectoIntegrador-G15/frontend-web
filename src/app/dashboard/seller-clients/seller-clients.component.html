@@ -5,7 +5,7 @@
     <h1 class="screen-title">
       {{ 'sellers.manageClients' | customTranslate }}
       <span *ngIf="sellerName" class="seller-name-subtitle">{{ sellerName }}</span>
-      <span *ngIf="!sellerName && !loading" class="seller-name-subtitle loading-text">Cargando...</span>
+      <span *ngIf="!sellerName && !loading" class="seller-name-subtitle loading-text">{{ 'sellerClients.loading' | customTranslate }}</span>
     </h1>
   </div>
 
@@ -27,7 +27,7 @@
         <span nz-icon nzType="team" nzTheme="outline" class="panel-icon assigned-icon"></span>
         <div class="panel-title-section">
           <h2 class="panel-title">{{ 'sellers.assignedClients' | customTranslate }}</h2>
-          <span class="panel-count">{{ assignedClients.length }} {{ assignedClients.length === 1 ? 'cliente' : 'clientes' }}</span>
+          <span class="panel-count">{{ assignedClients.length }} {{ assignedClients.length === 1 ? ('sellerClients.client' | customTranslate) : ('sellerClients.clients' | customTranslate) }}</span>
         </div>
       </div>
 
@@ -43,7 +43,7 @@
         <div *ngIf="assignedClients.length === 0" class="empty-state">
           <span nz-icon nzType="drag" nzTheme="outline" class="empty-icon"></span>
           <p class="empty-text">{{ 'sellers.noAssignedClients' | customTranslate }}</p>
-          <p class="empty-hint">Arrastra clientes aquí para asignarlos</p>
+          <p class="empty-hint">{{ 'sellerClients.dragToAssign' | customTranslate }}</p>
         </div>
 
         <div 
@@ -88,7 +88,7 @@
         <span nz-icon nzType="user-add" nzTheme="outline" class="panel-icon available-icon"></span>
         <div class="panel-title-section">
           <h2 class="panel-title">{{ 'sellers.availableClients' | customTranslate }}</h2>
-          <span class="panel-count">{{ availableClients.length }} {{ availableClients.length === 1 ? 'cliente' : 'clientes' }}</span>
+          <span class="panel-count">{{ availableClients.length }} {{ availableClients.length === 1 ? ('sellerClients.client' | customTranslate) : ('sellerClients.clients' | customTranslate) }}</span>
         </div>
       </div>
 
@@ -104,7 +104,7 @@
         <div *ngIf="availableClients.length === 0" class="empty-state">
           <span nz-icon nzType="drag" nzTheme="outline" class="empty-icon"></span>
           <p class="empty-text">{{ 'sellers.noAvailableClients' | customTranslate }}</p>
-          <p class="empty-hint">Arrastra clientes aquí para desasignarlos</p>
+          <p class="empty-hint">{{ 'sellerClients.dragToUnassign' | customTranslate }}</p>
         </div>
 
         <div 

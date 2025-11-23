@@ -178,6 +178,9 @@ describe('AuthenticationService', () => {
       const mockResponse = { msg: 'TOTP válido' };
       const code = '123456';
 
+      // Configurar rememberMe antes de validar para que use localStorage
+      sessionStorage.setItem('rememberMe', 'true');
+      
       service.validateTotp(code).subscribe(response => {
         expect(response).toEqual(mockResponse);
       });
@@ -187,7 +190,7 @@ describe('AuthenticationService', () => {
       expect(req.request.body).toEqual({ code });
       expect(req.request.headers.get('Authorization')).toBe('Bearer test-token-123');
       req.flush(mockResponse);
-
+      
       // Verificar que se finalizó la autenticación
       expect(localStorage.getItem('idToken')).toBe('test-token-123');
       expect(localStorage.getItem('refreshToken')).toBe('refresh-token-456');
@@ -256,6 +259,7 @@ describe('AuthenticationService', () => {
       sessionStorage.setItem('pendingRefreshToken', 'refresh-token-456');
       sessionStorage.setItem('pendingTokenExpiryAt', '1234567890');
       sessionStorage.setItem('pendingAuthEmail', 'test@example.com');
+      sessionStorage.setItem('rememberMe', 'true'); // Configurar rememberMe para usar localStorage
 
       service.finalizeAuthentication();
 
@@ -282,6 +286,7 @@ describe('AuthenticationService', () => {
     it('should handle missing optional fields gracefully', () => {
       sessionStorage.setItem('pendingIdToken', 'test-token');
       sessionStorage.setItem('pendingAuthEmail', 'test@example.com');
+      sessionStorage.setItem('rememberMe', 'true'); // Configurar rememberMe para usar localStorage
 
       service.finalizeAuthentication();
 
@@ -360,6 +365,7 @@ describe('AuthenticationService', () => {
       sendReq.flush({ msg: 'Código enviado' });
 
       // Step 3: Validate TOTP
+      sessionStorage.setItem('rememberMe', 'true'); // Configurar rememberMe antes de validar
       service.validateTotp('123456').subscribe();
       const validateReq = httpMock.expectOne(`${environment.apiUrl}${environment.apiEndpoints.authentication}/totp/validate`);
       validateReq.flush({ msg: 'TOTP válido' });

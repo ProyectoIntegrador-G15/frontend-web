@@ -124,7 +124,7 @@
       <div class="col-span-12 xl:col-span-7 map-card">
         <div class="flex items-center justify-between mb-4">
           <h3 class="subtitle">{{ 'routeDetail.map.title' | customTranslate }}</h3>
-          <div class="legend" role="list" aria-label="Leyenda del mapa">
+          <div class="legend" role="list" [attr.aria-label]="'routeDetail.map.title' | customTranslate">
             <span class="legend-item" role="listitem">
               <span class="legend-dot pickup" aria-hidden="true"></span>
               {{ 'routeDetail.pickupLabel' | customTranslate }}

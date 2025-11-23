@@ -2,6 +2,7 @@ import {Component, OnInit, OnDestroy} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Subscription, Subject} from 'rxjs';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {TranslateService} from '@ngx-translate/core';
 import {NzNotificationService} from 'ng-zorro-antd/notification';
 import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
 
@@ -49,6 +50,7 @@ export class WarehouseInventoryComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private fb: FormBuilder,
+    private translateService: TranslateService,
     private notification: NzNotificationService
   ) {
   }
@@ -93,7 +95,8 @@ export class WarehouseInventoryComponent implements OnInit, OnDestroy {
             id: product.id.toString(),
             name: product.name,
             purchase_price: product.purchase_price,
-            supplier: product.supplier_id.toString(),
+            supplier: null, // El endpoint de warehouse no incluye información del supplier
+            supplier_id: product.supplier_id,
             requires_cold_chain: product.requires_cold_chain,
             status: product.status ?? true,
             description: product.description,
@@ -107,7 +110,7 @@ export class WarehouseInventoryComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error en búsqueda:', error);
-          this.errorMessage = 'Error al buscar productos.';
+          this.errorMessage = this.translateService.instant('warehouseInventory.error.loadProducts');
           this.isLoading = false;
         }
       });
@@ -123,10 +126,10 @@ export class WarehouseInventoryComponent implements OnInit, OnDestroy {
   }
 
   getStatusText(status: boolean | string | undefined): string {
-    if (typeof status === 'boolean') {
-      return status ? 'Activo' : 'Inactivo';
-    }
-    return status === 'active' ? 'Activo' : 'Inactivo';
+    const key = (typeof status === 'boolean' ? status : status === 'active') 
+      ? 'common.active' 
+      : 'common.inactive';
+    return this.translateService.instant(key);
   }
 
   getStatusClass(status: boolean | string | undefined): string {
@@ -261,11 +264,9 @@ export class WarehouseInventoryComponent implements OnInit, OnDestroy {
         this.isInventoryModalVisible = false;
         this.resetInventoryForm();
 
-        this.notification.create(
-          'success',
-          '¡Inventario agregado exitosamente!',
-          `Se ha agregado ${inventoryData.quantity} unidades del producto a la bodega.`
-        );
+        const successTitle = this.translateService.instant('warehouseInventory.success.addInventory');
+        const successMessage = this.translateService.instant('warehouseInventory.success.addInventoryMessage', { quantity: inventoryData.quantity });
+        this.notification.create('success', successTitle, successMessage);
 
         // Recargar datos de la bodega
         this.getProductsByWarehouse();
@@ -275,16 +276,14 @@ export class WarehouseInventoryComponent implements OnInit, OnDestroy {
         console.error('Error:', error);
 
         this.isInventoryModalLoading = false;
-        this.errorMessage = 'Error al agregar inventario. Por favor, inténtalo de nuevo.';
+        this.errorMessage = this.translateService.instant('warehouseInventory.error.addInventory');
 
         // Rehabilitar el formulario en caso de error
         this.inventoryForm.enable();
 
-        this.notification.create(
-          'error',
-          'Error al agregar inventario',
-          'No se pudo agregar el inventario. Por favor, verifica los datos e inténtalo de nuevo.'
-        );
+        const errorTitle = this.translateService.instant('warehouseInventory.error.addInventoryTitle');
+        const errorMessage = this.translateService.instant('warehouseInventory.error.addInventoryMessage');
+        this.notification.create('error', errorTitle, errorMessage);
       }
     });
   }
@@ -307,10 +306,10 @@ export class WarehouseInventoryComponent implements OnInit, OnDestroy {
     const field = this.inventoryForm.get(fieldName);
     if (field && field.errors) {
       if (field.errors.required) {
-        return 'Este campo es obligatorio';
+        return this.translateService.instant('warehouseInventory.validation.required');
       }
       if (field.errors.min) {
-        return 'La cantidad debe ser mayor a 0';
+        return this.translateService.instant('warehouseInventory.validation.minQuantity');
       }
     }
     return '';

@@ -99,7 +99,7 @@
                 nzId="country-select"
                 nzLabelId="country-label"
                 [nzPlaceHolder]="'suppliers.selectCountry' | customTranslate"
-                [attr.aria-label]="('suppliers.country' | customTranslate) + ' (requerido)'"
+                [attr.aria-label]="('suppliers.country' | customTranslate) + ' ' + ('common.required' | customTranslate)"
                 [attr.aria-labelledby]="'country-label'"
                 [attr.aria-describedby]="'country-label'"
                 nzAllowClear
@@ -139,6 +139,133 @@
       <button class="btn-primary-sm" (click)="handleSupplierModalOk()" [nzLoading]="isSupplierModalLoading">
         <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
         {{ 'suppliers.createSupplier' | customTranslate }}
+      </button>
+    </div>
+  </ng-template>
+</nz-modal>
+
+<!-- Modal de carga masiva -->
+<nz-modal
+  [(nzVisible)]="isBulkUploadModalVisible"
+  [nzTitle]="bulkUploadModalTitle"
+  [nzContent]="bulkUploadModalContent"
+  [nzFooter]="bulkUploadModalFooter"
+  (nzOnCancel)="handleBulkUploadModalCancel()"
+  nzWidth="75%"
+>
+  <ng-template #bulkUploadModalTitle>{{ 'suppliers.bulkUpload' | customTranslate }}</ng-template>
+
+  <ng-template #bulkUploadModalContent>
+    <div class="space-y-6">
+
+      <!-- Descargar plantillas -->
+      <div class="bg-gray-50 dark:bg-white/5 p-4 rounded-lg border border-dashed border-gray-300 dark:border-white/10">
+        <div class="text-center mb-4">
+          <p class="font-medium text-dark dark:text-white/[.87] mb-1">{{ 'suppliers.downloadTemplate' | customTranslate }}</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- Plantilla Excel -->
+          <div class="flex items-center justify-between p-3 bg-white dark:bg-white/10 rounded-lg border border-gray-200 dark:border-white/20">
+            <div class="flex items-center gap-3">
+              <span nz-icon nzType="file-excel" nzTheme="outline" class="text-green-500 text-xl" aria-hidden="true"></span>
+              <div>
+                <p class="font-medium text-dark dark:text-white/[.87] text-sm">{{ 'suppliers.excelTemplate' | customTranslate }}</p>
+                <p class="text-xs text-gray-500 dark:text-white/50">{{ 'suppliers.excelFormat' | customTranslate }}</p>
+              </div>
+            </div>
+            <button
+              class="btn-secondary-sm text-xs px-3 py-1"
+              (click)="downloadExcelTemplate()">
+              <span nz-icon nzType="download" nzTheme="outline" class="text-xs" aria-hidden="true"></span>
+              {{ 'suppliers.downloadTemplate' | customTranslate }}
+            </button>
+          </div>
+
+          <!-- Plantilla CSV -->
+          <div class="flex items-center justify-between p-3 bg-white dark:bg-white/10 rounded-lg border border-gray-200 dark:border-white/20">
+            <div class="flex items-center gap-3">
+              <span nz-icon nzType="file-text" nzTheme="outline" class="text-blue-500 text-xl" aria-hidden="true"></span>
+              <div>
+                <p class="font-medium text-dark dark:text-white/[.87] text-sm">{{ 'suppliers.csvTemplate' | customTranslate }}</p>
+                <p class="text-xs text-gray-500 dark:text-white/50">{{ 'suppliers.csvFormat' | customTranslate }}</p>
+              </div>
+            </div>
+            <button
+              class="btn-secondary-sm text-xs px-3 py-1"
+              (click)="downloadCsvTemplate()">
+              <span nz-icon nzType="download" nzTheme="outline" class="text-xs" aria-hidden="true"></span>
+              {{ 'suppliers.downloadTemplate' | customTranslate }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Área de carga -->
+      <div class="upload-area">
+        <nz-upload
+          class="upload-list-inline"
+          nzListType="picture"
+          nzType="drag"
+          [nzMultiple]="false"
+          [nzFileList]="fileList"
+          nzAccept=".xlsx,.csv"
+          [nzCustomRequest]="customRequest"
+          [nzBeforeUpload]="beforeUpload"
+          [nzDownload]="onFileDownload"
+          (nzChange)="handleFileChange($event)"
+        >
+          <p class="text-center mb-[20px]">
+            <span nz-icon nzType="cloud-upload" nzTheme="outline" class="text-6xl text-blue-500" aria-hidden="true"></span>
+          </p>
+          <p class="text-[20px] font-medium text-dark dark:text-white/[.87]">
+            {{ 'suppliers.dragFileHere' | customTranslate }}
+          </p>
+          <p class="text-sm text-gray-500 dark:text-white/50 mt-2">
+            {{ 'suppliers.supportedFormats' | customTranslate }}
+          </p>
+        </nz-upload>
+      </div>
+
+      <!-- Sección de errores -->
+      <div *ngIf="bulkUploadErrors.length > 0" class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+        <div class="flex items-center gap-2 mb-3">
+          <span nz-icon nzType="exclamation-circle" nzTheme="outline" class="text-red-500 text-lg" aria-hidden="true"></span>
+          <h4 id="errors-heading" class="font-medium text-red-700 dark:text-red-400">{{ 'suppliers.errorsFound' | customTranslate }}</h4>
+        </div>
+        <ul 
+          class="space-y-2 max-h-60 overflow-y-auto"
+          role="list"
+          tabindex="0"
+          [attr.aria-labelledby]="'errors-heading'"
+          [attr.aria-label]="('suppliers.errorsFound' | customTranslate) + ': ' + bulkUploadErrors.length + ' ' + ('common.errors' | customTranslate)"
+          (keydown)="onErrorsListKeyDown($event)"
+          #errorsList>
+          <li *ngFor="let error of bulkUploadErrors; let i = index" 
+              class="text-sm text-red-600 dark:text-red-300 bg-red-100 dark:bg-red-900/30 px-3 py-2 rounded"
+              role="listitem">
+            {{ error }}
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </ng-template>
+
+  <ng-template #bulkUploadModalFooter>
+    <div class="flex justify-center gap-3 w-full">
+      <button class="btn-secondary-sm" (click)="handleBulkUploadModalCancel()">
+        {{ 'common.cancel' | customTranslate }}
+      </button>
+      <button
+        class="btn-primary-sm"
+        (click)="loadFile()"
+        [disabled]="isBulkUploadLoading"
+        [class.opacity-50]="isBulkUploadLoading"
+        [class.cursor-not-allowed]="isBulkUploadLoading">
+        <span nz-icon nzType="upload" nzTheme="outline" *ngIf="!isBulkUploadLoading" aria-hidden="true"></span>
+        <span nz-icon nzType="loading" nzTheme="outline" *ngIf="isBulkUploadLoading" aria-hidden="true"></span>
+        {{ isBulkUploadLoading ? ('common.loading' | customTranslate) : ('suppliers.uploadFile' | customTranslate) }}
       </button>
     </div>
   </ng-template>
@@ -184,11 +311,15 @@
       </div>
     </div>
 
-    <!-- Botón crear proveedor -->
-    <div class="w-full sm:w-auto">
+    <!-- Botones de acción -->
+    <div class="w-full sm:w-auto flex flex-col sm:flex-row gap-3">
       <button class="btn-primary-sm w-full sm:w-auto" (click)="showSupplierModal()">
         <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
         {{ 'suppliers.createSupplier' | customTranslate }}
+      </button>
+      <button class="btn-secondary-sm w-full sm:w-auto" (click)="loadBulkSuppliers()">
+        <span nz-icon nzType="upload" nzTheme="outline" aria-hidden="true"></span>
+        {{ 'suppliers.bulkUpload' | customTranslate }}
       </button>
     </div>
   </div>
@@ -197,7 +328,13 @@
 <div
   class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
   <div class="p-[25px]">
-    <div class="w-full overflow-x-auto">
+    <div 
+      class="w-full overflow-x-auto"
+      tabindex="0"
+      role="region"
+      [attr.aria-label]="'suppliers.tableScrollableRegion' | customTranslate"
+      (keydown)="onTableScrollKeyDown($event)"
+      #tableScrollContainer>
       <nz-table
         #suppliersTable
         [nzData]="suppliers"

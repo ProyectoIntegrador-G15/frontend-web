@@ -16,7 +16,9 @@
     "active": "Active",
     "inactive": "Inactive",
     "warning": "Warning",
-    "back": "Back"
+    "back": "Back",
+    "required": "(required)",
+    "errors": "errors"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -145,20 +147,55 @@
     "filterByCountry": "Filter by country",
     "searchByName": "Search suppliers by name",
     "searchByNit": "Search suppliers by NIT",
-    "searchByCountry": "Search suppliers by country"
+    "searchByCountry": "Search suppliers by country",
+    "bulkUpload": "Bulk Upload",
+    "downloadTemplate": "Download Template",
+    "excelTemplate": "Excel Template",
+    "excelFormat": ".xlsx format",
+    "csvTemplate": "CSV Template",
+    "csvFormat": ".csv format",
+    "dragFileHere": "Drag file here or click to select",
+    "supportedFormats": "Supported formats: CSV (.csv) or Excel (.xlsx)",
+    "errorsFound": "Errors found",
+    "uploadFile": "Upload File",
+    "tableScrollableRegion": "Suppliers table with horizontal scrolling"
   },
   "auth": {
     "signInTitle": "Sign in MediSupply",
-    "usernameOrEmail": "Username or Email Address",
-    "usernameOrEmailPlaceholder": "Username or Email",
+    "email": "Email",
+    "emailPlaceholder": "example@gmail.com",
+    "emailError": "Please enter a valid email address",
     "password": "Password",
-    "passwordPlaceholder": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "passwordError": "Please input your Password!",
     "keepLoggedIn": "Keep me logged in",
     "forgotPassword": "Forgot Password?",
     "loginButton": "Log in",
     "or": "or",
     "dontHaveAccount": "Don't have an account?",
-    "signUp": "Sign up"
+    "signUp": "Sign up",
+    "signOut": "Sign Out",
+    "twoFactorAuth": {
+      "title": "2FA Authentication",
+      "securityCode": "Security code",
+      "securityCodeLabel": "Security code",
+      "digitLabel": "Digit {{number}} of 6 of the security code",
+      "helpText": "Enter the 6-digit code sent to your email",
+      "confirm": "Confirm",
+      "validating": "Validating...",
+      "resendCode": "Resend code",
+      "sending": "Sending...",
+      "sendingCode": "Sending verification code...",
+      "codeSent": "Verification code sent to your email",
+      "errors": {
+        "completeFields": "Please complete all security code fields.",
+        "invalidCode": "Invalid code. You have {{remaining}} attempt {{plural}} remaining.",
+        "maxAttemptsReached": "You have exceeded the maximum number of attempts. You will be redirected to login.",
+        "sessionBlocked": "Session blocked due to multiple failed attempts. You will be redirected to login.",
+        "sendError": "Error sending verification code. Please try again.",
+        "validateError": "Error validating code. Please try again."
+      }
+    }
   },
   "createRoute": {
     "title": "Generate delivery route",
@@ -184,9 +221,9 @@
     "loadingError": "Could not load pending orders. Please try again.",
     "selectOrdersError": "Please select at least one order to generate the route.",
     "selectDateError": "Please select a date for the route.",
-    "routeCreatedSuccess": "Route #{id} generated successfully!",
+    "routeCreatedSuccess": "Route #{{id}} generated successfully!",
     "routeCreatedError": "Could not generate the route. Please try again.",
-    "routeError": "Error generating route: {error}"
+    "routeError": "Error generating route: {{error}}"
   },
   "routes": {
     "title": "Delivery Routes",
@@ -326,5 +363,246 @@
     "quantitySoldLabel": "Quantity sold (units)",
     "productsLabel": "Products",
     "quantitySoldSeries": "Quantity sold"
+  },
+  "productInventory": {
+    "medication": "Medication",
+    "id": "ID",
+    "notAvailable": "N/A",
+    "warehouses": "Warehouses",
+    "withInventory": "with inventory",
+    "totalQuantity": "Total Quantity",
+    "availableUnits": "available units",
+    "warehouseName": "Warehouse Name",
+    "location": "Location",
+    "address": "Address",
+    "sector": "Sector",
+    "availableQuantity": "Available Quantity",
+    "status": "Status",
+    "units": "units",
+    "noInventoryAvailable": "No inventory available",
+    "noInventoryDescription": "This product has no inventory in any warehouse",
+    "loadingInventory": "Loading inventory...",
+    "loadingInventoryDescription": "Getting warehouse and product information",
+    "errorLoadingInventory": "Error loading product inventory."
+  },
+  "sellerDetails": {
+    "title": "Seller Profile",
+    "loadingSeller": "Loading seller information...",
+    "backToSellers": "Back to sellers",
+    "subtitle": "View the performance and sales plan of each seller",
+    "tabs": {
+      "information": "Information",
+      "performance": "Performance",
+      "salesPlan": "Sales Plan",
+      "visitRoutes": "Visit Routes"
+    },
+    "personalInfo": {
+      "title": "Personal Information",
+      "identification": "Identification",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "entryDate": "Entry Date",
+      "notSpecified": "Not specified"
+    },
+    "commercialInfo": {
+      "title": "Commercial Information",
+      "commission": "Commission",
+      "salesTarget": "Sales Target",
+      "notDefined": "Not defined"
+    },
+    "salesPlan": {
+      "title": "Sales plan of",
+      "monthLabel": "Plan month:",
+      "yearLabel": "Plan year:",
+      "selectMonth": "Select month",
+      "selectYear": "Select year",
+      "createPlan": "Create plan",
+      "loadingPlans": "Loading sales plans...",
+      "noPlans": "No sales plans",
+      "noPlansDescription": "No sales plans have been created for this seller in the selected month and year.",
+      "tableHeaders": {
+        "planName": "Plan name",
+        "totalUnits": "Total target (units)",
+        "totalValue": "Total target ($)",
+        "period": "Period"
+      },
+      "modal": {
+        "title": "Create sales plan",
+        "planName": "Plan name:",
+        "planNamePlaceholder": "Ex: Q1 2025 Sales Plan",
+        "startMonth": "Start month:",
+        "endMonth": "End month:",
+        "selectMonthYear": "Select month and year",
+        "totalUnits": "Total target (units):",
+        "totalUnitsPlaceholder": "Ex: 1000",
+        "totalValue": "Total target (value $):",
+        "totalValuePlaceholder": "Ex: 5000000",
+        "visitsTarget": "Visits target:",
+        "visitsTargetPlaceholder": "Ex: 50",
+        "cancel": "Cancel",
+        "create": "Create plan"
+      },
+      "errors": {
+        "required": "This field is required",
+        "min": "The value must be greater than 0",
+        "minlength": "This field is too short",
+        "maxlength": "This field is too long",
+        "invalidDate": "The selected date is not valid",
+        "dateInPast": "Cannot select a date before the current month",
+        "dateTooFar": "Cannot select a date more than 6 months in the future",
+        "endBeforeStart": "The end date must be after the start date",
+        "startAfterEnd": "The start date cannot be after the end date"
+      },
+      "success": {
+        "created": "Sales plan created successfully!",
+        "createdDescription": "The plan \"{{name}}\" has been created successfully."
+      },
+      "error": {
+        "create": "Error creating sales plan",
+        "loadSeller": "Seller information not found"
+      }
+    },
+    "visitRoutes": {
+      "title": "Scheduled visit routes",
+      "generateRoute": "Generate visit route",
+      "loadingRoutes": "Loading routes...",
+      "noRoutes": "No visit routes",
+      "noRoutesDescription": "No visit routes have been generated for this seller yet.",
+      "tableHeaders": {
+        "id": "ID",
+        "date": "Date",
+        "clients": "Clients",
+        "duration": "Duration",
+        "status": "Status"
+      },
+      "clients": "clients",
+      "minutes": "min",
+      "andMore": "and {{count}} more",
+      "status": {
+        "draft": "Draft",
+        "confirmed": "Planned",
+        "inProgress": "In progress",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      }
+    },
+    "error": {
+      "loadSeller": "Could not load seller information"
+    }
+  },
+  "warehouseInventory": {
+    "title": "Products by warehouse:",
+    "loading": "Loading...",
+    "back": "Back",
+    "addInventory": "Add inventory",
+    "searchProducts": "Search products by name",
+    "clearSearch": "Clear search",
+    "modal": {
+      "title": "Add Inventory",
+      "product": "Product:",
+      "productPlaceholder": "Search product",
+      "quantity": "Quantity:",
+      "quantityPlaceholder": "Quantity",
+      "location": "Location:",
+      "locationPlaceholder": "Location identifier",
+      "cancel": "Cancel",
+      "add": "Add Inventory"
+    },
+    "table": {
+      "product": "Product",
+      "price": "Price (Unit)",
+      "availableQuantity": "Available Quantity",
+      "sector": "Sector",
+      "characteristics": "Characteristics",
+      "status": "Status"
+    },
+    "units": "units",
+    "notAvailable": "N/A",
+    "requiresColdChain": "Requires cold chain",
+    "storageInstructions": "Storage instructions:",
+    "noProducts": "No products available",
+    "noProductsDescription": "This warehouse has no products in inventory",
+    "loadingInventory": "Loading inventory...",
+    "loadingInventoryDescription": "Getting product information",
+    "error": {
+      "loadProducts": "Error searching products.",
+      "addInventory": "Error adding inventory. Please try again.",
+      "addInventoryTitle": "Error adding inventory",
+      "addInventoryMessage": "Could not add inventory. Please verify the data and try again."
+    },
+    "success": {
+      "addInventory": "Inventory added successfully!",
+      "addInventoryMessage": "{{quantity}} units of the product have been added to the warehouse."
+    },
+    "validation": {
+      "required": "This field is required",
+      "minQuantity": "Quantity must be greater than 0"
+    }
+  },
+  "confirmVisitRoute": {
+    "title": "Confirm route",
+    "loading": {
+      "geocoding": "Geocoding addresses...",
+      "hint": "This may take a few seconds"
+    },
+    "mapTitle": "Route map",
+    "routeTitle": "Route",
+    "table": {
+      "name": "Name",
+      "address": "Address"
+    },
+    "scheduledStops": "scheduled stops",
+    "confirmButton": "Confirm route",
+    "confirming": "Confirming...",
+    "error": {
+      "loadRoute": "Could not load route",
+      "loadGoogleMaps": "Error loading Google Maps",
+      "noRouteData": "Route data not found",
+      "loadPreview": "Error loading route preview",
+      "confirmRoute": "Could not confirm route",
+      "createRoute": "Could not create route"
+    },
+    "success": {
+      "confirmed": "Visit route #{{id}} confirmed successfully. Total: {{total}} clients."
+    }
+  },
+  "createVisitRoute": {
+    "title": "Generate visit route",
+    "seller": "Seller",
+    "loading": "Loading...",
+    "routeDate": "Visit route date",
+    "selectDate": "Select date",
+    "clientsToVisit": "Clients to visit",
+    "selectedClients": "{{count}} client(s) selected",
+    "loadingClients": "Loading clients...",
+    "table": {
+      "select": "Select",
+      "client": "Client",
+      "address": "Address",
+      "email": "Email"
+    },
+    "cancel": "Cancel",
+    "generateRoute": "Generate visit route",
+    "generating": "Generating...",
+    "error": {
+      "noSeller": "Please select a seller",
+      "noDate": "Please select a date for the visit route",
+      "noClients": "Please select at least one client to visit",
+      "noClientsAssigned": "This seller has no assigned clients.",
+      "loadClients": "Could not load clients. Please try again.",
+      "confirmRoute": "Could not confirm route",
+      "confirmRouteError": "Error confirming route: {{error}}"
+    },
+    "success": {
+      "confirmed": "Visit route #{{id}} confirmed successfully for {{sellerName}}. Total: {{total}} clients."
+    }
+  },
+  "sellerClients": {
+    "loading": "Loading...",
+    "client": "client",
+    "clients": "clients",
+    "dragToAssign": "Drag clients here to assign them",
+    "dragToUnassign": "Drag clients here to unassign them"
   }
 }

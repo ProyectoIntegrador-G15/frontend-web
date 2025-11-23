@@ -1,9 +1,11 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild, ElementRef} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 import {SuppliersService, Supplier} from '../../shared/services/suppliers.service';
 import {Subscription} from 'rxjs';
 import {NzNotificationService} from 'ng-zorro-antd/notification';
+import {NzMessageService} from 'ng-zorro-antd/message';
+import {NzUploadChangeParam, NzUploadFile} from 'ng-zorro-antd/upload';
 import {debounceTime, distinctUntilChanged, Subject} from 'rxjs';
 
 @Component({
@@ -18,6 +20,12 @@ export class SuppliersListComponent implements OnInit, OnDestroy {
   errorMessage = '';
   isSupplierModalVisible = false;
   isSupplierModalLoading = false;
+
+  // Modal de carga masiva
+  isBulkUploadModalVisible = false;
+  fileList: NzUploadFile[] = [];
+  isBulkUploadLoading = false;
+  bulkUploadErrors: string[] = [];
 
   // Paginación
   currentPage = 1;
@@ -40,10 +48,14 @@ export class SuppliersListComponent implements OnInit, OnDestroy {
 
   private subscription: Subscription = new Subscription();
 
+  @ViewChild('tableScrollContainer', { static: false }) tableScrollContainer?: ElementRef<HTMLDivElement>;
+  @ViewChild('errorsList', { static: false }) errorsList?: ElementRef<HTMLUListElement>;
+
   constructor(
     private suppliersService: SuppliersService,
     private fb: FormBuilder,
-    private notification: NzNotificationService
+    private notification: NzNotificationService,
+    private msg: NzMessageService
   ) {
   }
 
@@ -246,6 +258,229 @@ export class SuppliersListComponent implements OnInit, OnDestroy {
   clearCountrySearch(): void {
     this.countryFilter = '';
     this.countrySearchSubject.next('');
+  }
+
+  // Método para carga masiva de proveedores
+  loadBulkSuppliers(): void {
+    this.isBulkUploadModalVisible = true;
+  }
+
+  handleBulkUploadModalCancel(): void {
+    this.isBulkUploadModalVisible = false;
+    this.isBulkUploadLoading = false;
+    this.bulkUploadErrors = [];
+    this.clearFileList();
+  }
+
+  private clearFileList(): void {
+    this.fileList = [];
+  }
+
+  downloadExcelTemplate(): void {
+    this.downloadStaticFile('assets/templates/proveedores-template.xlsx', 'proveedores-template.xlsx');
+  }
+
+  downloadCsvTemplate(): void {
+    this.downloadStaticFile('assets/templates/proveedores-template.csv', 'proveedores-template.csv');
+  }
+
+  private downloadStaticFile(filePath: string, filename: string): void {
+    const link = document.createElement('a');
+    link.href = filePath;
+    link.download = filename;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    this.msg.success(`Plantilla ${filename} descargada exitosamente`);
+  }
+
+  beforeUpload = (file: NzUploadFile): boolean => {
+    if (this.fileList.length > 0) {
+      this.msg.error('Solo se permite cargar un archivo a la vez. Elimina el archivo actual antes de cargar uno nuevo.');
+      return false;
+    }
+
+    const isValidType = file.type === 'text/csv' ||
+      file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+      file.name?.endsWith('.csv') ||
+      file.name?.endsWith('.xlsx');
+
+    if (!isValidType) {
+      this.msg.error('Solo se permiten archivos CSV (.csv) o Excel (.xlsx)');
+      return false;
+    }
+
+    const isLt10M = file.size! / 1024 / 1024 < 10;
+    if (!isLt10M) {
+      this.msg.error('El archivo debe ser menor a 10MB');
+      return false;
+    }
+
+    return true;
+  }
+
+  customRequest = (item: any): void => {
+    setTimeout(() => {
+      item.onSuccess({}, item.file);
+    }, 200);
+  }
+
+  handleFileChange({file, fileList}: NzUploadChangeParam): void {
+    const status = file.status;
+    if (status === 'done') {
+      this.msg.success(`${file.name} archivo subido exitosamente.`);
+    } else if (status === 'error') {
+      this.msg.error(`${file.name} falló la subida del archivo.`);
+    }
+    this.fileList = [...fileList];
+  }
+
+  onFileDownload = (file: NzUploadFile): void => {
+    if (file.originFileObj) {
+      this.downloadFile(file.originFileObj, file.name);
+    } else {
+      this.msg.error('No se puede descargar el archivo');
+    }
+  };
+
+  private downloadFile(file: File, filename: string): void {
+    const url = window.URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    this.msg.success(`Archivo ${filename} descargado exitosamente`);
+  }
+
+  loadFile(): void {
+    if (this.isBulkUploadLoading) {
+      return; // Prevenir múltiples clics
+    }
+
+    if (this.fileList.length === 0) {
+      this.msg.error('Por favor selecciona un archivo antes de cargar');
+      return;
+    }
+
+    const file = this.fileList[0];
+    if (!file.originFileObj) {
+      this.msg.error('No se puede procesar el archivo');
+      return;
+    }
+
+    this.uploadFileToBackend(file.originFileObj);
+  }
+
+  private uploadFileToBackend(file: File): void {
+    this.isBulkUploadLoading = true;
+    this.bulkUploadErrors = [];
+    this.msg.loading('Cargando archivo...', {nzDuration: 0});
+
+    const uploadSubscription = this.suppliersService.bulkUploadSuppliers(file)
+      .subscribe({
+        next: (data) => {
+          this.msg.remove();
+          this.isBulkUploadLoading = false;
+
+          if (data.success) {
+            this.msg.success(data.message);
+            this.msg.info(`Proveedores creados: ${data.created_suppliers} de ${data.total_rows}`);
+
+            // Cerrar modal y limpiar archivos
+            this.handleBulkUploadModalCancel();
+
+            // Recargar la lista de proveedores
+            this.currentPage = 1;
+            this.getSuppliers();
+          } else {
+            // Mostrar errores en el modal
+            this.bulkUploadErrors = data.errors || [];
+            this.msg.error(data.message);
+          }
+        },
+        error: (error) => {
+          this.msg.remove();
+          this.isBulkUploadLoading = false;
+          console.error('Error al cargar archivo:', error);
+
+          // Mostrar solo el message del servicio
+          const errorMessage = error.message || 'Error al conectar con el servidor. Verifica que el backend esté ejecutándose.';
+          this.msg.error(errorMessage);
+        }
+      });
+
+    this.subscription.add(uploadSubscription);
+  }
+
+  /**
+   * Maneja el desplazamiento horizontal de la tabla con el teclado
+   */
+  onTableScrollKeyDown(event: KeyboardEvent): void {
+    const container = this.tableScrollContainer?.nativeElement;
+    if (!container) return;
+
+    const scrollAmount = 100; // Píxeles a desplazar
+
+    switch (event.key) {
+      case 'ArrowLeft':
+        event.preventDefault();
+        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        break;
+      case 'ArrowRight':
+        event.preventDefault();
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        break;
+      case 'Home':
+        event.preventDefault();
+        container.scrollTo({ left: 0, behavior: 'smooth' });
+        break;
+      case 'End':
+        event.preventDefault();
+        container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
+        break;
+    }
+  }
+
+  /**
+   * Maneja el desplazamiento vertical de la lista de errores con el teclado
+   */
+  onErrorsListKeyDown(event: KeyboardEvent): void {
+    const list = this.errorsList?.nativeElement;
+    if (!list) return;
+
+    const scrollAmount = 50; // Píxeles a desplazar
+
+    switch (event.key) {
+      case 'ArrowUp':
+        event.preventDefault();
+        list.scrollBy({ top: -scrollAmount, behavior: 'smooth' });
+        break;
+      case 'ArrowDown':
+        event.preventDefault();
+        list.scrollBy({ top: scrollAmount, behavior: 'smooth' });
+        break;
+      case 'Home':
+        event.preventDefault();
+        list.scrollTo({ top: 0, behavior: 'smooth' });
+        break;
+      case 'End':
+        event.preventDefault();
+        list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' });
+        break;
+      case 'PageUp':
+        event.preventDefault();
+        list.scrollBy({ top: -list.clientHeight, behavior: 'smooth' });
+        break;
+      case 'PageDown':
+        event.preventDefault();
+        list.scrollBy({ top: list.clientHeight, behavior: 'smooth' });
+        break;
+    }
   }
 }
 

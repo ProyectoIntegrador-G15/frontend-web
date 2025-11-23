@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SellersService, Seller, SalesPlan, CreateSalesPlanRequest } from '../../shared/services/sellers.service';
@@ -40,7 +40,7 @@ interface Tab {
   templateUrl: './seller-details.component.html',
   styleUrls: ['./seller-details.component.scss']
 })
-export class SellerDetailsComponent implements OnInit {
+export class SellerDetailsComponent implements OnInit, AfterViewInit {
 
   constructor(
     private route: ActivatedRoute,
@@ -54,6 +54,7 @@ export class SellerDetailsComponent implements OnInit {
   ) {
     this.initializeChartOptions();
     this.initializeYears();
+    this.updateMonths();
     this.initSalesPlanForm();
   }
   seller: Seller | null = null;
@@ -72,20 +73,7 @@ export class SellerDetailsComponent implements OnInit {
   loadingSalesPlans = false;
   selectedMonth = new Date().getMonth() + 1; // 1-12
   selectedYear = new Date().getFullYear();
-  months = [
-    { value: 1, label: 'Enero' },
-    { value: 2, label: 'Febrero' },
-    { value: 3, label: 'Marzo' },
-    { value: 4, label: 'Abril' },
-    { value: 5, label: 'Mayo' },
-    { value: 6, label: 'Junio' },
-    { value: 7, label: 'Julio' },
-    { value: 8, label: 'Agosto' },
-    { value: 9, label: 'Septiembre' },
-    { value: 10, label: 'Octubre' },
-    { value: 11, label: 'Noviembre' },
-    { value: 12, label: 'Diciembre' }
-  ];
+  months: Array<{ value: number; label: string }> = [];
   years: number[] = [];
 
   // Modal de creación de plan de ventas
@@ -115,12 +103,7 @@ export class SellerDetailsComponent implements OnInit {
 
   @ViewChild('chart') chart: ChartComponent | undefined;
 
-  tabs: Tab[] = [
-    { id: 'information', label: 'Información' },
-    { id: 'performance', label: 'Desempeño' },
-    { id: 'sales-plan', label: 'Plan de ventas' },
-    { id: 'visit-routes', label: 'Rutas de visita' }
-  ];
+  tabs: Tab[] = [];
 
   // Datos quemados de visitas (mock data)
   mockVisits = [
@@ -191,9 +174,14 @@ export class SellerDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Suscribirse a cambios de idioma para actualizar el gráfico
+    // Inicializar tabs con traducciones
+    this.updateTabs();
+    
+    // Suscribirse a cambios de idioma para actualizar el gráfico y tabs
     this.translateService.onLangChange.subscribe(() => {
       this.initializeChartOptions();
+      this.updateTabs();
+      this.updateMonths();
       if (this.performanceData.topProducts.length > 0) {
         this.updateChart();
       }
@@ -217,6 +205,99 @@ export class SellerDetailsComponent implements OnInit {
     });
   }
 
+  ngAfterViewInit(): void {
+    // Agregar atributos de accesibilidad a los inputs de búsqueda de nz-select
+    setTimeout(() => {
+      this.addAccessibilityToSelectSearchInputs();
+    }, 100);
+  }
+
+  private addAccessibilityToSelectSearchInputs(): void {
+    // Función auxiliar para agregar atributos de accesibilidad
+    const addAccessibilityAttributes = (selectId: string, labelKey: string) => {
+      const selectElement = document.querySelector(`#${selectId}`);
+      if (selectElement) {
+        // Buscar el input de búsqueda - el selector correcto según el HTML renderizado
+        const searchInput = selectElement.querySelector('input.ant-select-selection-search-input') as HTMLInputElement ||
+                          selectElement.querySelector('.ant-select-selection-search input') as HTMLInputElement ||
+                          selectElement.querySelector('nz-select-search input') as HTMLInputElement;
+        
+        if (searchInput) {
+          const label = this.translateService.instant(labelKey);
+          searchInput.setAttribute('aria-label', label);
+          searchInput.setAttribute('title', label);
+          const placeholder = label + ' - ' + this.translateService.instant('common.search');
+          searchInput.setAttribute('placeholder', placeholder);
+        }
+      }
+    };
+
+    // Agregar atributos inicialmente
+    addAccessibilityAttributes('sales-plan-month-select', 'sellerDetails.salesPlan.monthLabel');
+    addAccessibilityAttributes('sales-plan-year-select', 'sellerDetails.salesPlan.yearLabel');
+
+    // Usar MutationObserver para detectar cuando se renderiza el input de búsqueda
+    const monthSelect = document.querySelector('#sales-plan-month-select');
+    const yearSelect = document.querySelector('#sales-plan-year-select');
+
+    if (monthSelect) {
+      const observer = new MutationObserver(() => {
+        addAccessibilityAttributes('sales-plan-month-select', 'sellerDetails.salesPlan.monthLabel');
+      });
+      observer.observe(monthSelect, { childList: true, subtree: true, attributes: true });
+    }
+
+    if (yearSelect) {
+      const observer = new MutationObserver(() => {
+        addAccessibilityAttributes('sales-plan-year-select', 'sellerDetails.salesPlan.yearLabel');
+      });
+      observer.observe(yearSelect, { childList: true, subtree: true, attributes: true });
+    }
+
+    // También escuchar eventos de apertura del select para asegurar que se agreguen los atributos
+    if (monthSelect) {
+      monthSelect.addEventListener('click', () => {
+        setTimeout(() => {
+          addAccessibilityAttributes('sales-plan-month-select', 'sellerDetails.salesPlan.monthLabel');
+        }, 50);
+      });
+    }
+
+    if (yearSelect) {
+      yearSelect.addEventListener('click', () => {
+        setTimeout(() => {
+          addAccessibilityAttributes('sales-plan-year-select', 'sellerDetails.salesPlan.yearLabel');
+        }, 50);
+      });
+    }
+  }
+
+  private updateTabs(): void {
+    this.tabs = [
+      { id: 'information', label: this.translateService.instant('sellerDetails.tabs.information') },
+      { id: 'performance', label: this.translateService.instant('sellerDetails.tabs.performance') },
+      { id: 'sales-plan', label: this.translateService.instant('sellerDetails.tabs.salesPlan') },
+      { id: 'visit-routes', label: this.translateService.instant('sellerDetails.tabs.visitRoutes') }
+    ];
+  }
+
+  private updateMonths(): void {
+    this.months = [
+      { value: 1, label: this.translateService.instant('reports.months.january') },
+      { value: 2, label: this.translateService.instant('reports.months.february') },
+      { value: 3, label: this.translateService.instant('reports.months.march') },
+      { value: 4, label: this.translateService.instant('reports.months.april') },
+      { value: 5, label: this.translateService.instant('reports.months.may') },
+      { value: 6, label: this.translateService.instant('reports.months.june') },
+      { value: 7, label: this.translateService.instant('reports.months.july') },
+      { value: 8, label: this.translateService.instant('reports.months.august') },
+      { value: 9, label: this.translateService.instant('reports.months.september') },
+      { value: 10, label: this.translateService.instant('reports.months.october') },
+      { value: 11, label: this.translateService.instant('reports.months.november') },
+      { value: 12, label: this.translateService.instant('reports.months.december') }
+    ];
+  }
+
   loadSellerDetail(sellerId: string): void {
     this.loading = true;
     this.sellersService.getSellerById(sellerId).subscribe({
@@ -226,7 +307,7 @@ export class SellerDetailsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading seller:', error);
-        this.error = 'No se pudo cargar la información del vendedor';
+        this.error = this.translateService.instant('sellerDetails.error.loadSeller');
         this.loading = false;
       }
     });
@@ -290,11 +371,11 @@ export class SellerDetailsComponent implements OnInit {
 
     switch (this.seller.status) {
       case 'active':
-        return 'Activo';
+        return this.translateService.instant('sellers.statusActive');
       case 'inactive':
-        return 'Inactivo';
+        return this.translateService.instant('sellers.statusInactive');
       case 'suspended':
-        return 'Suspendido';
+        return this.translateService.instant('sellers.statusSuspended');
       default:
         return this.seller.status;
     }
@@ -336,18 +417,19 @@ export class SellerDetailsComponent implements OnInit {
 
   getRouteStatusText(status: string): string {
     switch (status) {
-      case 'draft': return 'Borrador';
-      case 'confirmed': return 'Planificada';
-      case 'in_progress': return 'En progreso';
-      case 'completed': return 'Completada';
-      case 'cancelled': return 'Cancelada';
+      case 'draft': return this.translateService.instant('sellerDetails.visitRoutes.status.draft');
+      case 'confirmed': return this.translateService.instant('sellerDetails.visitRoutes.status.confirmed');
+      case 'in_progress': return this.translateService.instant('sellerDetails.visitRoutes.status.inProgress');
+      case 'completed': return this.translateService.instant('sellerDetails.visitRoutes.status.completed');
+      case 'cancelled': return this.translateService.instant('sellerDetails.visitRoutes.status.cancelled');
       default: return status;
     }
   }
 
   getClientNamesShort(route: VisitRoute): string {
     if (!route.stops || route.stops.length === 0) {
-      return `${route.totalClients} clientes`;
+      const clientsText = this.translateService.instant('sellerDetails.visitRoutes.clients');
+      return `${route.totalClients} ${clientsText}`;
     }
 
     const names = route.stops.map(stop => stop.clientName);
@@ -360,7 +442,8 @@ export class SellerDetailsComponent implements OnInit {
     // Si son 3 o más, mostrar los primeros 2 y "X más"
     const firstTwo = names.slice(0, 2).join(', ');
     const remaining = names.length - 2;
-    return `${firstTwo} y ${remaining} más`;
+    const andMoreText = this.translateService.instant('sellerDetails.visitRoutes.andMore', { count: remaining });
+    return `${firstTwo} ${andMoreText}`;
   }
 
   getClientNamesForTooltip(route: VisitRoute): string {
@@ -856,37 +939,35 @@ export class SellerDetailsComponent implements OnInit {
     const field = this.salesPlanForm.get(fieldName);
     if (field && field.errors && (field.dirty || field.touched)) {
       if (field.errors.required) {
-        return 'Este campo es obligatorio';
+        return this.translateService.instant('sellerDetails.salesPlan.errors.required');
       }
       if (field.errors.min) {
-        return fieldName === 'total_value_target'
-          ? 'El valor debe ser mayor a 0'
-          : 'El valor debe ser mayor a 0';
+        return this.translateService.instant('sellerDetails.salesPlan.errors.min');
       }
       if (field.errors.minlength) {
-        return 'Este campo es demasiado corto';
+        return this.translateService.instant('sellerDetails.salesPlan.errors.minlength');
       }
       if (field.errors.maxlength) {
-        return 'Este campo es demasiado largo';
+        return this.translateService.instant('sellerDetails.salesPlan.errors.maxlength');
       }
       if (field.errors.invalidDate) {
-        return 'La fecha seleccionada no es válida';
+        return this.translateService.instant('sellerDetails.salesPlan.errors.invalidDate');
       }
       if (field.errors.dateInPast) {
-        return 'No se puede seleccionar una fecha anterior al mes actual';
+        return this.translateService.instant('sellerDetails.salesPlan.errors.dateInPast');
       }
       if (field.errors.dateTooFar) {
-        return 'No se puede seleccionar una fecha más de 6 meses en el futuro';
+        return this.translateService.instant('sellerDetails.salesPlan.errors.dateTooFar');
       }
       if (field.errors.endBeforeStart) {
-        return 'La fecha de fin debe ser posterior a la fecha de inicio';
+        return this.translateService.instant('sellerDetails.salesPlan.errors.endBeforeStart');
       }
       if (field.errors.dateRange) {
         if (fieldName === 'start_month') {
-          return 'La fecha de inicio no puede ser posterior a la fecha de fin';
+          return this.translateService.instant('sellerDetails.salesPlan.errors.startAfterEnd');
         }
         if (fieldName === 'end_month') {
-          return 'La fecha de fin debe ser posterior a la fecha de inicio';
+          return this.translateService.instant('sellerDetails.salesPlan.errors.endBeforeStart');
         }
       }
     }
@@ -927,7 +1008,10 @@ export class SellerDetailsComponent implements OnInit {
     }
 
     if (!this.seller) {
-      this.notification.error('Error', 'No se encontró información del vendedor');
+      this.notification.error(
+        this.translateService.instant('common.error'),
+        this.translateService.instant('sellerDetails.salesPlan.error.loadSeller')
+      );
       return;
     }
 
@@ -967,20 +1051,15 @@ export class SellerDetailsComponent implements OnInit {
         // Recargar planes de venta
         this.loadSalesPlans();
 
-        this.notification.create(
-          'success',
-          '¡Plan de venta creado exitosamente!',
-          `El plan "${planData.name}" ha sido creado correctamente.`
-        );
+        const successTitle = this.translateService.instant('sellerDetails.salesPlan.success.created');
+        const successDescription = this.translateService.instant('sellerDetails.salesPlan.success.createdDescription', { name: planData.name });
+        this.notification.create('success', successTitle, successDescription);
       },
       error: (error) => {
         this.isSalesPlanModalLoading = false;
-        const errorMessage = error?.error?.detail || error?.message || 'Error al crear el plan de venta';
-        this.notification.create(
-          'error',
-          'Error al crear plan de venta',
-          errorMessage
-        );
+        const errorMessage = error?.error?.detail || error?.message || this.translateService.instant('sellerDetails.salesPlan.error.create');
+        const errorTitle = this.translateService.instant('sellerDetails.salesPlan.error.create');
+        this.notification.create('error', errorTitle, errorMessage);
       }
     });
   }

@@ -16,7 +16,9 @@
     "active": "Activo",
     "inactive": "Inactivo",
     "warning": "Advertencia",
-    "back": "Regresar"
+    "back": "Regresar",
+    "required": "(requerido)",
+    "errors": "errores"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -145,20 +147,55 @@
     "filterByCountry": "Filtrar por país",
     "searchByName": "Buscar proveedores por nombre",
     "searchByNit": "Buscar proveedores por NIT",
-    "searchByCountry": "Buscar proveedores por país"
+    "searchByCountry": "Buscar proveedores por país",
+    "bulkUpload": "Carga Masiva",
+    "downloadTemplate": "Descargar Plantilla",
+    "excelTemplate": "Plantilla Excel",
+    "excelFormat": "Formato .xlsx",
+    "csvTemplate": "Plantilla CSV",
+    "csvFormat": "Formato .csv",
+    "dragFileHere": "Arrastra el archivo aquí o haz clic para seleccionar",
+    "supportedFormats": "Formatos soportados: CSV (.csv) o Excel (.xlsx)",
+    "errorsFound": "Errores encontrados",
+    "uploadFile": "Cargar Archivo",
+    "tableScrollableRegion": "Tabla de proveedores con desplazamiento horizontal"
   },
   "auth": {
     "signInTitle": "Iniciar sesión en MediSupply",
-    "usernameOrEmail": "Usuario o Email",
-    "usernameOrEmailPlaceholder": "Usuario o Email",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "ejemplo@gmail.com",
+    "emailError": "Por favor ingresa un correo electrónico válido",
     "password": "Contraseña",
-    "passwordPlaceholder": "Contraseña",
+    "passwordPlaceholder": "Ingresa tu contraseña",
+    "passwordError": "Por favor ingresa tu contraseña",
     "keepLoggedIn": "Mantener sesión iniciada",
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "loginButton": "Iniciar sesión",
     "or": "o",
     "dontHaveAccount": "¿No tienes una cuenta?",
-    "signUp": "Registrarse"
+    "signUp": "Registrarse",
+    "signOut": "Cerrar sesión",
+    "twoFactorAuth": {
+      "title": "Autenticación 2FA",
+      "securityCode": "Código de seguridad",
+      "securityCodeLabel": "Código de seguridad",
+      "digitLabel": "Dígito {{number}} de 6 del código de seguridad",
+      "helpText": "Ingrese el código de 6 dígitos enviado a su correo electrónico",
+      "confirm": "Confirmar",
+      "validating": "Validando...",
+      "resendCode": "Reenviar código",
+      "sending": "Enviando...",
+      "sendingCode": "Enviando código de verificación...",
+      "codeSent": "Código de verificación enviado a tu correo electrónico",
+      "errors": {
+        "completeFields": "Por favor, complete todos los campos del código de seguridad.",
+        "invalidCode": "Código inválido. Te quedan {{remaining}} intento {{plural}}.",
+        "maxAttemptsReached": "Has excedido el número máximo de intentos. Serás redirigido al login.",
+        "sessionBlocked": "Sesión bloqueada por múltiples intentos fallidos. Serás redirigido al login.",
+        "sendError": "Error al enviar el código de verificación. Por favor, intente nuevamente.",
+        "validateError": "Error al validar el código. Por favor, intente nuevamente."
+      }
+    }
   },
   "createRoute": {
     "title": "Generar ruta de entrega",
@@ -184,9 +221,9 @@
     "loadingError": "No se pudieron cargar las órdenes pendientes. Por favor, intente nuevamente.",
     "selectOrdersError": "Por favor, selecciona al menos una orden para generar la ruta.",
     "selectDateError": "Por favor, selecciona una fecha para la ruta.",
-    "routeCreatedSuccess": "¡Ruta #{id} generada exitosamente!",
+    "routeCreatedSuccess": "¡Ruta #{{id}} generada exitosamente!",
     "routeCreatedError": "No se pudo generar la ruta. Por favor, intente nuevamente.",
-    "routeError": "Error al generar la ruta: {error}"
+    "routeError": "Error al generar la ruta: {{error}}"
   },
   "routes": {
     "title": "Rutas de Entrega",
@@ -326,5 +363,246 @@
     "quantitySoldLabel": "Cantidad vendida (unidades)",
     "productsLabel": "Productos",
     "quantitySoldSeries": "Cantidad vendida"
+  },
+  "productInventory": {
+    "medication": "Medicamento",
+    "id": "ID",
+    "notAvailable": "N/A",
+    "warehouses": "Almacenes",
+    "withInventory": "con inventario",
+    "totalQuantity": "Cantidad Total",
+    "availableUnits": "unidades disponibles",
+    "warehouseName": "Nombre de Almacén",
+    "location": "Ubicación",
+    "address": "Dirección",
+    "sector": "Sector",
+    "availableQuantity": "Cantidad Disponible",
+    "status": "Estado",
+    "units": "unidades",
+    "noInventoryAvailable": "No hay inventario disponible",
+    "noInventoryDescription": "Este producto no tiene inventario en ningún almacén",
+    "loadingInventory": "Cargando inventario...",
+    "loadingInventoryDescription": "Obteniendo información de almacenes y productos",
+    "errorLoadingInventory": "Error al obtener el inventario del producto."
+  },
+  "sellerDetails": {
+    "title": "Perfil del vendedor",
+    "loadingSeller": "Cargando información del vendedor...",
+    "backToSellers": "Volver a vendedores",
+    "subtitle": "Consulta el desempeño y plan de ventas de cada vendedor",
+    "tabs": {
+      "information": "Información",
+      "performance": "Desempeño",
+      "salesPlan": "Plan de ventas",
+      "visitRoutes": "Rutas de visita"
+    },
+    "personalInfo": {
+      "title": "Información Personal",
+      "identification": "Identificación",
+      "email": "Email",
+      "phone": "Teléfono",
+      "address": "Dirección",
+      "entryDate": "Fecha de Ingreso",
+      "notSpecified": "No especificada"
+    },
+    "commercialInfo": {
+      "title": "Información Comercial",
+      "commission": "Comisión",
+      "salesTarget": "Meta de Ventas",
+      "notDefined": "No definida"
+    },
+    "salesPlan": {
+      "title": "Plan de ventas de",
+      "monthLabel": "Mes del plan:",
+      "yearLabel": "Año del plan:",
+      "selectMonth": "Seleccionar mes",
+      "selectYear": "Seleccionar año",
+      "createPlan": "Crear plan",
+      "loadingPlans": "Cargando planes de venta...",
+      "noPlans": "Sin planes de venta",
+      "noPlansDescription": "Aún no hay planes de venta creados para este vendedor en el mes y año seleccionados.",
+      "tableHeaders": {
+        "planName": "Nombre del plan",
+        "totalUnits": "Meta total (unidades)",
+        "totalValue": "Meta total ($)",
+        "period": "Periodo"
+      },
+      "modal": {
+        "title": "Crear plan de ventas",
+        "planName": "Nombre del plan:",
+        "planNamePlaceholder": "Ej: Plan de ventas Q1 2025",
+        "startMonth": "Mes de inicio:",
+        "endMonth": "Mes de fin:",
+        "selectMonthYear": "Seleccionar mes y año",
+        "totalUnits": "Meta total (unidades):",
+        "totalUnitsPlaceholder": "Ej: 1000",
+        "totalValue": "Meta total (valor $):",
+        "totalValuePlaceholder": "Ej: 5000000",
+        "visitsTarget": "Meta de visitas:",
+        "visitsTargetPlaceholder": "Ej: 50",
+        "cancel": "Cancelar",
+        "create": "Crear plan"
+      },
+      "errors": {
+        "required": "Este campo es obligatorio",
+        "min": "El valor debe ser mayor a 0",
+        "minlength": "Este campo es demasiado corto",
+        "maxlength": "Este campo es demasiado largo",
+        "invalidDate": "La fecha seleccionada no es válida",
+        "dateInPast": "No se puede seleccionar una fecha anterior al mes actual",
+        "dateTooFar": "No se puede seleccionar una fecha más de 6 meses en el futuro",
+        "endBeforeStart": "La fecha de fin debe ser posterior a la fecha de inicio",
+        "startAfterEnd": "La fecha de inicio no puede ser posterior a la fecha de fin"
+      },
+      "success": {
+        "created": "¡Plan de venta creado exitosamente!",
+        "createdDescription": "El plan \"{{name}}\" ha sido creado correctamente."
+      },
+      "error": {
+        "create": "Error al crear plan de venta",
+        "loadSeller": "No se encontró información del vendedor"
+      }
+    },
+    "visitRoutes": {
+      "title": "Rutas de visita programadas",
+      "generateRoute": "Generar ruta de visita",
+      "loadingRoutes": "Cargando rutas...",
+      "noRoutes": "Sin rutas de visita",
+      "noRoutesDescription": "Aún no hay rutas de visita generadas para este vendedor.",
+      "tableHeaders": {
+        "id": "ID",
+        "date": "Fecha",
+        "clients": "Clientes",
+        "duration": "Duración",
+        "status": "Estado"
+      },
+      "clients": "clientes",
+      "minutes": "min",
+      "andMore": "y {{count}} más",
+      "status": {
+        "draft": "Borrador",
+        "confirmed": "Planificada",
+        "inProgress": "En progreso",
+        "completed": "Completada",
+        "cancelled": "Cancelada"
+      }
+    },
+    "error": {
+      "loadSeller": "No se pudo cargar la información del vendedor"
+    }
+  },
+  "warehouseInventory": {
+    "title": "Productos por almacén:",
+    "loading": "Cargando...",
+    "back": "Regresar",
+    "addInventory": "Agregar inventario",
+    "searchProducts": "Buscar productos por nombre",
+    "clearSearch": "Limpiar búsqueda",
+    "modal": {
+      "title": "Agregar Inventario",
+      "product": "Producto:",
+      "productPlaceholder": "Buscar producto",
+      "quantity": "Cantidad:",
+      "quantityPlaceholder": "Cantidad",
+      "location": "Ubicación:",
+      "locationPlaceholder": "Identificador de ubicación",
+      "cancel": "Cancelar",
+      "add": "Agregar Inventario"
+    },
+    "table": {
+      "product": "Producto",
+      "price": "Precio (Und)",
+      "availableQuantity": "Cantidad Disponible",
+      "sector": "Sector",
+      "characteristics": "Características",
+      "status": "Estado"
+    },
+    "units": "unidades",
+    "notAvailable": "N/A",
+    "requiresColdChain": "Requiere cadena de frío",
+    "storageInstructions": "Instrucciones de almacenamiento:",
+    "noProducts": "No hay productos disponibles",
+    "noProductsDescription": "Este almacén no tiene productos en inventario",
+    "loadingInventory": "Cargando inventario...",
+    "loadingInventoryDescription": "Obteniendo información de productos",
+    "error": {
+      "loadProducts": "Error al buscar productos.",
+      "addInventory": "Error al agregar inventario. Por favor, inténtalo de nuevo.",
+      "addInventoryTitle": "Error al agregar inventario",
+      "addInventoryMessage": "No se pudo agregar el inventario. Por favor, verifica los datos e inténtalo de nuevo."
+    },
+    "success": {
+      "addInventory": "¡Inventario agregado exitosamente!",
+      "addInventoryMessage": "Se ha agregado {{quantity}} unidades del producto al almacén."
+    },
+    "validation": {
+      "required": "Este campo es obligatorio",
+      "minQuantity": "La cantidad debe ser mayor a 0"
+    }
+  },
+  "confirmVisitRoute": {
+    "title": "Confirmar ruta",
+    "loading": {
+      "geocoding": "Geocodificando direcciones...",
+      "hint": "Esto puede tomar unos segundos"
+    },
+    "mapTitle": "Mapa de la ruta",
+    "routeTitle": "Ruta",
+    "table": {
+      "name": "Nombre",
+      "address": "Dirección"
+    },
+    "scheduledStops": "paradas programadas",
+    "confirmButton": "Confirmar ruta",
+    "confirming": "Confirmando...",
+    "error": {
+      "loadRoute": "No se pudo cargar la ruta",
+      "loadGoogleMaps": "Error cargando Google Maps",
+      "noRouteData": "No se encontraron datos de la ruta",
+      "loadPreview": "Error al cargar la vista previa de la ruta",
+      "confirmRoute": "No se pudo confirmar la ruta",
+      "createRoute": "No se pudo crear la ruta"
+    },
+    "success": {
+      "confirmed": "Ruta de visita #{{id}} confirmada exitosamente. Total: {{total}} clientes."
+    }
+  },
+  "createVisitRoute": {
+    "title": "Generar ruta de visita",
+    "seller": "Vendedor",
+    "loading": "Cargando...",
+    "routeDate": "Fecha de la ruta de visita",
+    "selectDate": "Selecciona la fecha",
+    "clientsToVisit": "Clientes para visitar",
+    "selectedClients": "{{count}} cliente(s) seleccionado(s)",
+    "loadingClients": "Cargando clientes...",
+    "table": {
+      "select": "Seleccionar",
+      "client": "Cliente",
+      "address": "Dirección",
+      "email": "Email"
+    },
+    "cancel": "Cancelar",
+    "generateRoute": "Generar ruta de visita",
+    "generating": "Generando...",
+    "error": {
+      "noSeller": "Por favor selecciona un vendedor",
+      "noDate": "Por favor selecciona una fecha para la ruta de visita",
+      "noClients": "Por favor selecciona al menos un cliente para visitar",
+      "noClientsAssigned": "Este vendedor no tiene clientes asignados.",
+      "loadClients": "No se pudieron cargar los clientes. Por favor, intente nuevamente.",
+      "confirmRoute": "No se pudo confirmar la ruta",
+      "confirmRouteError": "Error al confirmar la ruta: {{error}}"
+    },
+    "success": {
+      "confirmed": "Ruta de visita #{{id}} confirmada exitosamente para {{sellerName}}. Total: {{total}} clientes."
+    }
+  },
+  "sellerClients": {
+    "loading": "Cargando...",
+    "client": "cliente",
+    "clients": "clientes",
+    "dragToAssign": "Arrastra clientes aquí para asignarlos",
+    "dragToUnassign": "Arrastra clientes aquí para desasignarlos"
   }
 }

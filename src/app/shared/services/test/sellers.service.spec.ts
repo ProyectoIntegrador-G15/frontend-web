@@ -613,6 +613,49 @@ describe('SellersService', () => {
       expect(req.request.body.sales_target).toBe(100000000.0);
       req.flush(mockSellerApiResponse);
     });
+
+    it('should create seller without optional fields', () => {
+      const newSeller: Omit<Seller, 'id' | 'entryDate'> = {
+        name: 'Minimal Seller',
+        identification: '9999999999',
+        status: 'active',
+        email: 'minimal@test.com',
+        phone: '+57 300 000 0000'
+      };
+
+      service.createSeller(newSeller).subscribe((seller) => {
+        expect(seller).toBeTruthy();
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}`);
+      expect(req.request.body.address).toBeNull();
+      expect(req.request.body.commission).toBeNull();
+      expect(req.request.body.sales_target).toBeNull();
+      req.flush(mockSellerApiResponse);
+    });
+
+    it('should create seller with all optional fields', () => {
+      const newSeller: Omit<Seller, 'id' | 'entryDate'> = {
+        name: 'Complete Seller',
+        identification: '8888888888',
+        status: 'active',
+        email: 'complete@test.com',
+        phone: '+57 300 000 0000',
+        address: 'Complete Address',
+        commission: 5.5,
+        salesTarget: 50000000.0
+      };
+
+      service.createSeller(newSeller).subscribe((seller) => {
+        expect(seller).toBeTruthy();
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}`);
+      expect(req.request.body.address).toBe('Complete Address');
+      expect(req.request.body.commission).toBe(5.5);
+      expect(req.request.body.sales_target).toBe(50000000.0);
+      req.flush(mockSellerApiResponse);
+    });
   });
 
   describe('updateSeller', () => {
@@ -647,6 +690,62 @@ describe('SellersService', () => {
       expect(req.request.body.commission).toBe(6.0);
       expect(req.request.body.name).toBeUndefined();
       req.flush(mockSellerApiResponse);
+    });
+
+    it('should update seller with all fields', () => {
+      const sellerId = '1';
+      const updateData = {
+        name: 'Updated Name',
+        status: 'suspended' as const,
+        email: 'updated@email.com',
+        phone: '+57 999 999 9999',
+        address: 'Updated Address',
+        commission: 7.5,
+        salesTarget: 60000000.0
+      };
+
+      service.updateSeller(sellerId, updateData).subscribe((seller) => {
+        expect(seller).toBeTruthy();
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}/${sellerId}`);
+      expect(req.request.body.name).toBe('Updated Name');
+      expect(req.request.body.status).toBe('suspended');
+      expect(req.request.body.email).toBe('updated@email.com');
+      expect(req.request.body.phone).toBe('+57 999 999 9999');
+      expect(req.request.body.address).toBe('Updated Address');
+      expect(req.request.body.commission).toBe(7.5);
+      expect(req.request.body.sales_target).toBe(60000000.0);
+      req.flush(mockSellerApiResponse);
+    });
+
+    it('should handle updating address to null', () => {
+      const sellerId = '1';
+      const updateData = { address: undefined };
+
+      service.updateSeller(sellerId, updateData).subscribe((seller) => {
+        expect(seller).toBeTruthy();
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}/${sellerId}`);
+      expect(req.request.body.address).toBeUndefined();
+      req.flush(mockSellerApiResponse);
+    });
+
+    it('should handle error when updating non-existent seller', () => {
+      const sellerId = '999';
+      const updateData = { name: 'Updated' };
+
+      service.updateSeller(sellerId, updateData).subscribe({
+        next: () => fail('Should have failed'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+          expect(error.message).toContain('Vendedor');
+        }
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}/${sellerId}`);
+      req.flush({ detail: 'Vendedor no encontrado' }, { status: 404, statusText: 'Not Found' });
     });
   });
 
@@ -904,6 +1003,93 @@ describe('SellersService', () => {
 
       const createReq = httpMock.expectOne(`${apiUrl}${sellersEndpoint}`);
       createReq.flush(mockSellerApiResponse);
+    });
+  });
+
+  // ========== PRUEBAS DE PERFORMANCE ==========
+
+  describe('getSellerPerformance', () => {
+    const mockPerformanceResponse = {
+      total_orders: 45,
+      total_revenue: 2500000.0,
+      total_visits: 120,
+      total_units_sold: 850,
+      units_compliance: 95.5,
+      revenue_compliance: 102.3,
+      visits_compliance: 88.2
+    };
+
+    it('should fetch seller performance data successfully', () => {
+      const sellerId = '1';
+      const startDate = '2025-01-01';
+      const endDate = '2025-01-31';
+
+      service.getSellerPerformance(sellerId, startDate, endDate).subscribe((performance) => {
+        expect(performance).toBeTruthy();
+        expect(performance.total_orders).toBe(45);
+        expect(performance.total_revenue).toBe(2500000.0);
+        expect(performance.total_visits).toBe(120);
+        expect(performance.total_units_sold).toBe(850);
+        expect(performance.units_compliance).toBe(95.5);
+        expect(performance.revenue_compliance).toBe(102.3);
+        expect(performance.visits_compliance).toBe(88.2);
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}/${sellerId}/performance?start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockPerformanceResponse);
+    });
+
+    it('should handle performance with null compliance values', () => {
+      const sellerId = '1';
+      const startDate = '2025-01-01';
+      const endDate = '2025-01-31';
+      const performanceWithNulls = {
+        ...mockPerformanceResponse,
+        units_compliance: null,
+        revenue_compliance: null,
+        visits_compliance: null
+      };
+
+      service.getSellerPerformance(sellerId, startDate, endDate).subscribe((performance) => {
+        expect(performance.units_compliance).toBeNull();
+        expect(performance.revenue_compliance).toBeNull();
+        expect(performance.visits_compliance).toBeNull();
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}/${sellerId}/performance?start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}`);
+      req.flush(performanceWithNulls);
+    });
+
+    it('should handle error when fetching performance fails', () => {
+      const sellerId = '1';
+      const startDate = '2025-01-01';
+      const endDate = '2025-01-31';
+      const errorMessage = 'Error al obtener el rendimiento';
+
+      service.getSellerPerformance(sellerId, startDate, endDate).subscribe({
+        next: () => fail('Should have failed'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+          expect(error.message).toBe(errorMessage);
+        }
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}/${sellerId}/performance?start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}`);
+      req.flush({ detail: errorMessage }, { status: 500, statusText: 'Server Error' });
+    });
+
+    it('should encode date parameters correctly', () => {
+      const sellerId = '1';
+      const startDate = '2025-01-01';
+      const endDate = '2025-12-31';
+
+      service.getSellerPerformance(sellerId, startDate, endDate).subscribe();
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}/${sellerId}/performance?start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}`);
+      expect(req.request.url).toContain('start_date=2025-01-01');
+      expect(req.request.url).toContain('end_date=2025-12-31');
+      req.flush(mockPerformanceResponse);
     });
   });
 

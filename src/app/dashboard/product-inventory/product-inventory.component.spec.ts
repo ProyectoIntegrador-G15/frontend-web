@@ -1,10 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
+import { Pipe, PipeTransform } from '@angular/core';
 
 import { ProductInventoryComponent } from './product-inventory.component';
 import { InventoryService } from '../../shared/services/inventory.service';
 import { ProductInventory, WarehouseInventory } from '../../shared/interfaces/inventory.type';
+
+// Mock pipe for customTranslate
+@Pipe({ name: 'customTranslate' })
+class MockCustomTranslatePipe implements PipeTransform {
+  transform(key: string): string {
+    return key; // Return the key as the translation for testing
+  }
+}
 
 describe('ProductInventoryComponent', () => {
   let component: ProductInventoryComponent;
@@ -45,17 +55,29 @@ describe('ProductInventoryComponent', () => {
   beforeEach(async () => {
     const inventoryServiceSpy = jasmine.createSpyObj('InventoryService', ['getProductInventory']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    const translateServiceSpy = jasmine.createSpyObj('TranslateService', ['instant']);
+
+    // Configurar el mock de TranslateService para devolver valores específicos
+    translateServiceSpy.instant.and.callFake((key: string) => {
+      const translations: { [key: string]: string } = {
+        'common.active': 'Activo',
+        'common.inactive': 'Inactivo',
+        'productInventory.errorLoadingInventory': 'Error al obtener el inventario del producto.'
+      };
+      return translations[key] || key;
+    });
 
     mockActivatedRoute = {
       params: of({ id: 'MED-001' })
     };
 
     await TestBed.configureTestingModule({
-      declarations: [ProductInventoryComponent],
+      declarations: [ProductInventoryComponent, MockCustomTranslatePipe],
       providers: [
         { provide: InventoryService, useValue: inventoryServiceSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute }
+        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: TranslateService, useValue: translateServiceSpy }
       ]
     }).compileComponents();
 

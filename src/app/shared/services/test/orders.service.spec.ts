@@ -355,6 +355,100 @@ describe('OrdersService', () => {
     });
   });
 
+  describe('getTopProductsBySeller', () => {
+    const mockTopProducts = [
+      {
+        product_id: 1,
+        product_name: 'Paracetamol 500mg',
+        total_quantity: 5000,
+        total_sales_amount: 10000000
+      },
+      {
+        product_id: 2,
+        product_name: 'Ibuprofeno 400mg',
+        total_quantity: 3000,
+        total_sales_amount: 6000000
+      }
+    ];
+
+    it('should fetch top products for a seller', () => {
+      const sellerId = 1;
+      service.getTopProductsBySeller(sellerId).subscribe((products) => {
+        expect(products).toBeTruthy();
+        expect(products.length).toBe(2);
+        expect(products[0].product_id).toBe(1);
+      });
+
+      const req = httpMock.expectOne(req => 
+        req.url.includes('/top-products-by-seller') && 
+        req.params.get('seller_id') === '1'
+      );
+      expect(req.request.method).toBe('GET');
+      req.flush(mockTopProducts);
+    });
+
+    it('should include date range when provided', () => {
+      const sellerId = 1;
+      const startDate = '2025-01-01';
+      const endDate = '2025-12-31';
+
+      service.getTopProductsBySeller(sellerId, startDate, endDate).subscribe((products) => {
+        expect(products).toBeTruthy();
+      });
+
+      const req = httpMock.expectOne(req => {
+        return req.url.includes('/top-products-by-seller') &&
+          req.params.get('seller_id') === '1' &&
+          req.params.get('start_date') === startDate &&
+          req.params.get('end_date') === endDate;
+      });
+      expect(req.request.method).toBe('GET');
+      req.flush(mockTopProducts);
+    });
+
+    it('should not include dates when only one is provided', () => {
+      const sellerId = 1;
+      const startDate = '2025-01-01';
+
+      service.getTopProductsBySeller(sellerId, startDate).subscribe((products) => {
+        expect(products).toBeTruthy();
+      });
+
+      const req = httpMock.expectOne(req => {
+        return req.url.includes('/top-products-by-seller') &&
+          req.params.get('seller_id') === '1' &&
+          !req.params.has('start_date') &&
+          !req.params.has('end_date');
+      });
+      expect(req.request.method).toBe('GET');
+      req.flush(mockTopProducts);
+    });
+
+    it('should handle errors when fetching top products', () => {
+      const sellerId = 1;
+      const errorMessage = 'Error al obtener productos';
+
+      service.getTopProductsBySeller(sellerId).subscribe({
+        next: () => fail('Should have failed'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+        }
+      });
+
+      // ApiService tiene retry(2), así que puede hacer hasta 3 peticiones (1 inicial + 2 retries)
+      const req1 = httpMock.expectOne(req => req.url.includes('/top-products-by-seller'));
+      req1.flush({ detail: errorMessage }, { status: 500, statusText: 'Server Error' });
+      
+      // Esperamos el primer retry
+      const req2 = httpMock.expectOne(req => req.url.includes('/top-products-by-seller'));
+      req2.flush({ detail: errorMessage }, { status: 500, statusText: 'Server Error' });
+      
+      // Esperamos el segundo retry
+      const req3 = httpMock.expectOne(req => req.url.includes('/top-products-by-seller'));
+      req3.flush({ detail: errorMessage }, { status: 500, statusText: 'Server Error' });
+    });
+  });
+
   describe('Error Message Handling', () => {
     it('should prioritize detail error message over message', () => {
       service.getOrders().subscribe({

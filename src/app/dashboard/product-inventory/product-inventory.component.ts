@@ -1,6 +1,7 @@
 import {Component, OnInit, OnDestroy} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
+import {TranslateService} from '@ngx-translate/core';
 
 import {InventoryService} from '../../shared/services/inventory.service';
 import {ProductInventory, WarehouseInventory} from '../../shared/interfaces/inventory.type';
@@ -22,7 +23,8 @@ export class ProductInventoryComponent implements OnInit, OnDestroy {
   constructor(
     private inventoryService: InventoryService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private translateService: TranslateService
   ) {
   }
 
@@ -51,7 +53,7 @@ export class ProductInventoryComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error al obtener inventario:', error);
-          this.errorMessage = 'Error al obtener el inventario del producto.';
+          this.errorMessage = this.translateService.instant('productInventory.errorLoadingInventory');
           this.isLoading = false;
         }
       });
@@ -60,7 +62,8 @@ export class ProductInventoryComponent implements OnInit, OnDestroy {
   }
 
   getStatusText(status: string): string {
-    return status === 'active' ? 'Activo' : 'Inactivo';
+    const key = status === 'active' ? 'common.active' : 'common.inactive';
+    return this.translateService.instant(key);
   }
 
   getStatusClass(status: string): string {

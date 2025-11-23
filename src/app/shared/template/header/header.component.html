@@ -60,18 +60,18 @@
         </li>
         <li>
           <span class="flex items-center cursor-pointer text-light whitespace-nowrap" nz-dropdown [nzDropdownMenu]="profile">
-            <div class="custom-avatar-circle">M</div>
-            <span class="me-1.5 ms-2.5 text-body dark:text-white/60 text-sm font-medium max-md:hidden">Md. Rafiq</span>
+            <div class="custom-avatar-circle">{{ userInitials || 'U' }}</div>
+            <span class="me-1.5 ms-2.5 text-body dark:text-white/60 text-sm font-medium max-md:hidden">{{ userName || 'Usuario' }}</span>
             <span class="[&>svg]:w-[10px] [&>svg]:h-[10px] [&>svg]:max-md:ms-[5px]" nz-icon nzType="down" nzTheme="outline"></span>
           </span>
           <nz-dropdown-menu #profile="nzDropdownMenu">
             <div class="min-w-[310px] max-sm:min-w-full pt-4 px-[15px] py-[12px] bg-white dark:bg-[#1b1e2b] rounded-[12px]">
               <figure
                 class="flex items-center text-sm rounded-[8px] bg-section dark:bg-white/10 py-[20px] px-[25px] mb-[12px]">
-                <div class="custom-avatar-circle me-4">M</div>
+                <div class="custom-avatar-circle me-4">{{ userInitials || 'U' }}</div>
                 <figcaption>
-                  <h1 class="text-dark dark:text-white/[.87] mb-0.5 text-sm">Md. Rafiq</h1>
-                  <p class="mb-0 text-xs text-body dark:text-white/60">UI Expert</p>
+                  <h1 class="text-dark dark:text-white/[.87] mb-0.5 text-sm">{{ userName || 'Usuario' }}</h1>
+                  <p class="mb-0 text-xs text-body dark:text-white/60">{{ userRole || 'Rol' }}</p>
                 </figcaption>
               </figure>
               <ul nz-menu class="mb-0 bg-transparent shadow-none">
@@ -85,7 +85,7 @@
               <a
                 class="flex items-center justify-center text-sm font-medium bg-[#f4f5f7] dark:bg-[#32333f] h-[50px] text-light hover:text-primary dark:hover:text-white/60 dark:text-white/[.87] mx-[-15px] mb-[-15px] rounded-b-[12px]"
                 href="#" (click)="signOut()">
-                <i class="facebook"></i> Sign Out</a>
+                <i class="facebook"></i> {{ 'auth.signOut' | customTranslate }}</a>
             </div>
           </nz-dropdown-menu>
         </li>

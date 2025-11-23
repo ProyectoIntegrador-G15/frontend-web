@@ -24,7 +24,7 @@
                 nzId="month-select"
                 nzLabelId="month-label"
                 [nzPlaceHolder]="'reports.selectMonth' | customTranslate"
-                [attr.aria-label]="('reports.monthReport' | customTranslate) + ' (requerido)'"
+                [attr.aria-label]="('reports.monthReport' | customTranslate) + ' ' + ('common.required' | customTranslate)"
                 [attr.aria-labelledby]="'month-label'"
                 [attr.aria-describedby]="'month-label'"
                 nzAllowClear
@@ -50,7 +50,7 @@
                 nzId="year-select"
                 nzLabelId="year-label"
                 [nzPlaceHolder]="'reports.selectYear' | customTranslate"
-                [attr.aria-label]="('reports.yearReport' | customTranslate) + ' (requerido)'"
+                [attr.aria-label]="('reports.yearReport' | customTranslate) + ' ' + ('common.required' | customTranslate)"
                 [attr.aria-labelledby]="'year-label'"
                 [attr.aria-describedby]="'year-label'"
                 nzAllowClear
