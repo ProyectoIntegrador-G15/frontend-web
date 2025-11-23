@@ -1,8 +1,8 @@
-import {Component} from '@angular/core';
+import { Component } from '@angular/core';
 import { AuthenticationService } from '../../shared/services/authentication.service';
-import {FormBuilder, FormGroup, UntypedFormGroup, Validators} from '@angular/forms';
-import {Router} from '@angular/router';
-import {Location} from '@angular/common';
+import { FormBuilder, FormGroup, UntypedFormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   templateUrl: './login.component.html'
@@ -64,7 +64,7 @@ export class LoginComponent {
           } else {
             // Si no encontramos el código, mostrar un mensaje genérico apropiado
             // Esto puede ocurrir si la estructura del error cambia
-            this.errorMessage = 'Las credenciales de inicio de sesión no son válidas. Por favor, verifique su correo y contraseña.';
+            this.errorMessage = 'Ocurrió un error al intentar iniciar sesión. Por favor, intente nuevamente.';
           }
         }
       });
@@ -72,7 +72,7 @@ export class LoginComponent {
       Object.values(this.validateForm.controls).forEach((control) => {
         if (control.invalid) {
           control.markAsDirty();
-          control.updateValueAndValidity({onlySelf: true});
+          control.updateValueAndValidity({ onlySelf: true });
         }
       });
     }

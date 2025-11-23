@@ -170,7 +170,7 @@ describe('LoginComponent', () => {
       authService.firebaseLogin.and.returnValue(throwError(() => error));
       component.submitForm();
       expect(component.error).toBe(true);
-      expect(component.errorMessage).toBe('Network error');
+      expect(component.errorMessage).toBe('Ocurrió un error al intentar iniciar sesión. Por favor, intente nuevamente.');
     });
 
     it('should set default error message if no specific error message', () => {
