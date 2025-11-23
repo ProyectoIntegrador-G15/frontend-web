@@ -33,6 +33,7 @@ import {NzSelectModule} from 'ng-zorro-antd/select';
 import {NzDatePickerModule} from 'ng-zorro-antd/date-picker';
 import {NzModalModule} from 'ng-zorro-antd/modal';
 import {NzInputModule} from 'ng-zorro-antd/input';
+import {NzInputNumberModule} from 'ng-zorro-antd/input-number';
 import {NzMessageModule} from 'ng-zorro-antd/message';
 import {NzPaginationModule} from 'ng-zorro-antd/pagination';
 import {NzSpinModule} from 'ng-zorro-antd/spin';
@@ -60,6 +61,7 @@ import {RouteDetailComponent} from './route-detail/route-detail.component';
 import {SellersListComponent} from './sellers-list/sellers-list.component';
 import {SellerDetailsComponent} from './seller-details/seller-details.component';
 import {SellerClientsComponent} from './seller-clients/seller-clients.component';
+import {CreateSellerComponent} from './create-seller/create-seller.component';
 import {CreateVisitRouteComponent} from './create-visit-route/create-visit-route.component';
 import {ConfirmVisitRouteComponent} from './confirm-visit-route/confirm-visit-route.component';
 import {TabsComponent} from '../shared/components/tabs/tabs.component';
@@ -101,6 +103,7 @@ const antdModule = [
   NzDatePickerModule,
   NzModalModule,
   NzInputModule,
+  NzInputNumberModule,
   AngularSvgIconModule.forRoot(),
   BaseChartDirective,
   NgApexchartsModule,
@@ -135,6 +138,7 @@ const antdModule = [
     SellersListComponent,
     SellerDetailsComponent,
     SellerClientsComponent,
+    CreateSellerComponent,
     CreateVisitRouteComponent,
     ConfirmVisitRouteComponent,
     ReportsComponent,

@@ -9,6 +9,7 @@ import {RoutesListComponent} from './routes-list/routes-list.component';
 import {CreateRouteComponent} from './create-route/create-route.component';
 import {RouteDetailComponent} from './route-detail/route-detail.component';
 import {SellersListComponent} from './sellers-list/sellers-list.component';
+import {CreateSellerComponent} from './create-seller/create-seller.component';
 import {SellerDetailsComponent} from './seller-details/seller-details.component';
 import {SellerClientsComponent} from './seller-clients/seller-clients.component';
 import {CreateVisitRouteComponent} from './create-visit-route/create-visit-route.component';
@@ -72,6 +73,13 @@ const routes: Routes = [
     component: SellersListComponent,
     data: {
       title: 'Vendedores',
+    },
+  },
+  {
+    path: 'sellers/create-seller',
+    component: CreateSellerComponent,
+    data: {
+      title: 'Registrar vendedor',
     },
   },
   {

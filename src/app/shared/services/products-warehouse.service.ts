@@ -94,7 +94,17 @@ export class ProductsWarehouseService {
     if (error.error?.message) {
       errorMessage = error.error.message;
     } else if (error.message) {
-      errorMessage = error.message;
+      // Si el mensaje es solo el prefijo de ApiService sin contenido real, usar el mensaje por defecto
+      const message = error.message.trim();
+      if (message && message !== 'Network or Client Error:' && !message.match(/^Network or Client Error:\s*$/)) {
+        // Extraer el mensaje real si está después del prefijo
+        if (message.startsWith('Network or Client Error: ')) {
+          const actualMessage = message.substring('Network or Client Error: '.length).trim();
+          errorMessage = actualMessage || errorMessage;
+        } else {
+          errorMessage = message;
+        }
+      }
     }
 
     return throwError(() => new Error(errorMessage));

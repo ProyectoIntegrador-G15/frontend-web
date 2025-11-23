@@ -287,4 +287,107 @@ describe('ProductsService', () => {
       req.flush(mockApiProducts);
     });
   });
+
+  describe('getProductsPaginated', () => {
+    it('should get products without search term', (done) => {
+      const mockPaginatedResponse = {
+        products: mockApiProducts,
+        total: 2,
+        total_pages: 1,
+        page: 1
+      };
+
+      service.getProductsPaginated(1, true, '').subscribe({
+        next: (response) => {
+          expect(response).toBeTruthy();
+          expect(response.products.length).toBe(2);
+          done();
+        },
+        error: done.fail
+      });
+
+      const req = httpMock.expectOne((request) => {
+        return request.url.includes('/products/paginated') &&
+               request.params.get('page') === '1' &&
+               request.params.get('status') === 'true' &&
+               !request.params.has('name');
+      });
+      expect(req.request.method).toBe('GET');
+      req.flush(mockPaginatedResponse);
+    });
+
+    it('should get products with search term', (done) => {
+      const mockPaginatedResponse = {
+        products: [mockApiProducts[0]],
+        total: 1,
+        total_pages: 1,
+        page: 1
+      };
+
+      service.getProductsPaginated(1, true, 'Paracetamol').subscribe({
+        next: (response) => {
+          expect(response).toBeTruthy();
+          expect(response.products.length).toBe(1);
+          done();
+        },
+        error: done.fail
+      });
+
+      const req = httpMock.expectOne((request) => {
+        return request.url.includes('/products/paginated') &&
+               request.params.get('name') === 'Paracetamol';
+      });
+      expect(req.request.method).toBe('GET');
+      req.flush(mockPaginatedResponse);
+    });
+
+    it('should trim search term before sending', (done) => {
+      const mockPaginatedResponse = {
+        products: [mockApiProducts[0]],
+        total: 1,
+        total_pages: 1,
+        page: 1
+      };
+
+      service.getProductsPaginated(1, true, '  Paracetamol  ').subscribe({
+        next: (response) => {
+          expect(response).toBeTruthy();
+          done();
+        },
+        error: done.fail
+      });
+
+      const req = httpMock.expectOne((request) => {
+        return request.url.includes('/products/paginated') &&
+               request.params.get('name') === 'Paracetamol';
+      });
+      expect(req.request.method).toBe('GET');
+      req.flush(mockPaginatedResponse);
+    });
+
+    it('should not include name parameter when search term is only whitespace', (done) => {
+      const mockPaginatedResponse = {
+        products: mockApiProducts,
+        total: 2,
+        total_pages: 1,
+        page: 1
+      };
+
+      service.getProductsPaginated(1, true, '   ').subscribe({
+        next: (response) => {
+          expect(response).toBeTruthy();
+          done();
+        },
+        error: done.fail
+      });
+
+      const req = httpMock.expectOne((request) => {
+        return request.url.includes('/products/paginated') &&
+               !request.params.has('name');
+      });
+      expect(req.request.method).toBe('GET');
+      req.flush(mockPaginatedResponse);
+    });
+
+  });
 });
