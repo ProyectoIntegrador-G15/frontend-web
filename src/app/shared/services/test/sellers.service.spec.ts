@@ -196,7 +196,7 @@ describe('SellersService', () => {
   });
 
   describe('createSeller', () => {
-    it('should create a new seller', () => {
+    it('should create a new seller with all fields', () => {
       const newSeller: Omit<Seller, 'id' | 'entryDate'> = {
         name: 'Ana Pérez',
         identification: '1045678901',
@@ -208,16 +208,248 @@ describe('SellersService', () => {
         salesTarget: 40000000.0
       };
 
+      const createdSellerResponse: SellerApiResponse = {
+        id: 4,
+        name: 'Ana Pérez',
+        identification: '1045678901',
+        status: 'active',
+        email: 'ana.perez@medisupply.com',
+        phone: '+57 303 456 7890',
+        address: 'Calle 48 #27-70, Bucaramanga',
+        commission: 4.0,
+        sales_target: 40000000.0,
+        entry_date: '2025-10-27T10:00:00Z',
+        created_at: '2025-10-27T10:00:00Z',
+        updated_at: '2025-10-27T10:00:00Z'
+      };
+
       service.createSeller(newSeller).subscribe((seller) => {
         expect(seller).toBeTruthy();
-        expect(seller.name).toBe('Carlos Rodríguez');
+        expect(seller.id).toBe('4');
+        expect(seller.name).toBe('Ana Pérez');
+        expect(seller.identification).toBe('1045678901');
+        expect(seller.email).toBe('ana.perez@medisupply.com');
+        expect(seller.phone).toBe('+57 303 456 7890');
+        expect(seller.address).toBe('Calle 48 #27-70, Bucaramanga');
+        expect(seller.commission).toBe(4.0);
+        expect(seller.salesTarget).toBe(40000000.0);
+        expect(seller.status).toBe('active');
       });
 
       const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body.name).toBe('Ana Pérez');
+      expect(req.request.body.identification).toBe('1045678901');
+      expect(req.request.body.email).toBe('ana.perez@medisupply.com');
+      expect(req.request.body.phone).toBe('+57 303 456 7890');
+      expect(req.request.body.address).toBe('Calle 48 #27-70, Bucaramanga');
+      expect(req.request.body.commission).toBe(4.0);
       expect(req.request.body.sales_target).toBe(40000000.0);
-      req.flush(mockSellerApiResponse);
+      req.flush(createdSellerResponse);
+    });
+
+    it('should create a seller without optional fields (address, commission, salesTarget)', () => {
+      const newSeller: Omit<Seller, 'id' | 'entryDate'> = {
+        name: 'Pedro Sánchez',
+        identification: '1056789012',
+        status: 'active',
+        email: 'pedro.sanchez@medisupply.com',
+        phone: '+57 304 567 8901'
+      };
+
+      const createdSellerResponse: SellerApiResponse = {
+        id: 5,
+        name: 'Pedro Sánchez',
+        identification: '1056789012',
+        status: 'active',
+        email: 'pedro.sanchez@medisupply.com',
+        phone: '+57 304 567 8901',
+        address: null,
+        commission: null,
+        sales_target: null,
+        entry_date: '2025-10-27T10:00:00Z',
+        created_at: '2025-10-27T10:00:00Z',
+        updated_at: '2025-10-27T10:00:00Z'
+      };
+
+      service.createSeller(newSeller).subscribe((seller) => {
+        expect(seller).toBeTruthy();
+        expect(seller.name).toBe('Pedro Sánchez');
+        expect(seller.address).toBeUndefined();
+        expect(seller.commission).toBeUndefined();
+        expect(seller.salesTarget).toBeUndefined();
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body.name).toBe('Pedro Sánchez');
+      expect(req.request.body.identification).toBe('1056789012');
+      expect(req.request.body.email).toBe('pedro.sanchez@medisupply.com');
+      expect(req.request.body.phone).toBe('+57 304 567 8901');
+      // Verificar que los campos opcionales se envían como null
+      expect(req.request.body.address).toBeNull();
+      expect(req.request.body.commission).toBeNull();
+      expect(req.request.body.sales_target).toBeNull();
+      req.flush(createdSellerResponse);
+    });
+
+    it('should create a seller with only address as optional field', () => {
+      const newSeller: Omit<Seller, 'id' | 'entryDate'> = {
+        name: 'Laura Torres',
+        identification: '1067890123',
+        status: 'active',
+        email: 'laura.torres@medisupply.com',
+        phone: '+57 305 678 9012',
+        address: 'Avenida 68 #45-30, Bogotá'
+      };
+
+      const createdSellerResponse: SellerApiResponse = {
+        id: 6,
+        name: 'Laura Torres',
+        identification: '1067890123',
+        status: 'active',
+        email: 'laura.torres@medisupply.com',
+        phone: '+57 305 678 9012',
+        address: 'Avenida 68 #45-30, Bogotá',
+        commission: null,
+        sales_target: null,
+        entry_date: '2025-10-27T10:00:00Z',
+        created_at: '2025-10-27T10:00:00Z',
+        updated_at: '2025-10-27T10:00:00Z'
+      };
+
+      service.createSeller(newSeller).subscribe((seller) => {
+        expect(seller).toBeTruthy();
+        expect(seller.name).toBe('Laura Torres');
+        expect(seller.address).toBe('Avenida 68 #45-30, Bogotá');
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body.address).toBe('Avenida 68 #45-30, Bogotá');
+      expect(req.request.body.commission).toBeNull();
+      expect(req.request.body.sales_target).toBeNull();
+      req.flush(createdSellerResponse);
+    });
+
+    it('should create a seller with only commission as optional field', () => {
+      const newSeller: Omit<Seller, 'id' | 'entryDate'> = {
+        name: 'Roberto Díaz',
+        identification: '1078901234',
+        status: 'active',
+        email: 'roberto.diaz@medisupply.com',
+        phone: '+57 306 789 0123',
+        commission: 5.5
+      };
+
+      const createdSellerResponse: SellerApiResponse = {
+        id: 7,
+        name: 'Roberto Díaz',
+        identification: '1078901234',
+        status: 'active',
+        email: 'roberto.diaz@medisupply.com',
+        phone: '+57 306 789 0123',
+        address: null,
+        commission: 5.5,
+        sales_target: null,
+        entry_date: '2025-10-27T10:00:00Z',
+        created_at: '2025-10-27T10:00:00Z',
+        updated_at: '2025-10-27T10:00:00Z'
+      };
+
+      service.createSeller(newSeller).subscribe((seller) => {
+        expect(seller).toBeTruthy();
+        expect(seller.name).toBe('Roberto Díaz');
+        expect(seller.commission).toBe(5.5);
+        expect(seller.address).toBeUndefined();
+        expect(seller.salesTarget).toBeUndefined();
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body.commission).toBe(5.5);
+      expect(req.request.body.address).toBeNull();
+      expect(req.request.body.sales_target).toBeNull();
+      req.flush(createdSellerResponse);
+    });
+
+    it('should create a seller with only salesTarget as optional field', () => {
+      const newSeller: Omit<Seller, 'id' | 'entryDate'> = {
+        name: 'Sofía Ramírez',
+        identification: '1089012345',
+        status: 'active',
+        email: 'sofia.ramirez@medisupply.com',
+        phone: '+57 307 890 1234',
+        salesTarget: 55000000.0
+      };
+
+      const createdSellerResponse: SellerApiResponse = {
+        id: 8,
+        name: 'Sofía Ramírez',
+        identification: '1089012345',
+        status: 'active',
+        email: 'sofia.ramirez@medisupply.com',
+        phone: '+57 307 890 1234',
+        address: null,
+        commission: null,
+        sales_target: 55000000.0,
+        entry_date: '2025-10-27T10:00:00Z',
+        created_at: '2025-10-27T10:00:00Z',
+        updated_at: '2025-10-27T10:00:00Z'
+      };
+
+      service.createSeller(newSeller).subscribe((seller) => {
+        expect(seller).toBeTruthy();
+        expect(seller.name).toBe('Sofía Ramírez');
+        expect(seller.salesTarget).toBe(55000000.0);
+        expect(seller.address).toBeUndefined();
+        expect(seller.commission).toBeUndefined();
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body.sales_target).toBe(55000000.0);
+      expect(req.request.body.address).toBeNull();
+      expect(req.request.body.commission).toBeNull();
+      req.flush(createdSellerResponse);
+    });
+
+    it('should transform API response correctly', () => {
+      const newSeller: Omit<Seller, 'id' | 'entryDate'> = {
+        name: 'Test Seller',
+        identification: '1090123456',
+        status: 'active',
+        email: 'test@medisupply.com',
+        phone: '+57 308 901 2345'
+      };
+
+      const createdSellerResponse: SellerApiResponse = {
+        id: 9,
+        name: 'Test Seller',
+        identification: '1090123456',
+        status: 'active',
+        email: 'test@medisupply.com',
+        phone: '+57 308 901 2345',
+        address: null,
+        commission: null,
+        sales_target: null,
+        entry_date: '2025-10-27T15:30:00Z',
+        created_at: '2025-10-27T15:30:00Z',
+        updated_at: '2025-10-27T15:30:00Z'
+      };
+
+      service.createSeller(newSeller).subscribe((seller) => {
+        expect(seller.id).toBe('9'); // ID convertido a string
+        expect(seller.name).toBe('Test Seller');
+        expect(seller.identification).toBe('1090123456');
+        expect(seller.status).toBe('active');
+        expect(seller.email).toBe('test@medisupply.com');
+        expect(seller.phone).toBe('+57 308 901 2345');
+        expect(seller.entryDate).toMatch(/\d{2}-\d{2}-\d{4}/); // Formato DD-MM-YYYY
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}`);
+      req.flush(createdSellerResponse);
     });
 
     it('should handle error when identification already exists', () => {
@@ -233,11 +465,153 @@ describe('SellersService', () => {
         next: () => fail('Should have failed'),
         error: (error) => {
           expect(error).toBeTruthy();
+          expect(error.message).toBe('Ya existe un vendedor con esta identificación');
         }
       });
 
       const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}`);
-      req.flush({ detail: 'Ya existe un vendedor con esta identificación' }, { status: 400, statusText: 'Bad Request' });
+      expect(req.request.method).toBe('POST');
+      req.flush(
+        { detail: 'Ya existe un vendedor con esta identificación' },
+        { status: 400, statusText: 'Bad Request' }
+      );
+    });
+
+    it('should handle server error (500)', () => {
+      const newSeller: Omit<Seller, 'id' | 'entryDate'> = {
+        name: 'Test Seller',
+        identification: '1101234567',
+        status: 'active',
+        email: 'test@test.com',
+        phone: '+57 300 000 0000'
+      };
+
+      service.createSeller(newSeller).subscribe({
+        next: () => fail('Should have failed'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+          expect(error.message).toBe('Error al crear el vendedor');
+        }
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}`);
+      req.flush(
+        { detail: 'Error al crear el vendedor' },
+        { status: 500, statusText: 'Internal Server Error' }
+      );
+    });
+
+    it('should handle unauthorized error (403)', () => {
+      const newSeller: Omit<Seller, 'id' | 'entryDate'> = {
+        name: 'Test Seller',
+        identification: '1112345678',
+        status: 'active',
+        email: 'test@test.com',
+        phone: '+57 300 000 0000'
+      };
+
+      service.createSeller(newSeller).subscribe({
+        next: () => fail('Should have failed'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+          expect(error.message).toBe('No tiene permisos para acceder a este recurso');
+        }
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}`);
+      req.flush(
+        { detail: 'No tiene permisos para acceder a este recurso' },
+        { status: 403, statusText: 'Forbidden' }
+      );
+    });
+
+    it('should handle network error', () => {
+      const newSeller: Omit<Seller, 'id' | 'entryDate'> = {
+        name: 'Test Seller',
+        identification: '1123456789',
+        status: 'active',
+        email: 'test@test.com',
+        phone: '+57 300 000 0000'
+      };
+
+      service.createSeller(newSeller).subscribe({
+        next: () => fail('Should have failed'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+          expect(error.message).toBeTruthy();
+        }
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}`);
+      req.error(new ProgressEvent('Network error'));
+    });
+
+    it('should send correct request body format', () => {
+      const newSeller: Omit<Seller, 'id' | 'entryDate'> = {
+        name: 'Validation Test',
+        identification: '1134567890',
+        status: 'active',
+        email: 'validation@test.com',
+        phone: '3001234567',
+        address: 'Test Address',
+        commission: 3.5,
+        salesTarget: 30000000.0
+      };
+
+      service.createSeller(newSeller).subscribe();
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({
+        name: 'Validation Test',
+        identification: '1134567890',
+        email: 'validation@test.com',
+        phone: '3001234567',
+        address: 'Test Address',
+        commission: 3.5,
+        sales_target: 30000000.0
+      });
+      // Verificar que NO se envía status (el backend lo establece automáticamente)
+      expect(req.request.body.status).toBeUndefined();
+      req.flush(mockSellerApiResponse);
+    });
+
+    it('should handle commission with decimal values', () => {
+      const newSeller: Omit<Seller, 'id' | 'entryDate'> = {
+        name: 'Decimal Test',
+        identification: '1145678901',
+        status: 'active',
+        email: 'decimal@test.com',
+        phone: '+57 300 000 0000',
+        commission: 7.75
+      };
+
+      service.createSeller(newSeller).subscribe((seller) => {
+        expect(seller).toBeTruthy();
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}`);
+      expect(req.request.body.commission).toBe(7.75);
+      req.flush(mockSellerApiResponse);
+    });
+
+    it('should handle salesTarget with large values', () => {
+      const newSeller: Omit<Seller, 'id' | 'entryDate'> = {
+        name: 'Large Value Test',
+        identification: '1156789012',
+        status: 'active',
+        email: 'large@test.com',
+        phone: '+57 300 000 0000',
+        salesTarget: 100000000.0
+      };
+
+      service.createSeller(newSeller).subscribe((seller) => {
+        expect(seller).toBeTruthy();
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}${sellersEndpoint}`);
+      expect(req.request.body.sales_target).toBe(100000000.0);
+      req.flush(mockSellerApiResponse);
     });
   });
 

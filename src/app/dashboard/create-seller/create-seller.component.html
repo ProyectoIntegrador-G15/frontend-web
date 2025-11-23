@@ -1,0 +1,175 @@
+<div class="create-seller-container">
+  <!-- Header con botón de regresar y título -->
+  <div class="flex items-center mb-6">
+    <button 
+      nz-button
+      nzType="text"
+      (click)="goBack()"
+      class="mr-4 p-2 hover:bg-gray-100 rounded-md">
+      <span class="text-[16px]" nz-icon nzType="arrow-left" nzTheme="outline"></span>
+    </button>
+    <h1 class="screen-title">Registrar vendedor</h1>
+  </div>
+
+  <!-- Card principal con formulario -->
+  <div class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
+    <div class="p-[25px]">
+      <!-- Mensaje de error general -->
+      <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+        <p class="font-medium">{{ error }}</p>
+      </div>
+
+      <!-- Formulario -->
+      <form [formGroup]="sellerForm" (ngSubmit)="onSubmit()">
+        <!-- Fila 1: Nombre e Identificación -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <!-- Nombre -->
+          <div>
+            <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+              Nombre <span class="text-red-500">*</span>
+            </label>
+            <input
+              nz-input
+              formControlName="name"
+              [class.border-red-500]="hasFieldError('name')"
+              placeholder="Ingrese el nombre completo del vendedor"
+              class="w-full">
+            <p *ngIf="hasFieldError('name')" class="text-xs text-red-500 mt-1">
+              {{ getFieldError('name') }}
+            </p>
+          </div>
+
+          <!-- Identificación -->
+          <div>
+            <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+              Identificación <span class="text-red-500">*</span>
+            </label>
+            <input
+              nz-input
+              formControlName="identification"
+              [class.border-red-500]="hasFieldError('identification')"
+              placeholder="Ingrese el número de identificación"
+              class="w-full">
+            <p *ngIf="hasFieldError('identification')" class="text-xs text-red-500 mt-1">
+              {{ getFieldError('identification') }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Fila 2: Email y Teléfono -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <!-- Email -->
+          <div>
+            <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+              Email <span class="text-red-500">*</span>
+            </label>
+            <input
+              nz-input
+              type="email"
+              formControlName="email"
+              [class.border-red-500]="hasFieldError('email')"
+              placeholder="correo@ejemplo.com"
+              class="w-full">
+            <p *ngIf="hasFieldError('email')" class="text-xs text-red-500 mt-1">
+              {{ getFieldError('email') }}
+            </p>
+          </div>
+
+          <!-- Teléfono -->
+          <div>
+            <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+              Teléfono <span class="text-red-500">*</span>
+            </label>
+            <input
+              nz-input
+              type="tel"
+              formControlName="phone"
+              [class.border-red-500]="hasFieldError('phone')"
+              placeholder="3001234567"
+              class="w-full">
+            <p *ngIf="hasFieldError('phone')" class="text-xs text-red-500 mt-1">
+              {{ getFieldError('phone') }}
+            </p>
+            <p class="text-xs text-gray-500 mt-1">
+              Mínimo 7 dígitos, máximo 20 dígitos
+            </p>
+          </div>
+        </div>
+
+        <!-- Fila 3: Dirección (ancho completo) -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+            Dirección
+          </label>
+          <input
+            nz-input
+            formControlName="address"
+            placeholder="Ingrese la dirección completa"
+            class="w-full">
+        </div>
+
+        <!-- Fila 4: Comisión y Meta de Ventas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <!-- Comisión -->
+          <div>
+            <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+              Comisión (%)
+            </label>
+            <input
+              nz-input
+              type="number"
+              formControlName="commission"
+              [class.border-red-500]="hasFieldError('commission')"
+              placeholder="0.0"
+              min="0"
+              max="100"
+              step="0.1"
+              class="w-full">
+            <p *ngIf="hasFieldError('commission')" class="text-xs text-red-500 mt-1">
+              {{ getFieldError('commission') }}
+            </p>
+            <p class="text-xs text-gray-500 mt-1">
+              Porcentaje de comisión (0-100%)
+            </p>
+          </div>
+
+          <!-- Meta de Ventas -->
+          <div>
+            <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+              Meta de ventas
+            </label>
+            <input
+              nz-input
+              type="number"
+              formControlName="sales_target"
+              [class.border-red-500]="hasFieldError('sales_target')"
+              placeholder="0"
+              min="0"
+              step="1000"
+              class="w-full">
+            <p *ngIf="hasFieldError('sales_target')" class="text-xs text-red-500 mt-1">
+              {{ getFieldError('sales_target') }}
+            </p>
+            <p class="text-xs text-gray-500 mt-1">
+              Meta de ventas en pesos colombianos
+            </p>
+          </div>
+        </div>
+
+        <!-- Botón de guardar -->
+        <div class="flex justify-center">
+          <button
+            class="btn-primary"
+            type="submit"
+            [disabled]="sellerForm.invalid || isLoading">
+            <span nz-icon nzType="save" nzTheme="outline" *ngIf="!isLoading"></span>
+            <span nz-icon nzType="loading" nzTheme="outline" *ngIf="isLoading"></span>
+            <span *ngIf="!isLoading">Guardar</span>
+            <span *ngIf="isLoading">Guardando...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
