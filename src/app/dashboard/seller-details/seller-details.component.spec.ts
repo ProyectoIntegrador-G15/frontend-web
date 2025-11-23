@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TranslateModule, TranslateService, LangChangeEvent } from '@ngx-translate/core';
@@ -7,7 +7,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { SellerDetailsComponent } from './seller-details.component';
 import { SellersService, Seller, SalesPlan, SalesPlanListResponse, CreateSalesPlanRequest } from '../../shared/services/sellers.service';
-import { VisitRoutesService } from '../../shared/services/visit-routes.service';
+import { VisitRoutesService, VisitRoute } from '../../shared/services/visit-routes.service';
 import { OrdersService } from '../../shared/services/orders.service';
 import { of, throwError } from 'rxjs';
 
@@ -573,6 +573,706 @@ describe('SellerDetailsComponent', () => {
           expect(component.salesPlanForm.get(key)?.dirty).toBe(true);
         });
       });
+    });
+  });
+
+  describe('loadVisitRoutes', () => {
+    it('should load visit routes successfully', () => {
+      const mockRoute: VisitRoute = {
+        id: '1',
+        sellerId: '1',
+        routeDate: '2025-01-01',
+        status: 'confirmed',
+        totalClients: 2,
+        createdAt: '2025-01-01T00:00:00Z',
+        stops: [
+          { id: '1', clientId: '1', clientName: 'Cliente 1', clientAddress: 'Address 1', sequence: 1, durationMinutes: 30, status: 'pending' },
+          { id: '2', clientId: '2', clientName: 'Cliente 2', clientAddress: 'Address 2', sequence: 2, durationMinutes: 30, status: 'pending' }
+        ]
+      };
+      const mockRoutes = {
+        routes: [mockRoute],
+        total: 1,
+        totalPages: 1,
+        page: 1
+      };
+      visitRoutesService.getVisitRoutes.and.returnValue(of(mockRoutes));
+
+      component.loadVisitRoutes('1');
+
+      expect(component.visitRoutes).toEqual(mockRoutes.routes);
+      expect(component.loadingRoutes).toBe(false);
+    });
+
+    it('should handle error when loading visit routes', () => {
+      visitRoutesService.getVisitRoutes.and.returnValue(
+        throwError(() => ({ message: 'Error loading routes' }))
+      );
+      spyOn(console, 'error');
+
+      component.loadVisitRoutes('1');
+
+      expect(component.loadingRoutes).toBe(false);
+      expect(console.error).toHaveBeenCalled();
+    });
+  });
+
+  describe('createVisitRoute', () => {
+    it('should navigate to create visit route with seller id', () => {
+      component.seller = mockSeller;
+      component.createVisitRoute();
+
+      expect(router.navigate).toHaveBeenCalledWith(
+        ['/dashboard/visit-routes/create'],
+        { queryParams: { sellerId: '1' } }
+      );
+    });
+
+    it('should not navigate if seller is null', () => {
+      component.seller = null;
+      component.createVisitRoute();
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('viewRouteDetail', () => {
+    it('should log route id and show alert', () => {
+      spyOn(console, 'log');
+      spyOn(window, 'alert');
+
+      component.viewRouteDetail('123');
+
+      expect(console.log).toHaveBeenCalledWith('Ver detalle de ruta:', '123');
+      expect(window.alert).toHaveBeenCalledWith('Vista de detalle de ruta #123 - Por implementar');
+    });
+  });
+
+  describe('getRouteStatusColor', () => {
+    it('should return blue for confirmed status', () => {
+      expect(component.getRouteStatusColor('confirmed')).toBe('blue');
+    });
+
+    it('should return orange for in_progress status', () => {
+      expect(component.getRouteStatusColor('in_progress')).toBe('orange');
+    });
+
+    it('should return green for completed status', () => {
+      expect(component.getRouteStatusColor('completed')).toBe('green');
+    });
+
+    it('should return red for cancelled status', () => {
+      expect(component.getRouteStatusColor('cancelled')).toBe('red');
+    });
+
+    it('should return default for unknown status', () => {
+      expect(component.getRouteStatusColor('unknown')).toBe('default');
+    });
+  });
+
+  describe('getRouteStatusText', () => {
+    it('should return translated text for draft status', () => {
+      (translateService.instant as jasmine.Spy).and.returnValue('Borrador');
+      expect(component.getRouteStatusText('draft')).toBe('Borrador');
+      expect(translateService.instant).toHaveBeenCalledWith('sellerDetails.visitRoutes.status.draft');
+    });
+
+    it('should return translated text for confirmed status', () => {
+      (translateService.instant as jasmine.Spy).and.returnValue('Confirmado');
+      expect(component.getRouteStatusText('confirmed')).toBe('Confirmado');
+      expect(translateService.instant).toHaveBeenCalledWith('sellerDetails.visitRoutes.status.confirmed');
+    });
+
+    it('should return translated text for in_progress status', () => {
+      (translateService.instant as jasmine.Spy).and.returnValue('En Progreso');
+      expect(component.getRouteStatusText('in_progress')).toBe('En Progreso');
+      expect(translateService.instant).toHaveBeenCalledWith('sellerDetails.visitRoutes.status.inProgress');
+    });
+
+    it('should return translated text for completed status', () => {
+      (translateService.instant as jasmine.Spy).and.returnValue('Completado');
+      expect(component.getRouteStatusText('completed')).toBe('Completado');
+      expect(translateService.instant).toHaveBeenCalledWith('sellerDetails.visitRoutes.status.completed');
+    });
+
+    it('should return translated text for cancelled status', () => {
+      (translateService.instant as jasmine.Spy).and.returnValue('Cancelado');
+      expect(component.getRouteStatusText('cancelled')).toBe('Cancelado');
+      expect(translateService.instant).toHaveBeenCalledWith('sellerDetails.visitRoutes.status.cancelled');
+    });
+
+    it('should return status itself for unknown status', () => {
+      expect(component.getRouteStatusText('unknown')).toBe('unknown');
+    });
+  });
+
+  describe('getClientNamesShort', () => {
+    it('should return formatted text when no stops', () => {
+      const route: VisitRoute = {
+        id: '1',
+        sellerId: '1',
+        routeDate: '2025-01-01',
+        status: 'confirmed',
+        totalClients: 5,
+        createdAt: '2025-01-01T00:00:00Z',
+        stops: []
+      };
+      (translateService.instant as jasmine.Spy).and.returnValue('clientes');
+      expect(component.getClientNamesShort(route)).toBe('5 clientes');
+    });
+
+    it('should return names for 1-2 clients', () => {
+      const route: VisitRoute = {
+        id: '1',
+        sellerId: '1',
+        routeDate: '2025-01-01',
+        status: 'confirmed',
+        totalClients: 2,
+        createdAt: '2025-01-01T00:00:00Z',
+        stops: [
+          { id: '1', clientId: '1', clientName: 'Cliente 1', clientAddress: 'Address 1', sequence: 1, durationMinutes: 30, status: 'pending' },
+          { id: '2', clientId: '2', clientName: 'Cliente 2', clientAddress: 'Address 2', sequence: 2, durationMinutes: 30, status: 'pending' }
+        ]
+      };
+      expect(component.getClientNamesShort(route)).toBe('Cliente 1, Cliente 2');
+    });
+
+    it('should return first 2 names and "X más" for 3+ clients', () => {
+      const route: VisitRoute = {
+        id: '1',
+        sellerId: '1',
+        routeDate: '2025-01-01',
+        status: 'confirmed',
+        totalClients: 5,
+        createdAt: '2025-01-01T00:00:00Z',
+        stops: [
+          { id: '1', clientId: '1', clientName: 'Cliente 1', clientAddress: 'Address 1', sequence: 1, durationMinutes: 30, status: 'pending' },
+          { id: '2', clientId: '2', clientName: 'Cliente 2', clientAddress: 'Address 2', sequence: 2, durationMinutes: 30, status: 'pending' },
+          { id: '3', clientId: '3', clientName: 'Cliente 3', clientAddress: 'Address 3', sequence: 3, durationMinutes: 30, status: 'pending' }
+        ]
+      };
+      (translateService.instant as jasmine.Spy).and.returnValue('y 1 más');
+      expect(component.getClientNamesShort(route)).toContain('Cliente 1, Cliente 2');
+    });
+  });
+
+  describe('getClientNamesForTooltip', () => {
+    it('should return empty string when no stops', () => {
+      const route: VisitRoute = {
+        id: '1',
+        sellerId: '1',
+        routeDate: '2025-01-01',
+        status: 'confirmed',
+        totalClients: 0,
+        createdAt: '2025-01-01T00:00:00Z',
+        stops: []
+      };
+      expect(component.getClientNamesForTooltip(route)).toBe('');
+    });
+
+    it('should return formatted names with numbers', () => {
+      const route: VisitRoute = {
+        id: '1',
+        sellerId: '1',
+        routeDate: '2025-01-01',
+        status: 'confirmed',
+        totalClients: 2,
+        createdAt: '2025-01-01T00:00:00Z',
+        stops: [
+          { id: '1', clientId: '1', clientName: 'Cliente 1', clientAddress: 'Address 1', sequence: 1, durationMinutes: 30, status: 'pending' },
+          { id: '2', clientId: '2', clientName: 'Cliente 2', clientAddress: 'Address 2', sequence: 2, durationMinutes: 30, status: 'pending' }
+        ]
+      };
+      expect(component.getClientNamesForTooltip(route)).toBe('1. Cliente 1\n2. Cliente 2');
+    });
+  });
+
+  describe('formatCurrency', () => {
+    it('should format currency correctly', () => {
+      const formatted = component.formatCurrency(50000000);
+      expect(formatted).toContain('50');
+      expect(formatted).toContain('000');
+    });
+  });
+
+  describe('onTabChange', () => {
+    it('should load visit routes when switching to visit-routes tab', () => {
+      component.seller = mockSeller;
+      spyOn(component, 'loadVisitRoutes');
+
+      component.onTabChange('visit-routes');
+
+      expect(component.activeTab).toBe('visit-routes');
+      expect(component.loadVisitRoutes).toHaveBeenCalledWith('1');
+    });
+
+    it('should load sales plans when switching to sales-plan tab', () => {
+      component.seller = mockSeller;
+      spyOn(component, 'loadSalesPlans');
+
+      component.onTabChange('sales-plan');
+
+      expect(component.activeTab).toBe('sales-plan');
+      expect(component.loadSalesPlans).toHaveBeenCalled();
+    });
+  });
+
+  describe('getStatusText', () => {
+    it('should return status itself for unknown status', () => {
+      component.seller = { ...mockSeller, status: 'unknown' as any };
+      expect(component.getStatusText()).toBe('unknown');
+    });
+  });
+
+  describe('getStatusColor', () => {
+    it('should return empty string for unknown status', () => {
+      component.seller = { ...mockSeller, status: 'unknown' as any };
+      expect(component.getStatusColor()).toBe('');
+    });
+  });
+
+  describe('Performance methods', () => {
+    beforeEach(() => {
+      component.seller = mockSeller;
+    });
+
+    describe('fetchPerformance', () => {
+      it('should fetch performance data successfully', () => {
+        const mockPerformance = {
+          total_revenue: 1000000,
+          total_orders: 50,
+          total_visits: 20,
+          total_units_sold: 500,
+          units_compliance: 80,
+          revenue_compliance: 75,
+          visits_compliance: 90
+        };
+        sellersService.getSellerPerformance.and.returnValue(of(mockPerformance));
+        ordersService.getTopProductsBySeller.and.returnValue(of([]));
+
+        (component as any).fetchPerformance();
+
+        expect(component.performanceData.kpis.total_revenue).toBe(1000000);
+        expect(component.performanceData.kpis.total_orders).toBe(50);
+        expect(component.loadingPerformance).toBe(false);
+      });
+
+      it('should handle error when fetching performance', () => {
+        sellersService.getSellerPerformance.and.returnValue(
+          throwError(() => ({ message: 'Error' }))
+        );
+        spyOn(console, 'error');
+
+        (component as any).fetchPerformance();
+
+        expect(component.loadingPerformance).toBe(false);
+        expect(console.error).toHaveBeenCalled();
+      });
+
+      it('should handle error when fetching top products', () => {
+        sellersService.getSellerPerformance.and.returnValue(of({
+          total_revenue: 0,
+          total_orders: 0,
+          total_visits: 0,
+          total_units_sold: 0,
+          units_compliance: 0,
+          revenue_compliance: 0,
+          visits_compliance: 0
+        }));
+        ordersService.getTopProductsBySeller.and.returnValue(
+          throwError(() => ({ message: 'Error' }))
+        );
+        spyOn(console, 'error');
+        spyOn(component as any, 'updateChart');
+
+        (component as any).fetchPerformance();
+
+        expect(component.performanceData.topProducts).toEqual([]);
+        expect(component.loadingTopProducts).toBe(false);
+        expect((component as any).updateChart).toHaveBeenCalled();
+      });
+
+      it('should not fetch if seller is null', () => {
+        component.seller = null;
+        (component as any).fetchPerformance();
+
+        expect(sellersService.getSellerPerformance).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('updateChart', () => {
+      it('should update chart with products data', () => {
+        component.performanceData.topProducts = [
+          { name: 'Product 1', quantity: 100, sales_amount: 50000 },
+          { name: 'Product 2', quantity: 50, sales_amount: 25000 }
+        ];
+        (translateService.instant as jasmine.Spy).and.returnValue('Cantidad vendida');
+
+        (component as any).updateChart();
+
+        expect(component.chartOptions.series).toBeDefined();
+        expect(component.chartOptions.xaxis?.categories).toEqual(['Product 1', 'Product 2']);
+      });
+
+      it('should update chart with empty data when no products', () => {
+        component.performanceData.topProducts = [];
+        (translateService.instant as jasmine.Spy).and.returnValue('Cantidad vendida');
+
+        (component as any).updateChart();
+
+        expect(component.chartOptions.series).toBeDefined();
+        expect(component.chartOptions.xaxis?.categories).toEqual([]);
+      });
+    });
+
+    describe('onStartDateChange', () => {
+      it('should update start date and fetch performance', () => {
+        spyOn(component as any, 'fetchPerformance');
+        component.activeTab = 'performance';
+        const newDate = new Date(2025, 0, 1);
+
+        component.onStartDateChange(newDate);
+
+        expect(component.performanceData.startDate).toEqual(newDate);
+        expect((component as any).fetchPerformance).toHaveBeenCalled();
+      });
+
+      it('should adjust end date if start is after end', () => {
+        component.performanceData.endDate = new Date(2025, 0, 1);
+        const newStart = new Date(2025, 1, 1);
+
+        component.onStartDateChange(newStart);
+
+        expect(component.performanceData.endDate.getTime()).toBe(newStart.getTime());
+      });
+    });
+
+    describe('onEndDateChange', () => {
+      it('should update end date and fetch performance', () => {
+        spyOn(component as any, 'fetchPerformance');
+        component.activeTab = 'performance';
+        const newDate = new Date(2025, 1, 1);
+
+        component.onEndDateChange(newDate);
+
+        expect(component.performanceData.endDate).toEqual(newDate);
+        expect((component as any).fetchPerformance).toHaveBeenCalled();
+      });
+
+      it('should adjust start date if end is before start', () => {
+        component.performanceData.startDate = new Date(2025, 1, 1);
+        const newEnd = new Date(2025, 0, 1);
+
+        component.onEndDateChange(newEnd);
+
+        expect(component.performanceData.startDate.getTime()).toBe(newEnd.getTime());
+      });
+    });
+
+    describe('disableFutureMonths', () => {
+      it('should disable future months', () => {
+        const futureDate = new Date();
+        futureDate.setMonth(futureDate.getMonth() + 1);
+        expect(component.disableFutureMonths(futureDate)).toBe(true);
+      });
+
+      it('should not disable current month', () => {
+        const currentDate = new Date();
+        expect(component.disableFutureMonths(currentDate)).toBe(false);
+      });
+
+      it('should not disable past months', () => {
+        const pastDate = new Date();
+        pastDate.setMonth(pastDate.getMonth() - 1);
+        expect(component.disableFutureMonths(pastDate)).toBe(false);
+      });
+    });
+
+    describe('disableFutureMonthsForSalesPlan', () => {
+      it('should disable dates more than 6 months in future', () => {
+        const futureDate = new Date();
+        futureDate.setMonth(futureDate.getMonth() + 7);
+        expect(component.disableFutureMonthsForSalesPlan(futureDate)).toBe(true);
+      });
+
+      it('should not disable dates within 6 months', () => {
+        const futureDate = new Date();
+        futureDate.setMonth(futureDate.getMonth() + 5);
+        expect(component.disableFutureMonthsForSalesPlan(futureDate)).toBe(false);
+      });
+
+      it('should disable past dates', () => {
+        const pastDate = new Date();
+        pastDate.setMonth(pastDate.getMonth() - 1);
+        expect(component.disableFutureMonthsForSalesPlan(pastDate)).toBe(true);
+      });
+    });
+  });
+
+  describe('Date validators', () => {
+    beforeEach(() => {
+      component.initSalesPlanForm();
+    });
+
+    describe('startDateValidator', () => {
+      it('should return null for valid date', () => {
+        const now = new Date();
+        const validDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        const control = { value: validDate };
+        const result = (component as any).startDateValidator(control);
+        expect(result).toBeNull();
+      });
+
+      it('should return dateInPast for past date', () => {
+        const pastDate = new Date();
+        pastDate.setMonth(pastDate.getMonth() - 1);
+        const control = { value: pastDate };
+        const result = (component as any).startDateValidator(control);
+        expect(result).toEqual({ dateInPast: true });
+      });
+
+      it('should return dateTooFar for date more than 6 months ahead', () => {
+        const farDate = new Date();
+        farDate.setMonth(farDate.getMonth() + 7);
+        const control = { value: farDate };
+        const result = (component as any).startDateValidator(control);
+        expect(result).toEqual({ dateTooFar: true });
+      });
+    });
+
+    describe('endDateValidator', () => {
+      it('should return endBeforeStart when end is before start', () => {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth() + 2, 1);
+        const end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        component.salesPlanForm.get('start_month')?.setValue(start);
+        const control = { value: end };
+        const result = (component as any).endDateValidator(control);
+        expect(result).toEqual({ endBeforeStart: true });
+      });
+    });
+
+    describe('validateDateRange', () => {
+      it('should set errors when end is before start', () => {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth() + 2, 1);
+        const end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        component.salesPlanForm.get('start_month')?.setValue(start);
+        component.salesPlanForm.get('end_month')?.setValue(end);
+
+        (component as any).validateDateRange();
+
+        expect(component.salesPlanForm.get('end_month')?.errors?.dateRange).toBe(true);
+      });
+
+      it('should clear errors when dates are valid', () => {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        const end = new Date(now.getFullYear(), now.getMonth() + 2, 1);
+        component.salesPlanForm.get('start_month')?.setValue(start);
+        component.salesPlanForm.get('end_month')?.setValue(end);
+        component.salesPlanForm.get('end_month')?.setErrors({ dateRange: true });
+
+        (component as any).validateDateRange();
+
+        expect(component.salesPlanForm.get('end_month')?.errors?.dateRange).toBeUndefined();
+      });
+    });
+  });
+
+  describe('getFieldError', () => {
+    beforeEach(() => {
+      component.initSalesPlanForm();
+      (translateService.instant as jasmine.Spy).and.callFake((key: string) => {
+        const translations: { [key: string]: string } = {
+          'sellerDetails.salesPlan.errors.required': 'Requerido',
+          'sellerDetails.salesPlan.errors.min': 'Mínimo',
+          'sellerDetails.salesPlan.errors.minlength': 'Mínimo largo',
+          'sellerDetails.salesPlan.errors.maxlength': 'Máximo largo',
+          'sellerDetails.salesPlan.errors.invalidDate': 'Fecha inválida',
+          'sellerDetails.salesPlan.errors.dateInPast': 'Fecha pasada',
+          'sellerDetails.salesPlan.errors.dateTooFar': 'Fecha muy lejana',
+          'sellerDetails.salesPlan.errors.endBeforeStart': 'Fin antes de inicio',
+          'sellerDetails.salesPlan.errors.startAfterEnd': 'Inicio después de fin'
+        };
+        return translations[key] || key;
+      });
+    });
+
+    it('should return maxlength error', () => {
+      const field = component.salesPlanForm.get('name');
+      field?.setValue('a'.repeat(300));
+      field?.markAsDirty();
+      expect(component.getFieldError('name')).toBe('Máximo largo');
+    });
+
+    it('should return dateRange error for start_month', () => {
+      const field = component.salesPlanForm.get('start_month');
+      field?.setErrors({ dateRange: true });
+      field?.markAsDirty();
+      expect(component.getFieldError('start_month')).toBe('Inicio después de fin');
+    });
+  });
+
+  describe('handleSalesPlanModalOk', () => {
+    let notificationService: jasmine.SpyObj<NzNotificationService>;
+
+    beforeEach(() => {
+      component.initSalesPlanForm();
+      component.seller = mockSeller;
+      notificationService = TestBed.inject(NzNotificationService) as jasmine.SpyObj<NzNotificationService>;
+    });
+
+    it('should create sales plan successfully', () => {
+      const now = new Date();
+      const startMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      const endMonth = new Date(now.getFullYear(), now.getMonth() + 2, 1);
+      component.salesPlanForm.patchValue({
+        name: 'Plan Test',
+        start_month: startMonth,
+        end_month: endMonth,
+        total_units_target: 1000,
+        total_value_target: 50000,
+        visits_target: 50
+      });
+      // Forzar que validateFormFields retorne true
+      spyOn(component, 'validateFormFields').and.returnValue(true);
+      
+      (translateService.instant as jasmine.Spy).and.returnValue('Plan creado');
+      sellersService.createSalesPlan.and.returnValue(of({ id: 1 } as any));
+      spyOn(component, 'loadSalesPlans');
+
+      component.handleSalesPlanModalOk();
+
+      expect(sellersService.createSalesPlan).toHaveBeenCalled();
+      expect(component.isSalesPlanModalVisible).toBe(false);
+      expect(component.isSalesPlanModalLoading).toBe(false);
+      expect(component.loadSalesPlans).toHaveBeenCalled();
+    });
+
+    it('should handle error when creating sales plan', () => {
+      const now = new Date();
+      const startMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      const endMonth = new Date(now.getFullYear(), now.getMonth() + 2, 1);
+      component.salesPlanForm.patchValue({
+        name: 'Plan Test',
+        start_month: startMonth,
+        end_month: endMonth,
+        total_units_target: 1000,
+        total_value_target: 50000,
+        visits_target: 50
+      });
+      // Forzar que validateFormFields retorne true
+      spyOn(component, 'validateFormFields').and.returnValue(true);
+      
+      (translateService.instant as jasmine.Spy).and.returnValue('Error');
+      sellersService.createSalesPlan.and.returnValue(
+        throwError(() => ({ error: { detail: 'Error detail' } }))
+      );
+
+      component.handleSalesPlanModalOk();
+
+      expect(component.isSalesPlanModalLoading).toBe(false);
+      expect(notificationService.create).toHaveBeenCalled();
+    });
+  });
+
+  describe('formatDateForAPI', () => {
+    it('should format date correctly', () => {
+      const date = new Date(2025, 0, 15);
+      const formatted = (component as any).formatDateForAPI(date);
+      expect(formatted).toBe('2025-01-15');
+    });
+
+    it('should return empty string for null date', () => {
+      expect((component as any).formatDateForAPI(null)).toBe('');
+    });
+  });
+
+  describe('formatPeriod', () => {
+    beforeEach(() => {
+      // Configurar traducciones para los meses
+      (translateService.instant as jasmine.Spy).and.callFake((key: string) => {
+        const translations: { [key: string]: string } = {
+          'reports.months.january': 'enero',
+          'reports.months.february': 'febrero',
+          'reports.months.march': 'marzo',
+          'reports.months.april': 'abril',
+          'reports.months.may': 'mayo',
+          'reports.months.june': 'junio',
+          'reports.months.july': 'julio',
+          'reports.months.august': 'agosto',
+          'reports.months.september': 'septiembre',
+          'reports.months.october': 'octubre',
+          'reports.months.november': 'noviembre',
+          'reports.months.december': 'diciembre'
+        };
+        return translations[key] || key;
+      });
+      (component as any).updateMonths();
+    });
+
+    it('should format same month and year', () => {
+      const result = component.formatPeriod('2025-01-01', '2025-01-31');
+      expect(result).toContain('enero');
+      expect(result).toContain('2025');
+    });
+
+    it('should format different months same year', () => {
+      // Usar fechas explícitas para evitar problemas de zona horaria
+      // Crear fechas usando el constructor Date(year, month, day) donde month es 0-indexed
+      const startDate = new Date(2025, 0, 15).toISOString().split('T')[0]; // Enero 2025
+      const endDate = new Date(2025, 2, 15).toISOString().split('T')[0]; // Marzo 2025
+      const result = component.formatPeriod(startDate, endDate);
+      // El resultado debería ser "enero - marzo 2025"
+      expect(result).toContain('enero');
+      expect(result).toContain('marzo');
+      expect(result).toContain('2025');
+      // Verificar que no contenga años diferentes
+      expect(result).not.toContain('2024');
+    });
+
+    it('should format different years', () => {
+      const result = component.formatPeriod('2024-12-01', '2025-01-31');
+      expect(result).toContain('2024');
+      expect(result).toContain('2025');
+    });
+  });
+
+  describe('ngAfterViewInit', () => {
+    it('should call addAccessibilityToSelectSearchInputs', fakeAsync(() => {
+      spyOn(component as any, 'addAccessibilityToSelectSearchInputs');
+      component.ngAfterViewInit();
+      tick(100);
+      expect((component as any).addAccessibilityToSelectSearchInputs).toHaveBeenCalled();
+    }));
+  });
+
+  describe('ngOnInit', () => {
+    it('should handle fragment for visit-routes tab', () => {
+      activatedRoute.fragment = of('visit-routes');
+      component.ngOnInit();
+      expect(component.activeTab).toBe('visit-routes');
+    });
+
+    it('should subscribe to language changes', () => {
+      spyOn(component as any, 'initializeChartOptions');
+      spyOn(component as any, 'updateTabs');
+      spyOn(component as any, 'updateMonths');
+      component.performanceData.topProducts = [{ name: 'Test', quantity: 1, sales_amount: 100 }];
+      spyOn(component as any, 'updateChart');
+
+      // Primero llamar ngOnInit para que se suscriba
+      component.ngOnInit();
+
+      // Luego emitir el evento de cambio de idioma
+      const langChangeEmitter = (translateService.onLangChange as any);
+      langChangeEmitter.emit({ lang: 'en' });
+
+      expect((component as any).initializeChartOptions).toHaveBeenCalled();
+      expect((component as any).updateTabs).toHaveBeenCalled();
+      expect((component as any).updateMonths).toHaveBeenCalled();
+      expect((component as any).updateChart).toHaveBeenCalled();
     });
   });
 });
