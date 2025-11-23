@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild, ElementRef} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 import {SuppliersService, Supplier} from '../../shared/services/suppliers.service';
@@ -47,6 +47,9 @@ export class SuppliersListComponent implements OnInit, OnDestroy {
   inputClass = 'w-full rounded-[6px] text-[16px] dark:bg-white/10 px-[16px] py-[12px] min-h-[50px] outline-none';
 
   private subscription: Subscription = new Subscription();
+
+  @ViewChild('tableScrollContainer', { static: false }) tableScrollContainer?: ElementRef<HTMLDivElement>;
+  @ViewChild('errorsList', { static: false }) errorsList?: ElementRef<HTMLUListElement>;
 
   constructor(
     private suppliersService: SuppliersService,
@@ -412,6 +415,72 @@ export class SuppliersListComponent implements OnInit, OnDestroy {
       });
 
     this.subscription.add(uploadSubscription);
+  }
+
+  /**
+   * Maneja el desplazamiento horizontal de la tabla con el teclado
+   */
+  onTableScrollKeyDown(event: KeyboardEvent): void {
+    const container = this.tableScrollContainer?.nativeElement;
+    if (!container) return;
+
+    const scrollAmount = 100; // Píxeles a desplazar
+
+    switch (event.key) {
+      case 'ArrowLeft':
+        event.preventDefault();
+        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        break;
+      case 'ArrowRight':
+        event.preventDefault();
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        break;
+      case 'Home':
+        event.preventDefault();
+        container.scrollTo({ left: 0, behavior: 'smooth' });
+        break;
+      case 'End':
+        event.preventDefault();
+        container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
+        break;
+    }
+  }
+
+  /**
+   * Maneja el desplazamiento vertical de la lista de errores con el teclado
+   */
+  onErrorsListKeyDown(event: KeyboardEvent): void {
+    const list = this.errorsList?.nativeElement;
+    if (!list) return;
+
+    const scrollAmount = 50; // Píxeles a desplazar
+
+    switch (event.key) {
+      case 'ArrowUp':
+        event.preventDefault();
+        list.scrollBy({ top: -scrollAmount, behavior: 'smooth' });
+        break;
+      case 'ArrowDown':
+        event.preventDefault();
+        list.scrollBy({ top: scrollAmount, behavior: 'smooth' });
+        break;
+      case 'Home':
+        event.preventDefault();
+        list.scrollTo({ top: 0, behavior: 'smooth' });
+        break;
+      case 'End':
+        event.preventDefault();
+        list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' });
+        break;
+      case 'PageUp':
+        event.preventDefault();
+        list.scrollBy({ top: -list.clientHeight, behavior: 'smooth' });
+        break;
+      case 'PageDown':
+        event.preventDefault();
+        list.scrollBy({ top: list.clientHeight, behavior: 'smooth' });
+        break;
+    }
   }
 }
 
