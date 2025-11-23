@@ -133,7 +133,7 @@ export class SellersService {
   /**
    * Gets sellers with pagination
    */
-  getSellersPaginated(page: number = 1): Observable<{sellers: Seller[], total: number, totalPages: number, page: number}> {
+  getSellersPaginated(page: number = 1): Observable<{ sellers: Seller[], total: number, totalPages: number, page: number }> {
     const sellersUrl = `${environment.apiUrl}${environment.apiEndpoints.sellers}?page=${page}`;
 
     return this.http.get<SellerPaginatedApiResponse>(sellersUrl)
@@ -252,9 +252,9 @@ export class SellersService {
    */
   private formatDate(isoDate: string): string {
     const date = new Date(isoDate);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const year = date.getUTCFullYear();
     return `${day}-${month}-${year}`;
   }
 
@@ -303,8 +303,6 @@ export class SellersService {
       errorMessage = error.error.detail;
     } else if (error.error?.message) {
       errorMessage = error.error.message;
-    } else if (error.message) {
-      errorMessage = error.message;
     }
 
     return throwError(() => new Error(errorMessage));

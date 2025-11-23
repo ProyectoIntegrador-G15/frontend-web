@@ -405,5 +405,455 @@ describe('WarehouseInventoryComponent', () => {
       expect(component.setupSearch).toHaveBeenCalled();
     });
   });
+
+  describe('Inventory Modal', () => {
+    beforeEach(() => {
+      component.warehouseId = '1';
+    });
+
+    describe('initInventoryForm', () => {
+      it('should initialize inventory form with required validators', () => {
+        component.initInventoryForm();
+        
+        expect(component.inventoryForm).toBeDefined();
+        expect(component.inventoryForm.get('product')).toBeTruthy();
+        expect(component.inventoryForm.get('quantity')).toBeTruthy();
+        expect(component.inventoryForm.get('location')).toBeTruthy();
+        
+        const productControl = component.inventoryForm.get('product');
+        const quantityControl = component.inventoryForm.get('quantity');
+        const locationControl = component.inventoryForm.get('location');
+        
+        expect(productControl?.hasError('required')).toBe(true);
+        expect(quantityControl?.hasError('required')).toBe(true);
+        expect(locationControl?.hasError('required')).toBe(true);
+      });
+    });
+
+    describe('showInventoryModal', () => {
+      it('should set isInventoryModalVisible to true', () => {
+        component.isInventoryModalVisible = false;
+        component.showInventoryModal();
+        expect(component.isInventoryModalVisible).toBe(true);
+      });
+    });
+
+    describe('handleInventoryModalCancel', () => {
+      it('should close modal and reset form when not loading', () => {
+        component.isInventoryModalVisible = true;
+        component.isInventoryModalLoading = false;
+        component.initInventoryForm();
+        component.inventoryForm.patchValue({ product: '1', quantity: 10, location: 'A-1' });
+        
+        component.handleInventoryModalCancel();
+        
+        expect(component.isInventoryModalVisible).toBe(false);
+        expect(component.inventoryForm.value.product).toBeNull();
+        expect(component.inventoryForm.value.quantity).toBeNull();
+        expect(component.inventoryForm.value.location).toBeNull();
+      });
+
+      it('should not close modal when loading', () => {
+        component.isInventoryModalVisible = true;
+        component.isInventoryModalLoading = true;
+        
+        component.handleInventoryModalCancel();
+        
+        expect(component.isInventoryModalVisible).toBe(true);
+      });
+    });
+
+    describe('handleInventoryModalOk', () => {
+      beforeEach(() => {
+        component.initInventoryForm();
+      });
+
+      it('should not process if modal is loading', () => {
+        component.isInventoryModalLoading = true;
+        spyOn(component, 'validateInventoryForm');
+        spyOn(component, 'addInventoryToProduct');
+        
+        component.handleInventoryModalOk();
+        
+        expect(component.validateInventoryForm).not.toHaveBeenCalled();
+        expect(component.addInventoryToProduct).not.toHaveBeenCalled();
+      });
+
+      it('should not process if form is invalid', () => {
+        component.isInventoryModalLoading = false;
+        spyOn(component, 'validateInventoryForm').and.returnValue(false);
+        spyOn(component, 'addInventoryToProduct');
+        
+        component.handleInventoryModalOk();
+        
+        expect(component.validateInventoryForm).toHaveBeenCalled();
+        expect(component.addInventoryToProduct).not.toHaveBeenCalled();
+      });
+
+      it('should process form when valid and not loading', () => {
+        component.isInventoryModalLoading = false;
+        component.inventoryForm.patchValue({
+          product: '1',
+          quantity: 10,
+          location: 'A-1'
+        });
+        spyOn(component, 'validateInventoryForm').and.returnValue(true);
+        spyOn(component, 'addInventoryToProduct');
+        
+        component.handleInventoryModalOk();
+        
+        expect(component.isInventoryModalLoading).toBe(true);
+        expect(component.inventoryForm.disabled).toBe(true);
+        expect(component.addInventoryToProduct).toHaveBeenCalledWith('1', jasmine.objectContaining({
+          warehouse_id: 1,
+          quantity: 10,
+          location_identifier: 'A-1'
+        }));
+      });
+    });
+
+    describe('addInventoryToProduct', () => {
+      beforeEach(() => {
+        component.initInventoryForm();
+        component.warehouseId = '1';
+        component.isInventoryModalLoading = true;
+        component.isInventoryModalVisible = true;
+      });
+
+      it('should add inventory successfully', () => {
+        const inventoryData = { warehouse_id: 1, quantity: 10, location_identifier: 'A-1' };
+        mockProductsService.addInventoryToProduct.and.returnValue(of({}));
+        mockProductsWarehouseService.getProductsByWarehouse.and.returnValue(of(mockWarehouseResponse));
+        
+        const translateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
+        translateService.instant.and.returnValue('Inventario agregado exitosamente');
+        
+        component.addInventoryToProduct('1', inventoryData);
+        
+        expect(component.isInventoryModalLoading).toBe(false);
+        expect(component.isInventoryModalVisible).toBe(false);
+        expect(mockProductsService.addInventoryToProduct).toHaveBeenCalledWith('1', inventoryData);
+        expect(mockNotificationService.create).toHaveBeenCalledWith('success', jasmine.any(String), jasmine.any(String));
+        expect(mockProductsWarehouseService.getProductsByWarehouse).toHaveBeenCalled();
+      });
+
+      it('should handle error when adding inventory', () => {
+        const inventoryData = { warehouse_id: 1, quantity: 10, location_identifier: 'A-1' };
+        const error = { message: 'Error adding inventory' };
+        mockProductsService.addInventoryToProduct.and.returnValue(throwError(() => error));
+        
+        const translateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
+        translateService.instant.and.returnValue('Error al agregar inventario');
+        
+        spyOn(console, 'error');
+        
+        component.addInventoryToProduct('1', inventoryData);
+        
+        expect(component.isInventoryModalLoading).toBe(false);
+        expect(component.inventoryForm.enabled).toBe(true);
+        expect(mockNotificationService.create).toHaveBeenCalledWith('error', jasmine.any(String), jasmine.any(String));
+        expect(console.error).toHaveBeenCalled();
+      });
+    });
+
+    describe('resetInventoryForm', () => {
+      it('should reset form and enable it', () => {
+        component.initInventoryForm();
+        component.inventoryForm.patchValue({ product: '1', quantity: 10, location: 'A-1' });
+        component.inventoryForm.disable();
+        
+        component.resetInventoryForm();
+        
+        expect(component.inventoryForm.value.product).toBeNull();
+        expect(component.inventoryForm.value.quantity).toBeNull();
+        expect(component.inventoryForm.value.location).toBeNull();
+        expect(component.inventoryForm.enabled).toBe(true);
+      });
+    });
+
+    describe('getFieldStatus', () => {
+      beforeEach(() => {
+        component.initInventoryForm();
+      });
+
+      it('should return empty string for valid field', () => {
+        const status = component.getFieldStatus('product');
+        expect(status).toBe('');
+      });
+
+      it('should return error for invalid dirty field', () => {
+        const field = component.inventoryForm.get('product');
+        field?.markAsDirty();
+        field?.setValue(null);
+        
+        const status = component.getFieldStatus('product');
+        expect(status).toBe('error');
+      });
+
+      it('should return empty string for invalid but not dirty field', () => {
+        const field = component.inventoryForm.get('product');
+        field?.setValue(null);
+        
+        const status = component.getFieldStatus('product');
+        expect(status).toBe('');
+      });
+    });
+
+    describe('getFieldError', () => {
+      beforeEach(() => {
+        component.initInventoryForm();
+        const translateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
+        translateService.instant.and.returnValue('Campo requerido');
+      });
+
+      it('should return error message for required field', () => {
+        const field = component.inventoryForm.get('product');
+        field?.markAsDirty();
+        field?.setValue(null);
+        
+        const error = component.getFieldError('product');
+        expect(error).toBe('Campo requerido');
+      });
+
+      it('should return error message for min validation', () => {
+        const field = component.inventoryForm.get('quantity');
+        field?.markAsDirty();
+        field?.setValue(0);
+        
+        const translateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
+        translateService.instant.and.returnValue('Cantidad mínima es 1');
+        
+        const error = component.getFieldError('quantity');
+        expect(error).toBe('Cantidad mínima es 1');
+      });
+
+      it('should return empty string when no errors', () => {
+        component.inventoryForm.patchValue({ product: '1', quantity: 10, location: 'A-1' });
+        
+        const error = component.getFieldError('product');
+        expect(error).toBe('');
+      });
+    });
+
+    describe('validateInventoryForm', () => {
+      beforeEach(() => {
+        component.initInventoryForm();
+      });
+
+      it('should return true for valid form', () => {
+        component.inventoryForm.patchValue({
+          product: '1',
+          quantity: 10,
+          location: 'A-1'
+        });
+        
+        const isValid = component.validateInventoryForm();
+        expect(isValid).toBe(true);
+      });
+
+      it('should return false for invalid form', () => {
+        const isValid = component.validateInventoryForm();
+        expect(isValid).toBe(false);
+      });
+
+      it('should mark all fields as dirty', () => {
+        component.validateInventoryForm();
+        
+        expect(component.inventoryForm.get('product')?.dirty).toBe(true);
+        expect(component.inventoryForm.get('quantity')?.dirty).toBe(true);
+        expect(component.inventoryForm.get('location')?.dirty).toBe(true);
+      });
+    });
+  });
+
+  describe('Product Search', () => {
+    describe('loadAllProducts', () => {
+      it('should load all products successfully', () => {
+        const mockProducts = [
+          { id: '1', name: 'Product 1' } as Product,
+          { id: '2', name: 'Product 2' } as Product
+        ];
+        mockProductsService.getProductsPaginated.and.returnValue(of({
+          products: mockProducts,
+          total: 2,
+          total_pages: 1,
+          page: 1,
+          page_size: 5
+        }));
+        
+        component.loadAllProducts();
+        
+        expect(component.isLoadingProducts).toBe(false);
+        expect(component.products).toEqual(mockProducts);
+        expect(mockProductsService.getProductsPaginated).toHaveBeenCalledWith(1, true, '');
+      });
+
+      it('should handle error when loading products', () => {
+        const error = new Error('Network error');
+        mockProductsService.getProductsPaginated.and.returnValue(throwError(() => error));
+        
+        spyOn(console, 'error');
+        
+        component.loadAllProducts();
+        
+        expect(component.isLoadingProducts).toBe(false);
+        expect(console.error).toHaveBeenCalledWith('Error al cargar productos:', error);
+      });
+
+      it('should handle empty products response', () => {
+        mockProductsService.getProductsPaginated.and.returnValue(of({
+          products: undefined,
+          total: 0,
+          total_pages: 0,
+          page: 1,
+          page_size: 5
+        }));
+        
+        component.loadAllProducts();
+        
+        expect(component.products).toEqual([]);
+      });
+    });
+
+    describe('setupProductSearch', () => {
+      it('should setup product search subscription', fakeAsync(() => {
+        component.setupProductSearch();
+        spyOn(component, 'searchProducts');
+        
+        component.onProductSearch('test');
+        tick(500);
+        
+        expect(component.searchProducts).toHaveBeenCalledWith('test');
+      }));
+
+      it('should debounce product search', fakeAsync(() => {
+        component.setupProductSearch();
+        spyOn(component, 'searchProducts');
+        
+        component.onProductSearch('t');
+        component.onProductSearch('te');
+        component.onProductSearch('test');
+        tick(500);
+        
+        expect(component.searchProducts).toHaveBeenCalledTimes(1);
+        expect(component.searchProducts).toHaveBeenCalledWith('test');
+      }));
+    });
+
+    describe('onProductSearch', () => {
+      it('should emit search term to productSearchSubject', () => {
+        spyOn(component['productSearchSubject'], 'next');
+        
+        component.onProductSearch('test');
+        
+        expect(component['productSearchSubject'].next).toHaveBeenCalledWith('test');
+      });
+    });
+
+    describe('searchProducts', () => {
+      it('should search products successfully', () => {
+        const mockProducts = [
+          { id: '1', name: 'Product 1' } as Product
+        ];
+        mockProductsService.getProductsPaginated.and.returnValue(of({
+          products: mockProducts,
+          total: 1,
+          total_pages: 1,
+          page: 1,
+          page_size: 5
+        }));
+        
+        component.searchProducts('test');
+        
+        expect(component.isLoadingProducts).toBe(false);
+        expect(component.products).toEqual(mockProducts);
+        expect(mockProductsService.getProductsPaginated).toHaveBeenCalledWith(1, true, 'test');
+      });
+
+      it('should handle error when searching products', () => {
+        const error = new Error('Search error');
+        mockProductsService.getProductsPaginated.and.returnValue(throwError(() => error));
+        
+        spyOn(console, 'error');
+        
+        component.searchProducts('test');
+        
+        expect(component.isLoadingProducts).toBe(false);
+        expect(console.error).toHaveBeenCalledWith('Error al buscar productos:', error);
+      });
+
+      it('should handle empty search results', () => {
+        mockProductsService.getProductsPaginated.and.returnValue(of({
+          products: undefined,
+          total: 0,
+          total_pages: 0,
+          page: 1,
+          page_size: 5
+        }));
+        
+        component.searchProducts('nonexistent');
+        
+        expect(component.products).toEqual([]);
+      });
+    });
+  });
+
+  describe('subscribeToProducts', () => {
+    it('should subscribe to products$ and update listOfData', () => {
+      const mockProducts = [
+        { id: '1', name: 'Product 1' } as Product,
+        { id: '2', name: 'Product 2' } as Product
+      ];
+      
+      // products$ ya está mockeado en beforeEach como of([])
+      // Se llama automáticamente en ngOnInit, así que verificamos que la suscripción está activa
+      component.ngOnInit();
+      
+      // El observable ya emitió [] en el setup, así que verificamos que la suscripción está activa
+      expect(component['subscription']).toBeDefined();
+      expect(component.listOfData).toEqual([]);
+    });
+  });
+
+  describe('getStatusClass', () => {
+    it('should return inactive classes for undefined status', () => {
+      const result = component.getStatusClass(undefined);
+      expect(result).toBe('bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300');
+    });
+
+    it('should return inactive classes for non-active string', () => {
+      const result = component.getStatusClass('inactive');
+      expect(result).toBe('bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300');
+    });
+  });
+
+  describe('Product mapping in getProductsByWarehouse', () => {
+    it('should map products correctly with all fields', () => {
+      const responseWithNullStatus: WarehouseProductsResponse = {
+        ...mockWarehouseResponse,
+        products: [{
+          id: 3,
+          name: 'Product without status',
+          description: 'Test',
+          purchase_price: 1000,
+          storage_instructions: 'Test',
+          temperature_range: '20-25°C',
+          requires_cold_chain: false,
+          supplier_id: 1,
+          status: null,
+          available_quantity: 50,
+          location_identifier: 'C-10'
+        }]
+      };
+      
+      mockProductsWarehouseService.getProductsByWarehouse.and.returnValue(of(responseWithNullStatus));
+      component.warehouseId = '1';
+      
+      component.getProductsByWarehouse();
+      
+      expect(component.listOfData[0].status).toBe(true); // Default value
+      expect(component.listOfData[0].location_identifier).toBe('C-10');
+    });
+  });
 });
 
