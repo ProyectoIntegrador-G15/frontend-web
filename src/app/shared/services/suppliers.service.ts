@@ -87,6 +87,20 @@ export class SuppliersService {
     );
   }
 
+  bulkUploadSuppliers(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.apiService.postDirect<any>(`${this.endpointsService.getEndpointPath('suppliers')}/bulk`, formData)
+      .pipe(
+        map(response => {
+          this.refreshSuppliers();
+          return response;
+        }),
+        catchError(this.handleError)
+      );
+  }
+
   private refreshSuppliers(): void {
     this.getSuppliersPaginated(1).subscribe({
       next: (response) => {

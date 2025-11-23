@@ -1,4 +1,4 @@
-import {Component} from '@angular/core'
+import {Component} from '@angular/core';
 import { AuthenticationService } from '../../shared/services/authentication.service';
 import {FormBuilder, FormGroup, UntypedFormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
@@ -42,15 +42,29 @@ export class LoginComponent {
         error: (err) => {
           this.error = true;
           this.isLoading = false;
-          // Extraer el mensaje de error de Firebase
+
+          // Angular HttpClient envuelve esto en HttpErrorResponse donde err.error contiene el JSON de respuesta
+          let errorCode = '';
+
+          // Intentar diferentes rutas para encontrar el código de error de Firebase
           if (err?.error?.error?.message) {
-            this.errorMessage = this.getErrorMessage(err.error.error.message);
+            // Estructura: err.error.error.message (donde err.error es el JSON de Firebase)
+            errorCode = err.error.error.message;
           } else if (err?.error?.message) {
-            this.errorMessage = this.getErrorMessage(err.error.message);
+            // Estructura alternativa: err.error.message
+            errorCode = err.error.message;
           } else if (err?.message) {
-            this.errorMessage = err.message;
+            // Mensaje directo
+            errorCode = err.message;
+          }
+
+          // Si encontramos el código de error, traducirlo
+          if (errorCode) {
+            this.errorMessage = this.getErrorMessage(errorCode);
           } else {
-            this.errorMessage = 'Ocurrió un error al intentar iniciar sesión. Por favor, intente nuevamente.';
+            // Si no encontramos el código, mostrar un mensaje genérico apropiado
+            // Esto puede ocurrir si la estructura del error cambia
+            this.errorMessage = 'Las credenciales de inicio de sesión no son válidas. Por favor, verifique su correo y contraseña.';
           }
         }
       });
@@ -83,20 +97,20 @@ export class LoginComponent {
    */
   private getErrorMessage(errorCode: string): string {
     const errorMessages: { [key: string]: string } = {
-      'EMAIL_NOT_FOUND': 'No existe una cuenta con este correo electrónico.',
-      'INVALID_PASSWORD': 'La contraseña es incorrecta.',
-      'USER_DISABLED': 'Esta cuenta ha sido deshabilitada.',
-      'INVALID_EMAIL': 'El formato del correo electrónico no es válido.',
-      'TOO_MANY_ATTEMPTS_TRY_LATER': 'Demasiados intentos fallidos. Por favor, intente más tarde.',
-      'OPERATION_NOT_ALLOWED': 'Esta operación no está permitida.',
-      'WEAK_PASSWORD': 'La contraseña es muy débil.',
-      'EMAIL_EXISTS': 'Ya existe una cuenta con este correo electrónico.',
-      'INVALID_ID_TOKEN': 'El token de autenticación no es válido.',
-      'EXPIRED_ID_TOKEN': 'El token de autenticación ha expirado.',
-      'CREDENTIAL_TOO_OLD_LOGIN_AGAIN': 'Las credenciales son muy antiguas. Por favor, inicie sesión nuevamente.',
-      'INVALID_LOGIN_CREDENTIALS': 'Las credenciales de inicio de sesión no son válidas.',
-      'MISSING_PASSWORD': 'La contraseña es requerida.',
-      'MISSING_EMAIL': 'El correo electrónico es requerido.'
+      EMAIL_NOT_FOUND: 'No existe una cuenta con este correo electrónico.',
+      INVALID_PASSWORD: 'La contraseña es incorrecta.',
+      USER_DISABLED: 'Esta cuenta ha sido deshabilitada.',
+      INVALID_EMAIL: 'El formato del correo electrónico no es válido.',
+      TOO_MANY_ATTEMPTS_TRY_LATER: 'Demasiados intentos fallidos. Por favor, intente más tarde.',
+      OPERATION_NOT_ALLOWED: 'Esta operación no está permitida.',
+      WEAK_PASSWORD: 'La contraseña es muy débil.',
+      EMAIL_EXISTS: 'Ya existe una cuenta con este correo electrónico.',
+      INVALID_ID_TOKEN: 'El token de autenticación no es válido.',
+      EXPIRED_ID_TOKEN: 'El token de autenticación ha expirado.',
+      CREDENTIAL_TOO_OLD_LOGIN_AGAIN: 'Las credenciales son muy antiguas. Por favor, inicie sesión nuevamente.',
+      INVALID_LOGIN_CREDENTIALS: 'Las credenciales de inicio de sesión no son válidas.',
+      MISSING_PASSWORD: 'La contraseña es requerida.',
+      MISSING_EMAIL: 'El correo electrónico es requerido.'
     };
 
     return errorMessages[errorCode] || 'Ocurrió un error al intentar iniciar sesión. Por favor, intente nuevamente.';

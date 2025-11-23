@@ -146,7 +146,17 @@
     "filterByCountry": "Filtrar por país",
     "searchByName": "Buscar proveedores por nombre",
     "searchByNit": "Buscar proveedores por NIT",
-    "searchByCountry": "Buscar proveedores por país"
+    "searchByCountry": "Buscar proveedores por país",
+    "bulkUpload": "Carga Masiva",
+    "downloadTemplate": "Descargar Plantilla",
+    "excelTemplate": "Plantilla Excel",
+    "excelFormat": "Formato .xlsx",
+    "csvTemplate": "Plantilla CSV",
+    "csvFormat": "Formato .csv",
+    "dragFileHere": "Arrastra el archivo aquí o haz clic para seleccionar",
+    "supportedFormats": "Formatos soportados: CSV (.csv) o Excel (.xlsx)",
+    "errorsFound": "Errores encontrados",
+    "uploadFile": "Cargar Archivo"
   },
   "auth": {
     "signInTitle": "Iniciar sesión en MediSupply",
@@ -162,7 +172,28 @@
     "or": "o",
     "dontHaveAccount": "¿No tienes una cuenta?",
     "signUp": "Registrarse",
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "twoFactorAuth": {
+      "title": "Autenticación 2FA",
+      "securityCode": "Código de seguridad",
+      "securityCodeLabel": "Código de seguridad",
+      "digitLabel": "Dígito {{number}} de 6 del código de seguridad",
+      "helpText": "Ingrese el código de 6 dígitos enviado a su correo electrónico",
+      "confirm": "Confirmar",
+      "validating": "Validando...",
+      "resendCode": "Reenviar código",
+      "sending": "Enviando...",
+      "sendingCode": "Enviando código de verificación...",
+      "codeSent": "Código de verificación enviado a tu correo electrónico",
+      "errors": {
+        "completeFields": "Por favor, complete todos los campos del código de seguridad.",
+        "invalidCode": "Código inválido. Te quedan {{remaining}} intento {{plural}}.",
+        "maxAttemptsReached": "Has excedido el número máximo de intentos. Serás redirigido al login.",
+        "sessionBlocked": "Sesión bloqueada por múltiples intentos fallidos. Serás redirigido al login.",
+        "sendError": "Error al enviar el código de verificación. Por favor, intente nuevamente.",
+        "validateError": "Error al validar el código. Por favor, intente nuevamente."
+      }
+    }
   },
   "createRoute": {
     "title": "Generar ruta de entrega",
