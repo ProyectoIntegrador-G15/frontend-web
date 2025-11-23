@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { of, throwError } from 'rxjs';
@@ -117,9 +117,120 @@ describe('CreateRouteComponent', () => {
 
     it('should handle error when loading orders', () => {
       ordersService.getPendingOrders.and.returnValue(throwError(() => new Error('Error loading')));
+      spyOn(console, 'error');
       component.ngOnInit();
       expect(component.error).toBeTruthy();
       expect(component.isLoading).toBe(false);
+      expect(component.showContent).toBe(false);
+      expect(console.error).toHaveBeenCalled();
+    });
+
+    it('should sort orders when only one has requestedDeliveryDate (second has date)', () => {
+      const ordersWithOneDate: Order[] = [
+        {
+          id: '1',
+          requestedDeliveryDate: null,
+          deliveredAt: null,
+          clientName: 'Client 1',
+          state: 'pending',
+          country: 'Colombia',
+          totalAmount: 1000,
+          createdAt: '2024-01-10T10:00:00Z',
+          clientId: 1,
+          clientAddress: 'Address 1',
+          products: []
+        },
+        {
+          id: '2',
+          requestedDeliveryDate: '2024-01-15',
+          deliveredAt: null,
+          clientName: 'Client 2',
+          state: 'pending',
+          country: 'Colombia',
+          totalAmount: 2000,
+          createdAt: '2024-01-11T10:00:00Z',
+          clientId: 2,
+          clientAddress: 'Address 2',
+          products: []
+        }
+      ];
+      ordersService.getPendingOrders.and.returnValue(of(ordersWithOneDate));
+      component.ngOnInit();
+      // La orden con fecha debe ir primero
+      expect(component.pendingOrders[0].id).toBe('2');
+      expect(component.pendingOrders[1].id).toBe('1');
+    });
+
+    it('should sort orders when only one has requestedDeliveryDate (first has date)', () => {
+      const ordersWithOneDate: Order[] = [
+        {
+          id: '1',
+          requestedDeliveryDate: '2024-01-15',
+          deliveredAt: null,
+          clientName: 'Client 1',
+          state: 'pending',
+          country: 'Colombia',
+          totalAmount: 1000,
+          createdAt: '2024-01-10T10:00:00Z',
+          clientId: 1,
+          clientAddress: 'Address 1',
+          products: []
+        },
+        {
+          id: '2',
+          requestedDeliveryDate: null,
+          deliveredAt: null,
+          clientName: 'Client 2',
+          state: 'pending',
+          country: 'Colombia',
+          totalAmount: 2000,
+          createdAt: '2024-01-11T10:00:00Z',
+          clientId: 2,
+          clientAddress: 'Address 2',
+          products: []
+        }
+      ];
+      ordersService.getPendingOrders.and.returnValue(of(ordersWithOneDate));
+      component.ngOnInit();
+      // La orden con fecha debe ir primero
+      expect(component.pendingOrders[0].id).toBe('1');
+      expect(component.pendingOrders[1].id).toBe('2');
+    });
+
+    it('should sort orders by createdAt when neither has requestedDeliveryDate', () => {
+      const ordersWithoutDates: Order[] = [
+        {
+          id: '1',
+          requestedDeliveryDate: null,
+          deliveredAt: null,
+          clientName: 'Client 1',
+          state: 'pending',
+          country: 'Colombia',
+          totalAmount: 1000,
+          createdAt: '2024-01-11T10:00:00Z',
+          clientId: 1,
+          clientAddress: 'Address 1',
+          products: []
+        },
+        {
+          id: '2',
+          requestedDeliveryDate: null,
+          deliveredAt: null,
+          clientName: 'Client 2',
+          state: 'pending',
+          country: 'Colombia',
+          totalAmount: 2000,
+          createdAt: '2024-01-10T10:00:00Z',
+          clientId: 2,
+          clientAddress: 'Address 2',
+          products: []
+        }
+      ];
+      ordersService.getPendingOrders.and.returnValue(of(ordersWithoutDates));
+      component.ngOnInit();
+      // La orden más antigua debe ir primero (FIFO)
+      expect(component.pendingOrders[0].id).toBe('2');
+      expect(component.pendingOrders[1].id).toBe('1');
     });
   });
 
@@ -294,6 +405,184 @@ describe('CreateRouteComponent', () => {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       expect(component.disabledDate(tomorrow)).toBe(false);
+    });
+  });
+
+  describe('ngAfterViewInit', () => {
+    it('should call addAccessibilityToSelectSearchInput after timeout', fakeAsync(() => {
+      spyOn(component as any, 'addAccessibilityToSelectSearchInput');
+      component.ngAfterViewInit();
+      tick(100);
+      expect((component as any).addAccessibilityToSelectSearchInput).toHaveBeenCalled();
+    }));
+  });
+
+  describe('addAccessibilityToSelectSearchInput', () => {
+    beforeEach(() => {
+      // Limpiar cualquier elemento existente
+      const existing = document.getElementById('vehicle-select');
+      if (existing) {
+        existing.remove();
+      }
+    });
+
+    afterEach(() => {
+      // Limpiar después de cada test de forma segura
+      const existing = document.getElementById('vehicle-select');
+      if (existing) {
+        existing.remove();
+      }
+    });
+
+    it('should not throw when vehicleSelect does not exist', () => {
+      expect(() => (component as any).addAccessibilityToSelectSearchInput()).not.toThrow();
+    });
+
+    it('should not throw when searchInput does not exist', () => {
+      const mockSelect = document.createElement('div');
+      mockSelect.id = 'vehicle-select';
+      document.body.appendChild(mockSelect);
+      
+      expect(() => (component as any).addAccessibilityToSelectSearchInput()).not.toThrow();
+    });
+
+    it('should add attributes when searchInput exists with first selector', () => {
+      const mockSelect = document.createElement('div');
+      mockSelect.id = 'vehicle-select';
+      const mockInput = document.createElement('input');
+      mockInput.className = 'ant-select-selection-search-input';
+      mockSelect.appendChild(mockInput);
+      document.body.appendChild(mockSelect);
+      
+      translateService.instant.and.returnValue('Vehicle/Driver');
+      
+      (component as any).addAccessibilityToSelectSearchInput();
+      
+      expect(mockInput.getAttribute('aria-label')).toBe('Vehicle/Driver');
+      expect(mockInput.getAttribute('title')).toBe('Vehicle/Driver');
+    });
+
+    it('should add attributes when searchInput exists with second selector', () => {
+      const mockSelect = document.createElement('div');
+      mockSelect.id = 'vehicle-select';
+      const searchContainer = document.createElement('div');
+      searchContainer.className = 'ant-select-selection-search';
+      const mockInput = document.createElement('input');
+      searchContainer.appendChild(mockInput);
+      mockSelect.appendChild(searchContainer);
+      document.body.appendChild(mockSelect);
+      
+      translateService.instant.and.returnValue('Vehicle/Driver');
+      
+      (component as any).addAccessibilityToSelectSearchInput();
+      
+      expect(mockInput.getAttribute('aria-label')).toBe('Vehicle/Driver');
+      expect(mockInput.getAttribute('title')).toBe('Vehicle/Driver');
+    });
+
+    it('should add placeholder when it does not exist', () => {
+      const mockSelect = document.createElement('div');
+      mockSelect.id = 'vehicle-select';
+      const mockInput = document.createElement('input');
+      mockInput.className = 'ant-select-selection-search-input';
+      mockSelect.appendChild(mockInput);
+      document.body.appendChild(mockSelect);
+      
+      translateService.instant.and.callFake((key: string) => {
+        if (key === 'createRoute.vehicleDriver') return 'Vehicle/Driver';
+        if (key === 'common.search') return 'Search';
+        return key;
+      });
+      
+      (component as any).addAccessibilityToSelectSearchInput();
+      
+      expect(mockInput.getAttribute('placeholder')).toBe('Vehicle/Driver - Search');
+    });
+
+    it('should not override existing placeholder', () => {
+      const mockSelect = document.createElement('div');
+      mockSelect.id = 'vehicle-select';
+      const mockInput = document.createElement('input');
+      mockInput.className = 'ant-select-selection-search-input';
+      mockInput.setAttribute('placeholder', 'Existing placeholder');
+      mockSelect.appendChild(mockInput);
+      document.body.appendChild(mockSelect);
+      
+      translateService.instant.and.returnValue('Vehicle/Driver');
+      
+      (component as any).addAccessibilityToSelectSearchInput();
+      
+      expect(mockInput.getAttribute('placeholder')).toBe('Existing placeholder');
+    });
+  });
+
+  describe('formatDateForBackend', () => {
+    it('should format date correctly', () => {
+      const date = new Date(2024, 0, 15); // Enero 15, 2024
+      const result = (component as any).formatDateForBackend(date);
+      expect(result).toBe('2024-01-15');
+    });
+
+    it('should pad month and day with zeros', () => {
+      const date = new Date(2024, 0, 5); // Enero 5, 2024
+      const result = (component as any).formatDateForBackend(date);
+      expect(result).toBe('2024-01-05');
+    });
+  });
+
+  describe('generateRoute - error cases', () => {
+    beforeEach(() => {
+      component.pendingOrders = mockOrders.map(order => ({ ...order, selected: false }));
+    });
+
+    it('should handle error without message property', () => {
+      component.pendingOrders[0].selected = true;
+      component.selectedDate = new Date('2024-01-20T12:00:00Z');
+      routesService.createRoute.and.returnValue(throwError(() => ({ error: 'Error' })));
+      translateService.instant.and.returnValue('Error creating route');
+      spyOn(console, 'error');
+      
+      component.generateRoute();
+      
+      expect(snackService.error).toHaveBeenCalled();
+      expect(component.error).toBeTruthy();
+      expect(component.isLoading).toBe(false);
+    });
+
+    it('should handle error with message property', () => {
+      component.pendingOrders[0].selected = true;
+      component.selectedDate = new Date('2024-01-20T12:00:00Z');
+      routesService.createRoute.and.returnValue(throwError(() => ({ message: 'Specific error message' })));
+      translateService.instant.and.returnValue('Error creating route');
+      spyOn(console, 'error');
+      
+      component.generateRoute();
+      
+      expect(snackService.error).toHaveBeenCalled();
+      expect(component.error).toBe('Specific error message');
+      expect(component.isLoading).toBe(false);
+    });
+
+    it('should handle multiple selected orders', () => {
+      component.pendingOrders[0].selected = true;
+      component.pendingOrders[1].selected = true;
+      component.selectedDate = new Date('2024-01-20T12:00:00Z');
+      const mockResponse: RouteApiResponse = {
+        id: 1,
+        vehicle_id: 1,
+        created_at: '2024-01-20T10:00:00Z',
+        state: 'planned',
+        deliveries: 2,
+        gmaps_metrics: '{}',
+        country: 'Colombia',
+        waypoints: []
+      };
+      routesService.createRoute.and.returnValue(of(mockResponse));
+      
+      component.generateRoute();
+      
+      const callArgs = routesService.createRoute.calls.mostRecent().args[0] as CreateRouteRequest;
+      expect(callArgs.orders).toEqual([1, 2]);
     });
   });
 });

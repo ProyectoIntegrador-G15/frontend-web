@@ -121,5 +121,205 @@ describe('LanguageService', () => {
       expect(newLang).not.toBe(initialLang);
     });
   });
+
+  describe('initializeLanguage', () => {
+    it('should use saved language from localStorage', () => {
+      localStorage.setItem('medisupply-language', 'en-US');
+      
+      TestBed.resetTestingModule();
+      const translateServiceSpy = jasmine.createSpyObj('TranslateService', ['setDefaultLang', 'use']);
+      translateServiceSpy.setDefaultLang.and.returnValue(of('es-CO'));
+      translateServiceSpy.use.and.returnValue(of('en-US'));
+
+      TestBed.configureTestingModule({
+        providers: [
+          LanguageService,
+          { provide: TranslateService, useValue: translateServiceSpy }
+        ]
+      });
+
+      const newService = TestBed.inject(LanguageService);
+      expect(translateServiceSpy.use).toHaveBeenCalledWith('en-US');
+    });
+
+    it('should use browser language when no saved language', () => {
+      Object.defineProperty(navigator, 'language', {
+        writable: true,
+        value: 'en-US'
+      });
+
+      TestBed.resetTestingModule();
+      const translateServiceSpy = jasmine.createSpyObj('TranslateService', ['setDefaultLang', 'use']);
+      translateServiceSpy.setDefaultLang.and.returnValue(of('es-CO'));
+      translateServiceSpy.use.and.returnValue(of('en-US'));
+
+      TestBed.configureTestingModule({
+        providers: [
+          LanguageService,
+          { provide: TranslateService, useValue: translateServiceSpy }
+        ]
+      });
+
+      const newService = TestBed.inject(LanguageService);
+      expect(translateServiceSpy.use).toHaveBeenCalled();
+    });
+
+    it('should use default language when no saved or browser language', () => {
+      Object.defineProperty(navigator, 'language', {
+        writable: true,
+        value: 'fr-FR'
+      });
+
+      TestBed.resetTestingModule();
+      const translateServiceSpy = jasmine.createSpyObj('TranslateService', ['setDefaultLang', 'use']);
+      translateServiceSpy.setDefaultLang.and.returnValue(of('es-CO'));
+      translateServiceSpy.use.and.returnValue(of('es-CO'));
+
+      TestBed.configureTestingModule({
+        providers: [
+          LanguageService,
+          { provide: TranslateService, useValue: translateServiceSpy }
+        ]
+      });
+
+      const newService = TestBed.inject(LanguageService);
+      expect(translateServiceSpy.use).toHaveBeenCalledWith('es-CO');
+    });
+  });
+
+  describe('getBrowserLanguage', () => {
+    it('should return en-US for English browser language', () => {
+      Object.defineProperty(navigator, 'language', {
+        writable: true,
+        value: 'en'
+      });
+
+      TestBed.resetTestingModule();
+      const translateServiceSpy = jasmine.createSpyObj('TranslateService', ['setDefaultLang', 'use']);
+      translateServiceSpy.setDefaultLang.and.returnValue(of('es-CO'));
+      translateServiceSpy.use.and.returnValue(of('en-US'));
+
+      TestBed.configureTestingModule({
+        providers: [
+          LanguageService,
+          { provide: TranslateService, useValue: translateServiceSpy }
+        ]
+      });
+
+      const newService = TestBed.inject(LanguageService);
+      expect(translateServiceSpy.use).toHaveBeenCalledWith('en-US');
+    });
+
+    it('should return es-CO for Spanish-CO browser language', () => {
+      Object.defineProperty(navigator, 'language', {
+        writable: true,
+        value: 'es-CO'
+      });
+
+      TestBed.resetTestingModule();
+      const translateServiceSpy = jasmine.createSpyObj('TranslateService', ['setDefaultLang', 'use']);
+      translateServiceSpy.setDefaultLang.and.returnValue(of('es-CO'));
+      translateServiceSpy.use.and.returnValue(of('es-CO'));
+
+      TestBed.configureTestingModule({
+        providers: [
+          LanguageService,
+          { provide: TranslateService, useValue: translateServiceSpy }
+        ]
+      });
+
+      const newService = TestBed.inject(LanguageService);
+      expect(translateServiceSpy.use).toHaveBeenCalledWith('es-CO');
+    });
+
+    it('should return es-PE for Spanish-PE browser language', () => {
+      Object.defineProperty(navigator, 'language', {
+        writable: true,
+        value: 'es-PE'
+      });
+
+      TestBed.resetTestingModule();
+      const translateServiceSpy = jasmine.createSpyObj('TranslateService', ['setDefaultLang', 'use']);
+      translateServiceSpy.setDefaultLang.and.returnValue(of('es-CO'));
+      translateServiceSpy.use.and.returnValue(of('es-PE'));
+
+      TestBed.configureTestingModule({
+        providers: [
+          LanguageService,
+          { provide: TranslateService, useValue: translateServiceSpy }
+        ]
+      });
+
+      const newService = TestBed.inject(LanguageService);
+      expect(translateServiceSpy.use).toHaveBeenCalledWith('es-PE');
+    });
+
+    it('should return es-EC for Spanish-EC browser language', () => {
+      Object.defineProperty(navigator, 'language', {
+        writable: true,
+        value: 'es-EC'
+      });
+
+      TestBed.resetTestingModule();
+      const translateServiceSpy = jasmine.createSpyObj('TranslateService', ['setDefaultLang', 'use']);
+      translateServiceSpy.setDefaultLang.and.returnValue(of('es-CO'));
+      translateServiceSpy.use.and.returnValue(of('es-EC'));
+
+      TestBed.configureTestingModule({
+        providers: [
+          LanguageService,
+          { provide: TranslateService, useValue: translateServiceSpy }
+        ]
+      });
+
+      const newService = TestBed.inject(LanguageService);
+      expect(translateServiceSpy.use).toHaveBeenCalledWith('es-EC');
+    });
+
+    it('should return es-MX for Spanish-MX browser language', () => {
+      Object.defineProperty(navigator, 'language', {
+        writable: true,
+        value: 'es-MX'
+      });
+
+      TestBed.resetTestingModule();
+      const translateServiceSpy = jasmine.createSpyObj('TranslateService', ['setDefaultLang', 'use']);
+      translateServiceSpy.setDefaultLang.and.returnValue(of('es-CO'));
+      translateServiceSpy.use.and.returnValue(of('es-MX'));
+
+      TestBed.configureTestingModule({
+        providers: [
+          LanguageService,
+          { provide: TranslateService, useValue: translateServiceSpy }
+        ]
+      });
+
+      const newService = TestBed.inject(LanguageService);
+      expect(translateServiceSpy.use).toHaveBeenCalledWith('es-MX');
+    });
+
+    it('should return es-CO for generic Spanish browser language', () => {
+      Object.defineProperty(navigator, 'language', {
+        writable: true,
+        value: 'es'
+      });
+
+      TestBed.resetTestingModule();
+      const translateServiceSpy = jasmine.createSpyObj('TranslateService', ['setDefaultLang', 'use']);
+      translateServiceSpy.setDefaultLang.and.returnValue(of('es-CO'));
+      translateServiceSpy.use.and.returnValue(of('es-CO'));
+
+      TestBed.configureTestingModule({
+        providers: [
+          LanguageService,
+          { provide: TranslateService, useValue: translateServiceSpy }
+        ]
+      });
+
+      const newService = TestBed.inject(LanguageService);
+      expect(translateServiceSpy.use).toHaveBeenCalledWith('es-CO');
+    });
+  });
+
 });
 

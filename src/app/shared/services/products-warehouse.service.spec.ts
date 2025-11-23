@@ -167,6 +167,55 @@ describe('ProductsWarehouseService', () => {
         });
       });
     });
+
+    it('should handle product with undefined status', (done) => {
+      const responseWithUndefinedStatus: WarehouseProductsResponse = {
+        ...mockWarehouseResponse,
+        products: [{
+          ...mockWarehouseResponse.products[0],
+          status: undefined
+        }]
+      };
+
+      apiService.getDirect.and.returnValue(of(responseWithUndefinedStatus));
+
+      service.getProductsByWarehouse('1').subscribe(() => {
+        service.products$.subscribe(products => {
+          expect(products[0].status).toBe(true); // Should default to true
+          done();
+        });
+      });
+    });
+
+    it('should handle errors with error.message when error.error.message is not available', () => {
+      // Simular el error transformado por ApiService
+      const errorResponse = new Error('Network or Client Error: Network error');
+      apiService.getDirect.and.returnValue(throwError(() => errorResponse));
+
+      service.getProductsByWarehouse('1').subscribe({
+        next: () => fail('should have failed'),
+        error: (error) => {
+          expect(error).toBeDefined();
+          // ProductsWarehouseService.handleError extracts the actual message
+          expect(error.message).toBe('Network error');
+        }
+      });
+    });
+
+    it('should handle errors with default message when no error message available', () => {
+      // Simular el error transformado por ApiService sin mensaje real
+      const errorResponse = new Error('Network or Client Error: ');
+      apiService.getDirect.and.returnValue(throwError(() => errorResponse));
+
+      service.getProductsByWarehouse('1').subscribe({
+        next: () => fail('should have failed'),
+        error: (error) => {
+          expect(error).toBeDefined();
+          // ProductsWarehouseService.handleError should use default message
+          expect(error.message).toBe('Ocurrió un error inesperado');
+        }
+      });
+    });
   });
 });
 
