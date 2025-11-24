@@ -1,0 +1,19 @@
+.create-seller-container {
+  padding: 20px;
+
+  // Asegurar que el botón tenga texto blanco cuando está habilitado
+  .btn-primary:not(:disabled) {
+    color: var(--white, #FFF) !important;
+    
+    span, 
+    [nz-icon] {
+      color: var(--white, #FFF) !important;
+    }
+  }
+}
+
+// Estilos para inputs con error
+.border-red-500 {
+  border-color: #ef4444 !important;
+}
+

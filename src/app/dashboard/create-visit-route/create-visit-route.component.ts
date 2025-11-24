@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { ClientsService, Client } from '../../shared/services/clients.service';
 import { VisitRoutesService, VisitRoute } from '../../shared/services/visit-routes.service';
 import { SellersService, Seller } from '../../shared/services/sellers.service';
@@ -39,7 +40,8 @@ export class CreateVisitRouteComponent implements OnInit {
     private clientsService: ClientsService,
     private visitRoutesService: VisitRoutesService,
     private sellersService: SellersService,
-    private snackService: SnackService
+    private snackService: SnackService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -73,7 +75,7 @@ export class CreateVisitRouteComponent implements OnInit {
         console.error('Error loading seller:', error);
         // Si no podemos cargar el vendedor, usamos el primero disponible
         this.selectedSellerId = '1';
-        this.sellerName = 'Vendedor 1';
+        this.sellerName = this.translateService.instant('sellers.title') + ' 1';
       }
     });
   }
@@ -91,7 +93,7 @@ export class CreateVisitRouteComponent implements OnInit {
     this.clientsService.getClients(sellerId).subscribe({
       next: (clients) => {
         if (clients.length === 0) {
-          this.error = 'Este vendedor no tiene clientes asignados.';
+          this.error = this.translateService.instant('createVisitRoute.error.noClientsAssigned');
         }
         
         this.clients = clients.map(client => ({
@@ -101,7 +103,7 @@ export class CreateVisitRouteComponent implements OnInit {
         this.loadingClients = false;
       },
       error: (error) => {
-        this.error = 'No se pudieron cargar los clientes. Por favor, intente nuevamente.';
+        this.error = this.translateService.instant('createVisitRoute.error.loadClients');
         this.loadingClients = false;
       }
     });
@@ -121,6 +123,11 @@ export class CreateVisitRouteComponent implements OnInit {
     return this.clients.filter(c => c.selected);
   }
 
+  getSelectedClientsText(): string {
+    const count = this.selectedClients.length;
+    return this.translateService.instant('createVisitRoute.selectedClients', { count });
+  }
+
   toggleClientSelection(client: ClientWithSelection): void {
     client.selected = !client.selected;
   }
@@ -134,17 +141,17 @@ export class CreateVisitRouteComponent implements OnInit {
   generateVisitRoute(): void {
     // Validaciones
     if (!this.selectedSellerId) {
-      this.error = 'Por favor selecciona un vendedor';
+      this.error = this.translateService.instant('createVisitRoute.error.noSeller');
       return;
     }
 
     if (!this.selectedDate) {
-      this.error = 'Por favor selecciona una fecha para la ruta de visita';
+      this.error = this.translateService.instant('createVisitRoute.error.noDate');
       return;
     }
 
     if (this.selectedClients.length === 0) {
-      this.error = 'Por favor selecciona al menos un cliente para visitar';
+      this.error = this.translateService.instant('createVisitRoute.error.noClients');
       return;
     }
 
@@ -173,9 +180,12 @@ export class CreateVisitRouteComponent implements OnInit {
     this.visitRoutesService.confirmVisitRoute(this.generatedRoute.id).subscribe({
       next: (route) => {
         // Mostrar snack de confirmación
-        this.snackService.success(
-          `Ruta de visita #${route.id} confirmada exitosamente para ${this.sellerName}. Total: ${route.totalClients} clientes.`
-        );
+        const successMessage = this.translateService.instant('createVisitRoute.success.confirmed', {
+          id: route.id,
+          sellerName: this.sellerName,
+          total: route.totalClients
+        });
+        this.snackService.success(successMessage);
         
         // Redirigir al detalle del vendedor (tab de rutas de visita)
         this.router.navigate(['/dashboard/sellers', this.selectedSellerId], {
@@ -184,8 +194,11 @@ export class CreateVisitRouteComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error confirming route:', error);
-        this.error = error.message || 'No se pudo confirmar la ruta';
-        this.snackService.error('Error al confirmar la ruta: ' + (error.message || 'Error desconocido'));
+        this.error = error.message || this.translateService.instant('createVisitRoute.error.confirmRoute');
+        const errorMessage = this.translateService.instant('createVisitRoute.error.confirmRouteError', {
+          error: error.message || this.translateService.instant('common.error')
+        });
+        this.snackService.error(errorMessage);
         this.loading = false;
       }
     });

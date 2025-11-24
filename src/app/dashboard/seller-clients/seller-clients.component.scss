@@ -1,0 +1,466 @@
+.seller-clients-container {
+  padding: 20px;
+}
+
+// Header (sin fondo) - mismo estilo que seller-details
+.seller-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.seller-name-subtitle {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.75em;
+  color: #595959;
+  font-weight: bold;
+
+  &.loading-text {
+    color: #737373;
+  }
+}
+
+// Contenedor principal de drag and drop
+.drag-drop-container {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 24px;
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+// Paneles de drag and drop
+.drag-panel {
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #e8e8e8;
+  padding: 20px;
+  min-height: 400px;
+  max-height: calc(100vh - 250px);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  &.assigned-panel {
+    border-left: 4px solid #1890ff;
+
+    .drop-list.cdk-drop-list-dragging .drag-item:not(.cdk-drag-placeholder) {
+      border-color: #1890ff;
+    }
+  }
+
+  &.available-panel {
+    border-left: 4px solid #52c41a;
+
+    .drop-list.cdk-drop-list-dragging .drag-item:not(.cdk-drag-placeholder) {
+      border-color: #52c41a;
+    }
+  }
+}
+
+// Encabezado del panel
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.panel-icon {
+  font-size: 24px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  flex-shrink: 0;
+
+  &.assigned-icon {
+    background: #e6f7ff;
+    color: #1890ff;
+  }
+
+  &.available-icon {
+    background: #f6ffed;
+    color: #52c41a;
+  }
+}
+
+.panel-title-section {
+  flex: 1;
+}
+
+.panel-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #262626;
+  margin: 0 0 4px 0;
+}
+
+.panel-count {
+  font-size: 13px;
+  color: #595959;
+  font-weight: 400;
+}
+
+// Lista de drop
+.drop-list {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 200px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+
+  &.cdk-drop-list-dragging {
+    background-color: #fafafa;
+  }
+
+  // Estado cuando se arrastra sobre el panel (recibiendo)
+  &.cdk-drop-list-receiving {
+    background-color: #f0f9ff;
+    border: 2px dashed #1890ff;
+    border-radius: 12px;
+    
+    &.assigned-panel-list {
+      border-color: #1890ff;
+      background-color: #e6f7ff;
+    }
+    
+    &.available-panel-list {
+      border-color: #52c41a;
+      background-color: #f6ffed;
+    }
+  }
+
+  &.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+  }
+
+  // Scrollbar personalizado
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f5f5f5;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d9d9d9;
+    border-radius: 3px;
+
+    &:hover {
+      background: #bfbfbf;
+    }
+  }
+}
+
+// Items arrastrables - toda la tarjeta es arrastrable
+.drag-item {
+  padding: 14px;
+  margin-bottom: 10px;
+  background: #fafafa;
+  border: 2px solid #e8e8e8;
+  border-radius: 10px;
+  cursor: grab;
+  transition: all 0.2s ease;
+  position: relative;
+  user-select: none;
+
+  &:hover {
+    background: #f0f0f0;
+    border-color: #d9d9d9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    .drag-indicator {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &.assigned-item {
+    border-left: 3px solid #1890ff;
+  }
+
+  &.available-item {
+    border-left: 3px solid #52c41a;
+  }
+
+  // Estado mientras se arrastra
+  &.cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  // Placeholder mientras se arrastra
+  .cdk-drag-placeholder {
+    opacity: 0.4;
+    background: #e6f7ff;
+    border: 2px dashed #1890ff;
+  }
+}
+
+// Indicador de drag (icono visual, no handle)
+.drag-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: transparent;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  opacity: 0.5;
+
+  .drag-icon {
+    font-size: 16px;
+    color: #8c8c8c;
+    pointer-events: none;
+  }
+}
+
+// Contenido del cliente
+.client-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.client-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.client-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.client-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #262626;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.client-email {
+  font-size: 13px;
+  color: #595959;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Preview mientras se arrastra
+.drag-preview {
+  padding: 12px 16px;
+  background: white;
+  border: 2px solid #1890ff;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: rotate(2deg);
+}
+
+.drag-preview-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: #262626;
+
+  span[nz-icon] {
+    font-size: 18px;
+    color: #1890ff;
+  }
+}
+
+// Separador visual simplificado entre paneles
+.drag-separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  min-width: 60px;
+  position: relative;
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+}
+
+.separator-line {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #d9d9d9, transparent);
+}
+
+.separator-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  border: 2px solid #e8e8e8;
+  margin: 0 8px;
+  transition: all 0.3s ease;
+
+  span[nz-icon] {
+    font-size: 18px;
+    color: #8c8c8c;
+  }
+}
+
+// Efecto cuando se arrastra sobre el separador
+.drag-drop-container:has(.cdk-drag-preview) .separator-icon {
+  background: #e6f7ff;
+  border-color: #1890ff;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
+
+  span[nz-icon] {
+    color: #1890ff;
+    animation: rotate 1s ease-in-out infinite;
+  }
+}
+
+@keyframes rotate {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+}
+
+// Estado vacío
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 56px;
+  color: #d9d9d9;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.empty-text {
+  font-size: 15px;
+  color: #595959;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+
+.empty-hint {
+  font-size: 13px;
+  color: #737373;
+  margin: 0;
+  font-style: italic;
+}
+
+// Estilos para CDK drag-drop
+.cdk-drop-list {
+  min-height: 100px;
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.3;
+  background: #f0f0f0;
+  border: 2px dashed #d9d9d9;
+}
+
+// Modo oscuro
+.dark {
+  .drag-panel {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .panel-header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .panel-title {
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .panel-count {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .drag-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .client-name {
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .client-email {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .empty-text {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .empty-hint {
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+

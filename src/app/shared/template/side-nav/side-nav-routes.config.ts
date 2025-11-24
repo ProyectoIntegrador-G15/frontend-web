@@ -4,18 +4,18 @@ import {
 
 export const ROUTES: SideNavInterface[] = [
   {
-    path: '/providers',
-    title: 'navigation.providers',
-    iconType: 'nzIcon',
-    icon: 'car',
-    iconTheme: 'outline',
-    submenu: []
-  },
-  {
     path: '/dashboard/products',
     title: 'navigation.products',
     iconType: 'nzIcon',
     icon: 'shop',
+    iconTheme: 'outline',
+    submenu: []
+  },
+  {
+    path: '/dashboard/suppliers',
+    title: 'navigation.providers',
+    iconType: 'nzIcon',
+    icon: 'car',
     iconTheme: 'outline',
     submenu: []
   },

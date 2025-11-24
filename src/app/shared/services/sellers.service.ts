@@ -33,8 +33,37 @@ export interface SellerPerformanceResponse {
   total_orders: number;
   total_revenue: number;
   total_visits: number;
-  units_compliance: number;
-  revenue_compliance: number;
+  total_units_sold: number;
+  units_compliance: number | null;
+  revenue_compliance: number | null;
+  visits_compliance: number | null;
+}
+
+export interface SalesPlan {
+  id: number;
+  seller_id: number;
+  name: string;
+  start_date: string;
+  end_date: string;
+  total_units_target: number;
+  total_value_target: number;
+  visits_target: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SalesPlanListResponse {
+  sales_plans: SalesPlan[];
+  total: number;
+}
+
+export interface CreateSalesPlanRequest {
+  name: string;
+  start_date: string;
+  end_date: string;
+  total_units_target: number;
+  total_value_target: number;
+  visits_target: number | null;
 }
 
 // Interfaz para el frontend
@@ -64,19 +93,19 @@ export class SellersService {
    */
   getSellers(): Observable<Seller[]> {
     const sellersUrl = `${environment.apiUrl}${environment.apiEndpoints.sellers}`;
-    
+
     // First, get the first page to know total pages
     return this.http.get<SellerPaginatedApiResponse>(`${sellersUrl}?page=1`)
       .pipe(
         switchMap(firstPageResponse => {
           const allSellers = [...firstPageResponse.sellers];
           const totalPages = firstPageResponse.total_pages;
-          
+
           // If there's only one page, return the sellers
           if (totalPages <= 1) {
             return of(allSellers.map(seller => this.transformSeller(seller)));
           }
-          
+
           // If there are multiple pages, fetch them all
           const pageRequests: Observable<SellerPaginatedApiResponse>[] = [];
           for (let page = 2; page <= totalPages; page++) {
@@ -84,7 +113,7 @@ export class SellersService {
               this.http.get<SellerPaginatedApiResponse>(`${sellersUrl}?page=${page}`)
             );
           }
-          
+
           // Wait for all page requests to complete
           return forkJoin(pageRequests).pipe(
             map(responses => {
@@ -92,7 +121,7 @@ export class SellersService {
               responses.forEach(response => {
                 allSellers.push(...response.sellers);
               });
-              
+
               return allSellers.map(seller => this.transformSeller(seller));
             })
           );
@@ -104,9 +133,9 @@ export class SellersService {
   /**
    * Gets sellers with pagination
    */
-  getSellersPaginated(page: number = 1): Observable<{sellers: Seller[], total: number, totalPages: number, page: number}> {
+  getSellersPaginated(page: number = 1): Observable<{ sellers: Seller[], total: number, totalPages: number, page: number }> {
     const sellersUrl = `${environment.apiUrl}${environment.apiEndpoints.sellers}?page=${page}`;
-    
+
     return this.http.get<SellerPaginatedApiResponse>(sellersUrl)
       .pipe(
         map(response => ({
@@ -156,7 +185,7 @@ export class SellersService {
       commission: seller.commission || null,
       sales_target: seller.salesTarget || null
     };
-    
+
     const sellersUrl = `${environment.apiUrl}${environment.apiEndpoints.sellers}`;
     return this.http.post<SellerApiResponse>(sellersUrl, sellerData)
       .pipe(
@@ -170,14 +199,14 @@ export class SellersService {
    */
   updateSeller(id: string, seller: Partial<Seller>): Observable<Seller> {
     const sellerData: any = {};
-    if (seller.name) sellerData.name = seller.name;
-    if (seller.status) sellerData.status = seller.status;
-    if (seller.email) sellerData.email = seller.email;
-    if (seller.phone) sellerData.phone = seller.phone;
-    if (seller.address !== undefined) sellerData.address = seller.address;
-    if (seller.commission !== undefined) sellerData.commission = seller.commission;
-    if (seller.salesTarget !== undefined) sellerData.sales_target = seller.salesTarget;
-    
+    if (seller.name) { sellerData.name = seller.name; }
+    if (seller.status) { sellerData.status = seller.status; }
+    if (seller.email) { sellerData.email = seller.email; }
+    if (seller.phone) { sellerData.phone = seller.phone; }
+    if (seller.address !== undefined) { sellerData.address = seller.address; }
+    if (seller.commission !== undefined) { sellerData.commission = seller.commission; }
+    if (seller.salesTarget !== undefined) { sellerData.sales_target = seller.salesTarget; }
+
     const sellersUrl = `${environment.apiUrl}${environment.apiEndpoints.sellers}/${id}`;
     return this.http.patch<SellerApiResponse>(sellersUrl, sellerData)
       .pipe(
@@ -223,10 +252,44 @@ export class SellersService {
    */
   private formatDate(isoDate: string): string {
     const date = new Date(isoDate);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const year = date.getUTCFullYear();
     return `${day}-${month}-${year}`;
+  }
+
+  /**
+   * Gets sales plans for a seller filtered by month and year
+   */
+  getSalesPlans(sellerId: string | number, month: number, year: number): Observable<SalesPlanListResponse> {
+    const url = `${environment.apiUrl}${environment.apiEndpoints.sellers}/${sellerId}/sales-plans`;
+    const fullUrl = `${url}?month=${month}&year=${year}`;
+    return this.http.get<SalesPlanListResponse>(fullUrl)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * Gets a specific sales plan by ID
+   */
+  getSalesPlan(sellerId: string | number, planId: number): Observable<SalesPlan> {
+    const url = `${environment.apiUrl}${environment.apiEndpoints.sellers}/${sellerId}/sales-plans/${planId}`;
+    return this.http.get<SalesPlan>(url)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * Creates a new sales plan for a seller
+   */
+  createSalesPlan(sellerId: string | number, planData: CreateSalesPlanRequest): Observable<SalesPlan> {
+    const url = `${environment.apiUrl}${environment.apiEndpoints.sellers}/${sellerId}/sales-plans`;
+    return this.http.post<SalesPlan>(url, planData)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
   /**
@@ -240,8 +303,6 @@ export class SellersService {
       errorMessage = error.error.detail;
     } else if (error.error?.message) {
       errorMessage = error.error.message;
-    } else if (error.message) {
-      errorMessage = error.message;
     }
 
     return throwError(() => new Error(errorMessage));

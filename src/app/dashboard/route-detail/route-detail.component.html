@@ -1,0 +1,202 @@
+<div class="route-detail-container">
+  <!-- Header -->
+  <div class="flex items-center mb-6">
+    <app-back-button (backClick)="goBack()" class="mr-4"></app-back-button>
+    <h1 class="screen-title">{{ 'routeDetail.title' | customTranslate }}</h1>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="mb-4">
+    <nz-alert nzType="error" [nzMessage]="error" nzCloseable (nzOnClose)="error = null"></nz-alert>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
+    <p class="mt-4 text-gray-500">{{ 'routeDetail.loading' | customTranslate }}</p>
+    <p class="text-xs text-gray-400 mt-2">{{ 'routeDetail.loadingHint' | customTranslate }}</p>
+  </div>
+
+  <!-- Content -->
+  <ng-container *ngIf="!loading && routeDetail">
+    <!-- Resumen consolidado -->
+    <div class="summary-card mb-6">
+      <div class="summary-top">
+        <div>
+          <p class="summary-overline">{{ 'routeDetail.routeLabel' | customTranslate }} {{ routeDetail.id }}</p>
+          <h2 class="summary-title">{{ 'routeDetail.summary.title' | customTranslate }}</h2>
+        </div>
+        <div class="status-chip">
+          <span class="status-icon">
+            <span nz-icon nzType="car" nzTheme="outline" aria-hidden="true"></span>
+          </span>
+          <nz-tag class="status-tag" [nzColor]="getStatusTagColor(routeDetail.status)" role="status" [attr.aria-label]="getStatusLabel(routeDetail.status)">
+            {{ getStatusLabel(routeDetail.status) }}
+          </nz-tag>
+        </div>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="summary-icon calendar">
+            <span nz-icon nzType="calendar" nzTheme="outline" aria-hidden="true"></span>
+          </div>
+          <div class="summary-text">
+            <span class="summary-item-label">{{ 'routeDetail.summary.date' | customTranslate }}</span>
+            <span class="summary-item-value">{{ routeDetail.creationDate }}</span>
+          </div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-icon warehouse">
+            <span nz-icon nzType="bank" nzTheme="outline" aria-hidden="true"></span>
+          </div>
+          <div class="summary-text">
+            <span class="summary-item-label">{{ 'routeDetail.summary.origin' | customTranslate }}</span>
+            <span class="summary-item-value">{{ routeDetail.originWarehouse }}</span>
+          </div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-icon truck">
+            <span nz-icon nzType="car" nzTheme="outline" aria-hidden="true"></span>
+          </div>
+          <div class="summary-text">
+            <span class="summary-item-label">{{ 'routeDetail.summary.truck' | customTranslate }}</span>
+            <span class="summary-item-value">{{ routeDetail.assignedTruck }}</span>
+          </div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-icon deliveries">
+            <span nz-icon nzType="inbox" nzTheme="outline" aria-hidden="true"></span>
+          </div>
+          <div class="summary-text">
+            <span class="summary-item-label">{{ 'routeDetail.summary.deliveries' | customTranslate }}</span>
+            <span class="summary-item-value">{{ routeDetail.deliveries }}</span>
+          </div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-icon stops">
+            <span nz-icon nzType="flag" nzTheme="outline" aria-hidden="true"></span>
+          </div>
+          <div class="summary-text">
+            <span class="summary-item-label">{{ 'routeDetail.metrics.totalStops' | customTranslate }}</span>
+            <span class="summary-item-value">{{ routeDetail.metrics?.performedShipmentCount || routeDetail.deliveries }}</span>
+          </div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-icon distance">
+            <span nz-icon nzType="deployment-unit" nzTheme="outline" aria-hidden="true"></span>
+          </div>
+          <div class="summary-text">
+            <span class="summary-item-label">{{ 'routeDetail.metrics.distance' | customTranslate }}</span>
+            <span class="summary-item-value">
+              {{ routeDetail.metrics?.travelDistanceMeters ? (routeDetail.metrics?.travelDistanceMeters / 1000 | number:'1.0-1') + ' km' : '—' }}
+            </span>
+          </div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-icon duration">
+            <span nz-icon nzType="clock-circle" nzTheme="outline" aria-hidden="true"></span>
+          </div>
+          <div class="summary-text">
+            <span class="summary-item-label">{{ 'routeDetail.metrics.duration' | customTranslate }}</span>
+            <span class="summary-item-value">
+              {{ routeDetail.metrics?.totalDuration ? (routeDetail.metrics?.totalDuration / 3600 | number:'1.0-1') + ' h' : '—' }}
+            </span>
+          </div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-icon cost">
+            <span nz-icon nzType="dollar" nzTheme="outline" aria-hidden="true"></span>
+          </div>
+          <div class="summary-text">
+            <span class="summary-item-label">{{ 'routeDetail.metrics.cost' | customTranslate }}</span>
+            <span class="summary-item-value">
+              {{ routeDetail.metrics?.totalCost ? ('$' + (routeDetail.metrics?.totalCost | number:'1.0-0')) : '—' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid layout -->
+    <div class="grid grid-cols-12 gap-6 route-content">
+      <!-- Map -->
+      <div class="col-span-12 xl:col-span-7 map-card">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="subtitle">{{ 'routeDetail.map.title' | customTranslate }}</h3>
+          <div class="legend" role="list" [attr.aria-label]="'routeDetail.map.title' | customTranslate">
+            <span class="legend-item" role="listitem">
+              <span class="legend-dot pickup" aria-hidden="true"></span>
+              {{ 'routeDetail.pickupLabel' | customTranslate }}
+            </span>
+            <span class="legend-item" role="listitem">
+              <span class="legend-dot delivery" aria-hidden="true"></span>
+              {{ 'routeDetail.deliveryLabel' | customTranslate }}
+            </span>
+          </div>
+        </div>
+        <div id="routeDetailMap" class="route-map" role="application" [attr.aria-label]="('routeDetail.map.title' | customTranslate) + ': ' + (waypointsWithCoords.length | number) + ' ' + ('routeDetail.map.totalStops' | customTranslate)" [attr.aria-describedby]="'map-description-' + routeDetail.id"></div>
+        <div [id]="'map-description-' + routeDetail.id" class="sr-only">
+          {{ 'routeDetail.map.description' | customTranslate }}: {{ waypointsWithCoords.length }} {{ 'routeDetail.map.totalStops' | customTranslate }}. {{ 'routeDetail.map.interactiveControls' | customTranslate }}
+        </div>
+        <div class="map-footer">
+          <span class="text-xs text-gray-500">
+            <span nz-icon nzType="environment" nzTheme="outline" aria-hidden="true"></span>
+            {{ waypointsWithCoords.length }} {{ 'routeDetail.map.totalStops' | customTranslate }}
+          </span>
+          <span *ngIf="geocoding" class="text-xs text-gray-400" role="status" aria-live="polite">
+            <nz-spin nzSimple [nzSize]="'small'"></nz-spin>
+            {{ 'routeDetail.map.geocoding' | customTranslate }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="col-span-12 xl:col-span-5">
+        <div class="stops-card">
+          <h3 class="subtitle">{{ 'routeDetail.table.title' | customTranslate }}</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col" style="width: 70px;">#</th>
+                  <th scope="col">{{ 'routeDetail.table.type' | customTranslate }}</th>
+                  <th scope="col">{{ 'routeDetail.table.name' | customTranslate }}</th>
+                  <th scope="col">{{ 'routeDetail.table.address' | customTranslate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let waypoint of waypointsWithCoords">
+                  <td>
+                    <span class="stop-number"
+                      [ngClass]="waypoint.pickup ? 'pickup-stop' : 'delivery-stop'">
+                      {{ waypoint.displaySequence }}
+                    </span>
+                  </td>
+                  <td>
+                    <nz-tag
+                      [ngClass]="waypoint.pickup ? 'pickup-tag' : 'delivery-tag'"
+                      role="status"
+                      [attr.aria-label]="getWaypointTypeLabel(waypoint.pickup)">
+                      {{ getWaypointTypeLabel(waypoint.pickup) }}
+                    </nz-tag>
+                  </td>
+                  <td>
+                    <p class="table-name">{{ waypoint.pointName }}</p>
+                    <p class="table-order text-xs text-gray-500" *ngIf="waypoint.orderId">
+                      {{ 'routeDetail.table.order' | customTranslate }} #{{ waypoint.orderId }}
+                    </p>
+                  </td>
+                  <td>
+                    <p class="table-address">{{ waypoint.pointAddress }}</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>
+

@@ -1,3 +1,48 @@
+<!-- Botones de acción: Regresar y Agregar inventario -->
+<div class="flex items-center justify-between mb-6">
+  <button
+    (click)="goBack()"
+    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200"
+    type="button"
+    [attr.aria-label]="'warehouseInventory.back' | customTranslate">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+    </svg>
+    {{ 'warehouseInventory.back' | customTranslate }}
+  </button>
+  
+  <button class="btn-primary" (click)="showInventoryModal()" type="button">
+    <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
+    {{ 'warehouseInventory.addInventory' | customTranslate }}
+  </button>
+</div>
+
+<!-- Título con nombre de bodega -->
+<h1 class="screen-title mt-3 mb-6">
+  {{ 'warehouseInventory.title' | customTranslate }} 
+  <span *ngIf="warehouseName" style="color: var(--blue-violet-a11y, #5F6AB0); font-weight: 600;">{{ warehouseName }}</span>
+  <span *ngIf="!warehouseName" class="text-gray-500">{{ 'warehouseInventory.loading' | customTranslate }}</span>
+</h1>
+
+<!-- Búsqueda de productos -->
+<div class="mb-[25px] mt-[4px]">
+  <div class="w-full">
+    <nz-input-group [nzSuffix]="suffixIconSearch" nzPrefixIcon="search">
+      <input
+        type="text"
+        nz-input
+        [placeholder]="'warehouseInventory.searchProducts' | customTranslate"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange($event)"
+        class="w-full"
+      />
+    </nz-input-group>
+    <ng-template #suffixIconSearch>
+      <span *ngIf="searchTerm" nz-icon nzType="close-circle" nzTheme="outline" (click)="clearSearch()" class="cursor-pointer hover:text-red-500" role="button" tabindex="0" [attr.aria-label]="'warehouseInventory.clearSearch' | customTranslate" (keydown.enter)="clearSearch()" (keydown.space)="clearSearch()"></span>
+    </ng-template>
+  </div>
+</div>
+
 <!-- Modal de agregar inventario -->
 <nz-modal
   [(nzVisible)]="isInventoryModalVisible"
@@ -5,19 +50,27 @@
   [nzContent]="inventoryModalContent"
   [nzFooter]="inventoryModalFooter"
   (nzOnCancel)="handleInventoryModalCancel()"
+  [nzMaskClosable]="!isInventoryModalLoading"
+  [nzClosable]="!isInventoryModalLoading"
   nzWidth="75%"
 >
-  <ng-template #inventoryModalTitle>Agregar Inventario</ng-template>
+  <ng-template #inventoryModalTitle>{{ 'warehouseInventory.modal.title' | customTranslate }}</ng-template>
 
   <ng-template #inventoryModalContent>
     <form nz-form nzLayout="vertical" [formGroup]="inventoryForm" (ngSubmit)="handleInventoryModalOk()">
       <nz-form-item>
         <nz-form-control [nzValidateStatus]="getFieldStatus('product')" [nzErrorTip]="getFieldError('product')">
-          <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
-            Producto: <span class="text-red-500">*</span></nz-form-label>
+          <nz-form-label id="product-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+            {{ 'warehouseInventory.modal.product' | customTranslate }} <span class="text-red-500">*</span></nz-form-label>
+          <label for="product-select" class="sr-only">{{ 'warehouseInventory.modal.product' | customTranslate }}</label>
           <nz-select
             class="w-full"
-            nzPlaceHolder="Buscar producto"
+            nzId="product-select"
+            nzLabelId="product-label"
+            [nzPlaceHolder]="'warehouseInventory.modal.productPlaceholder' | customTranslate"
+            [attr.aria-label]="('warehouseInventory.modal.product' | customTranslate) + ' ' + ('common.required' | customTranslate)"
+            [attr.aria-labelledby]="'product-label'"
+            [attr.aria-describedby]="'product-label'"
             nzAllowClear
             nzShowSearch
             nzServerSearch
@@ -33,18 +86,18 @@
         <div nz-col nzXs="24" nzSm="12">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('quantity')" [nzErrorTip]="getFieldError('quantity')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
-                Cantidad: <span class="text-red-500">*</span></nz-form-label>
-              <input class="{{inputClass}}" type="number" nz-input placeholder="Cantidad" formControlName="quantity">
+              <nz-form-label id="quantity-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+                {{ 'warehouseInventory.modal.quantity' | customTranslate }} <span class="text-red-500">*</span></nz-form-label>
+              <input class="{{inputClass}}" type="number" nz-input id="quantity-input" [attr.aria-labelledby]="'quantity-label'" [placeholder]="'warehouseInventory.modal.quantityPlaceholder' | customTranslate" formControlName="quantity">
             </nz-form-control>
           </nz-form-item>
         </div>
         <div nz-col nzXs="24" nzSm="12">
           <nz-form-item>
             <nz-form-control [nzValidateStatus]="getFieldStatus('location')" [nzErrorTip]="getFieldError('location')">
-              <nz-form-label class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
-                Ubicación: <span class="text-red-500">*</span></nz-form-label>
-              <input class="{{inputClass}}" type="text" nz-input placeholder="Identificador de ubicación" formControlName="location">
+              <nz-form-label id="location-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+                {{ 'warehouseInventory.modal.location' | customTranslate }} <span class="text-red-500">*</span></nz-form-label>
+              <input class="{{inputClass}}" type="text" nz-input id="location-input" [attr.aria-labelledby]="'location-label'" [placeholder]="'warehouseInventory.modal.locationPlaceholder' | customTranslate" formControlName="location">
             </nz-form-control>
           </nz-form-item>
         </div>
@@ -54,77 +107,131 @@
 
   <ng-template #inventoryModalFooter>
     <div class="flex justify-center gap-3 w-full">
-      <button class="btn-secondary" (click)="handleInventoryModalCancel()">
-        Cancelar
+      <button 
+        class="btn-secondary" 
+        (click)="handleInventoryModalCancel()"
+        [disabled]="isInventoryModalLoading">
+        {{ 'warehouseInventory.modal.cancel' | customTranslate }}
       </button>
-      <button class="btn-primary" (click)="handleInventoryModalOk()" [nzLoading]="isInventoryModalLoading">
-        <span nz-icon nzType="plus" nzTheme="outline"></span>
-        Agregar Inventario
+      <button 
+        class="btn-primary" 
+        (click)="handleInventoryModalOk()" 
+        [nzLoading]="isInventoryModalLoading"
+        [disabled]="isInventoryModalLoading || inventoryForm.invalid">
+        <span nz-icon nzType="plus" nzTheme="outline" *ngIf="!isInventoryModalLoading" aria-hidden="true"></span>
+        {{ 'warehouseInventory.modal.add' | customTranslate }}
       </button>
     </div>
   </ng-template>
 </nz-modal>
 
-<div class="flex justify-end mb-[25px] mt-[4px]">
-  <!-- Add Inventory -->
-  <button class="btn-primary" (click)="showInventoryModal()">
-    <span nz-icon nzType="plus" nzTheme="outline"></span>
-    Agregar inventario
-  </button>
-  <!-- end: Add Inventory -->
+<!-- Tabla de productos -->
+<div *ngIf="!isLoading && listOfData.length > 0 && !errorMessage" class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>{{ 'warehouseInventory.table.product' | customTranslate }}</th>
+        <th>{{ 'warehouseInventory.table.price' | customTranslate }}</th>
+        <th>{{ 'warehouseInventory.table.availableQuantity' | customTranslate }}</th>
+        <th>{{ 'warehouseInventory.table.sector' | customTranslate }}</th>
+        <th>{{ 'warehouseInventory.table.characteristics' | customTranslate }}</th>
+        <th>{{ 'warehouseInventory.table.status' | customTranslate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of listOfData">
+        <td>{{ product.name }}</td>
+        <td>{{ formatPrice(product.purchase_price) }}</td>
+        <td>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+            {{ product.stock || 0 }} {{ 'warehouseInventory.units' | customTranslate }}
+          </span>
+        </td>
+        <td>
+          <span *ngIf="product.location_identifier" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300">
+            {{ product.location_identifier }}
+          </span>
+          <span *ngIf="!product.location_identifier" class="text-xs text-gray-400 dark:text-gray-500">
+            {{ 'warehouseInventory.notAvailable' | customTranslate }}
+          </span>
+        </td>
+        <td>
+          <div class="flex items-center gap-2">
+            <span *ngIf="product.requires_cold_chain === true"
+                  class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+                  nz-tooltip
+                  [nzTooltipTitle]="'warehouseInventory.requiresColdChain' | customTranslate"
+                  nzTooltipPlacement="top"
+                  role="img"
+                  [attr.aria-label]="'warehouseInventory.requiresColdChain' | customTranslate">
+              <span nz-icon nzType="cloud" nzTheme="outline" class="text-sm" aria-hidden="true"></span>
+            </span>
+            <span *ngIf="product.storageInstructions"
+                  class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                  nz-tooltip
+                  [nzTooltipTitle]="product.storageInstructions"
+                  nzTooltipPlacement="top"
+                  role="img"
+                  [attr.aria-label]="('warehouseInventory.storageInstructions' | customTranslate) + product.storageInstructions">
+              <span nz-icon nzType="info-circle" nzTheme="outline" class="text-sm" aria-hidden="true"></span>
+            </span>
+            <span *ngIf="!product.requires_cold_chain && !product.storageInstructions" class="text-xs text-gray-400 dark:text-gray-500">
+              -
+            </span>
+          </div>
+        </td>
+        <td>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                [ngClass]="getStatusClass(product.status)">
+            {{ getStatusText(product.status) }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
-<div
-  class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
+<!-- Mensaje cuando no hay datos -->
+<div *ngIf="!isLoading && !errorMessage && listOfData.length === 0" class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
   <div class="p-[25px]">
-    <div class="w-full overflow-x-auto">
-      <nz-table #productsByWarehouse [nzData]="listOfData" [nzFrontPagination]="false" [nzShowPagination]="false">
-        <thead>
-        <tr>
-          <th
-            class="bg-regularBG dark:bg-[#323440] px-[20px] py-[16px] text-start text-dark dark:text-white/[.87] text-15px font-medium border-none before:hidden rounded-s-[10px] capitalize">
-            Producto
-          </th>
-          <th
-            class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
-            Precio (Und)
-          </th>
-          <th
-            class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
-            Proveedor
-          </th>
-          <th
-            class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
-            Características
-          </th>
-          <th
-            class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
-            Estado
-          </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr class="group" *ngFor="let data of productsByWarehouse.data">
-          <td
-            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-            {{ data.name }}
-          </td>
-          <td
-            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-          </td>
-          <td
-            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-          </td>
-          <td
-            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-          </td>
-          <td
-            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
-            {{ data.status }}
-          </td>
-        </tr>
-        </tbody>
-      </nz-table>
+    <div class="flex flex-col items-center justify-center py-16">
+      <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+        </svg>
+      </div>
+      <h3 class="text-lg font-semibold text-dark dark:text-white mb-2">{{ 'warehouseInventory.noProducts' | customTranslate }}</h3>
+      <p class="text-sm text-gray-600 dark:text-gray-400">{{ 'warehouseInventory.noProductsDescription' | customTranslate }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- Mensaje de error -->
+<div *ngIf="errorMessage" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
+  <div class="flex">
+    <div class="flex-shrink-0">
+      <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+      </svg>
+    </div>
+    <div class="ml-3">
+      <h3 class="text-sm font-medium text-red-800 dark:text-red-300">
+        {{ 'common.error' | customTranslate }}
+      </h3>
+      <div class="mt-2 text-sm text-red-700 dark:text-red-400">
+        {{ errorMessage }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading state -->
+<div *ngIf="isLoading" class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
+  <div class="p-[25px]">
+    <div class="flex flex-col items-center justify-center py-16">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+      <h3 class="text-lg font-semibold text-dark dark:text-white mb-2">{{ 'warehouseInventory.loadingInventory' | customTranslate }}</h3>
+      <p class="text-sm text-gray-600 dark:text-gray-400">{{ 'warehouseInventory.loadingInventoryDescription' | customTranslate }}</p>
     </div>
   </div>
 </div>

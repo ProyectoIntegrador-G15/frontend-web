@@ -33,11 +33,13 @@ import {NzSelectModule} from 'ng-zorro-antd/select';
 import {NzDatePickerModule} from 'ng-zorro-antd/date-picker';
 import {NzModalModule} from 'ng-zorro-antd/modal';
 import {NzInputModule} from 'ng-zorro-antd/input';
+import {NzInputNumberModule} from 'ng-zorro-antd/input-number';
 import {NzMessageModule} from 'ng-zorro-antd/message';
 import {NzPaginationModule} from 'ng-zorro-antd/pagination';
 import {NzSpinModule} from 'ng-zorro-antd/spin';
 import {NzUploadModule} from 'ng-zorro-antd/upload';
 import {NzAlertModule} from 'ng-zorro-antd/alert';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 
 import {AngularSvgIconModule} from 'angular-svg-icon';
 import {BaseChartDirective} from 'ng2-charts';
@@ -47,7 +49,7 @@ import {PERFECT_SCROLLBAR_CONFIG} from 'ngx-om-perfect-scrollbar';
 import {PerfectScrollbarConfigInterface} from 'ngx-om-perfect-scrollbar';
 import {FullCalendarModule} from '@fullcalendar/angular';
 
-import {WarehousesComponent} from './warehouse/warehouses.component';
+import {WarehousesListComponent} from './warehouses-list/warehouses-list.component';
 import {WarehouseInventoryComponent} from './warehouse-inventory/warehouse-inventory.component';
 
 // Products
@@ -55,13 +57,17 @@ import {ProductsComponent} from './products/products.component';
 import {ProductInventoryComponent} from './product-inventory/product-inventory.component';
 import {RoutesListComponent} from './routes-list/routes-list.component';
 import {CreateRouteComponent} from './create-route/create-route.component';
+import {RouteDetailComponent} from './route-detail/route-detail.component';
 import {SellersListComponent} from './sellers-list/sellers-list.component';
-import {SellerDetailComponent} from './seller-detail/seller-detail.component';
+import {SellerDetailsComponent} from './seller-details/seller-details.component';
+import {SellerClientsComponent} from './seller-clients/seller-clients.component';
+import {CreateSellerComponent} from './create-seller/create-seller.component';
 import {CreateVisitRouteComponent} from './create-visit-route/create-visit-route.component';
 import {ConfirmVisitRouteComponent} from './confirm-visit-route/confirm-visit-route.component';
 import {TabsComponent} from '../shared/components/tabs/tabs.component';
 import {BackButtonComponent} from '../shared/components/back-button/back-button.component';
 import {ReportsComponent} from './reports/reports.component';
+import {SuppliersListComponent} from './suppliers-list/suppliers-list.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -97,6 +103,7 @@ const antdModule = [
   NzDatePickerModule,
   NzModalModule,
   NzInputModule,
+  NzInputNumberModule,
   AngularSvgIconModule.forRoot(),
   BaseChartDirective,
   NgApexchartsModule,
@@ -106,7 +113,8 @@ const antdModule = [
   NzPaginationModule,
   NzSpinModule,
   NzUploadModule,
-  NzAlertModule
+  NzAlertModule,
+  DragDropModule
 ];
 
 @NgModule({
@@ -122,15 +130,19 @@ const antdModule = [
   declarations: [
     ProductsComponent,
     ProductInventoryComponent,
-    WarehousesComponent,
+    WarehousesListComponent,
     WarehouseInventoryComponent,
     RoutesListComponent,
     CreateRouteComponent,
+    RouteDetailComponent,
     SellersListComponent,
-    SellerDetailComponent,
+    SellerDetailsComponent,
+    SellerClientsComponent,
+    CreateSellerComponent,
     CreateVisitRouteComponent,
     ConfirmVisitRouteComponent,
     ReportsComponent,
+    SuppliersListComponent,
   ],
   providers: [
     ThemeConstantService,

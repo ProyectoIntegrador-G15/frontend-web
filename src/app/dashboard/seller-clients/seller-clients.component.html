@@ -1,0 +1,138 @@
+<div class="seller-clients-container">
+  <!-- Header con botón de regreso -->
+  <div class="seller-header">
+    <app-back-button (backClick)="goBack()"></app-back-button>
+    <h1 class="screen-title">
+      {{ 'sellers.manageClients' | customTranslate }}
+      <span *ngIf="sellerName" class="seller-name-subtitle">{{ sellerName }}</span>
+      <span *ngIf="!sellerName && !loading" class="seller-name-subtitle loading-text">{{ 'sellerClients.loading' | customTranslate }}</span>
+    </h1>
+  </div>
+
+  <!-- Indicador de carga -->
+  <div *ngIf="loading" class="flex justify-center items-center py-12">
+    <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="error && !loading" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+    <p class="font-medium">{{ error }}</p>
+  </div>
+
+  <!-- Contenido principal con drag and drop -->
+  <div *ngIf="!loading && !error" class="drag-drop-container">
+    <!-- Clientes asignados -->
+    <div class="drag-panel assigned-panel">
+      <div class="panel-header">
+        <span nz-icon nzType="team" nzTheme="outline" class="panel-icon assigned-icon"></span>
+        <div class="panel-title-section">
+          <h2 class="panel-title">{{ 'sellers.assignedClients' | customTranslate }}</h2>
+          <span class="panel-count">{{ assignedClients.length }} {{ assignedClients.length === 1 ? ('sellerClients.client' | customTranslate) : ('sellerClients.clients' | customTranslate) }}</span>
+        </div>
+      </div>
+
+      <div 
+        cdkDropList
+        #assignedList="cdkDropList"
+        [cdkDropListData]="assignedClients"
+        [cdkDropListConnectedTo]="[availableList]"
+        (cdkDropListDropped)="onDrop($event)"
+        class="drop-list assigned-panel-list"
+        [class.empty]="assignedClients.length === 0">
+        
+        <div *ngIf="assignedClients.length === 0" class="empty-state">
+          <span nz-icon nzType="drag" nzTheme="outline" class="empty-icon"></span>
+          <p class="empty-text">{{ 'sellers.noAssignedClients' | customTranslate }}</p>
+          <p class="empty-hint">{{ 'sellerClients.dragToAssign' | customTranslate }}</p>
+        </div>
+
+        <div 
+          *ngFor="let client of assignedClients" 
+          cdkDrag
+          [cdkDragData]="client"
+          class="drag-item assigned-item">
+          <div class="client-content">
+            <div class="drag-indicator">
+              <span nz-icon nzType="drag" nzTheme="outline" class="drag-icon"></span>
+            </div>
+            <div class="client-avatar">
+              <span nz-icon nzType="user" nzTheme="outline"></span>
+            </div>
+            <div class="client-info">
+              <p class="client-name">{{ client.name }}</p>
+              <p class="client-email">{{ client.email }}</p>
+            </div>
+          </div>
+          <div class="drag-preview" *cdkDragPreview>
+            <div class="drag-preview-content">
+              <span nz-icon nzType="user" nzTheme="outline"></span>
+              <span>{{ client.name }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Separador visual simplificado -->
+    <div class="drag-separator">
+      <div class="separator-line"></div>
+      <div class="separator-icon">
+        <span nz-icon nzType="swap" nzTheme="outline"></span>
+      </div>
+      <div class="separator-line"></div>
+    </div>
+
+    <!-- Clientes disponibles -->
+    <div class="drag-panel available-panel">
+      <div class="panel-header">
+        <span nz-icon nzType="user-add" nzTheme="outline" class="panel-icon available-icon"></span>
+        <div class="panel-title-section">
+          <h2 class="panel-title">{{ 'sellers.availableClients' | customTranslate }}</h2>
+          <span class="panel-count">{{ availableClients.length }} {{ availableClients.length === 1 ? ('sellerClients.client' | customTranslate) : ('sellerClients.clients' | customTranslate) }}</span>
+        </div>
+      </div>
+
+      <div 
+        cdkDropList
+        #availableList="cdkDropList"
+        [cdkDropListData]="availableClients"
+        [cdkDropListConnectedTo]="[assignedList]"
+        (cdkDropListDropped)="onDrop($event)"
+        class="drop-list available-panel-list"
+        [class.empty]="availableClients.length === 0">
+        
+        <div *ngIf="availableClients.length === 0" class="empty-state">
+          <span nz-icon nzType="drag" nzTheme="outline" class="empty-icon"></span>
+          <p class="empty-text">{{ 'sellers.noAvailableClients' | customTranslate }}</p>
+          <p class="empty-hint">{{ 'sellerClients.dragToUnassign' | customTranslate }}</p>
+        </div>
+
+        <div 
+          *ngFor="let client of availableClients" 
+          cdkDrag
+          [cdkDragData]="client"
+          class="drag-item available-item">
+          <div class="client-content">
+            <div class="drag-indicator">
+              <span nz-icon nzType="drag" nzTheme="outline" class="drag-icon"></span>
+            </div>
+            <div class="client-avatar">
+              <span nz-icon nzType="user" nzTheme="outline"></span>
+            </div>
+            <div class="client-info">
+              <p class="client-name">{{ client.name }}</p>
+              <p class="client-email">{{ client.email }}</p>
+            </div>
+          </div>
+          <div class="drag-preview" *cdkDragPreview>
+            <div class="drag-preview-content">
+              <span nz-icon nzType="user" nzTheme="outline"></span>
+              <span>{{ client.name }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

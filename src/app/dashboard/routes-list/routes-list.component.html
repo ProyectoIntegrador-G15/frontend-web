@@ -2,8 +2,8 @@
   <!-- Header con título y botón crear ruta -->
   <div class="flex items-center justify-between mb-6">
     <h1 class="screen-title">{{ 'routes.title' | customTranslate }}</h1>
-    <button class="btn-primary" (click)="createRoute()">
-      <span nz-icon nzType="plus" nzTheme="outline"></span>
+    <button class="btn-primary" (click)="createRoute()" type="button">
+      <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
       {{ 'routes.createRoute' | customTranslate }}
     </button>
   </div>
@@ -16,7 +16,7 @@
   <!-- Mensaje de error -->
   <div *ngIf="error && !loading" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
     <p class="font-medium">{{ error }}</p>
-    <button class="mt-2 text-sm underline" (click)="loadRoutes()">{{ 'routes.retry' | customTranslate }}</button>
+    <button class="mt-2 text-sm underline" (click)="loadRoutes()" type="button" [attr.aria-label]="'routes.retry' | customTranslate">{{ 'routes.retry' | customTranslate }}</button>
   </div>
 
   <!-- Tabla de rutas con estilos globales -->
@@ -24,12 +24,13 @@
     <table>
       <thead>
         <tr>
-          <th>{{ 'routes.routeId' | customTranslate }}</th>
-          <th>{{ 'routes.creationDate' | customTranslate }}</th>
-          <th>{{ 'routes.originWarehouse' | customTranslate }}</th>
-          <th>{{ 'routes.assignedDeliveries' | customTranslate }}</th>
-          <th>{{ 'routes.status' | customTranslate }}</th>
-          <th>{{ 'routes.assignedTruck' | customTranslate }}</th>
+          <th scope="col">{{ 'routes.routeId' | customTranslate }}</th>
+          <th scope="col">{{ 'routes.creationDate' | customTranslate }}</th>
+          <th scope="col">{{ 'routes.originWarehouse' | customTranslate }}</th>
+          <th scope="col">{{ 'routes.assignedDeliveries' | customTranslate }}</th>
+          <th scope="col">{{ 'routes.status' | customTranslate }}</th>
+          <th scope="col">{{ 'routes.assignedTruck' | customTranslate }}</th>
+          <th scope="col">{{ 'routes.actions' | customTranslate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -43,12 +44,26 @@
           <td>{{ route.originWarehouse }}</td>
           <td>{{ route.assignedDeliveries }}</td>
           <td>
-            <nz-tag [nzColor]="getStatusColor(route.status)">
+            <nz-tag [nzColor]="getStatusColor(route.status)" role="status" [attr.aria-label]="getStatusText(route.status)">
               {{ getStatusText(route.status) }}
             </nz-tag>
           </td>
           <td>
             <p>{{ route.assignedTruck }}</p>
+          </td>
+          <td class="actions-cell">
+            <button
+              nz-button
+              nzType="default"
+              type="button"
+              (click)="viewRoute(route)"
+              class="action-button"
+              [attr.aria-label]="('routes.viewDetail' | customTranslate) + ': Ruta #' + route.id"
+              [nzTooltipTitle]="'routes.viewDetail' | customTranslate">
+              <span class="action-icon">
+                <span nz-icon nzType="eye" nzTheme="outline" aria-hidden="true"></span>
+              </span>
+            </button>
           </td>
         </tr>
       </tbody>
@@ -58,7 +73,7 @@
   <!-- Empty State - Sin rutas -->
   <div *ngIf="!loading && !error && routes.length === 0" class="empty-state">
     <div class="empty-state-content">
-      <span nz-icon nzType="environment" nzTheme="outline" class="empty-icon"></span>
+      <span nz-icon nzType="environment" nzTheme="outline" class="empty-icon" aria-hidden="true"></span>
       <h2 class="empty-title">{{ 'routes.noRoutes' | customTranslate }}</h2>
       <p class="empty-description">
         {{ 'routes.noRoutesDescription' | customTranslate }}

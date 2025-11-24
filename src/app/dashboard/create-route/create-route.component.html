@@ -2,11 +2,14 @@
   <!-- Header con botón de regresar y título -->
   <div class="flex items-center mb-6">
     <button 
+      type="button"
       nz-button
       nzType="text"
       (click)="goBack()"
+      [attr.aria-label]="'common.back' | customTranslate"
       class="mr-4 p-2 hover:bg-gray-100 rounded-md">
-      <span class="text-[16px]" nz-icon nzType="arrow-left" nzTheme="outline"></span>
+      <span class="text-[16px]" nz-icon nzType="arrow-left" nzTheme="outline" aria-hidden="true"></span>
+      <span class="sr-only">{{ 'common.back' | customTranslate }}</span>
     </button>
     <h1 class="screen-title">{{ 'createRoute.title' | customTranslate }}</h1>
   </div>
@@ -16,15 +19,17 @@
     <div class="p-[25px]">
       <!-- Campo de Fecha -->
       <div class="mb-6">
-        <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+        <label for="route-date-picker" class="block text-sm font-medium text-dark dark:text-white mb-2">
           {{ 'createRoute.routeDate' | customTranslate }}
         </label>
         <nz-date-picker
+          id="route-date-picker"
           [(ngModel)]="selectedDate"
           [nzDisabledDate]="disabledDate"
           nzFormat="dd/MM/yyyy"
           class="w-full"
-          [nzPlaceHolder]="'createRoute.selectDate' | customTranslate">
+          [nzPlaceHolder]="'createRoute.selectDate' | customTranslate"
+          [attr.aria-label]="'createRoute.routeDate' | customTranslate">
         </nz-date-picker>
         <p class="text-xs text-gray-500 mt-1">{{ 'createRoute.dateHelper' | customTranslate }}</p>
       </div>
@@ -46,7 +51,7 @@
         <!-- Error State -->
         <div *ngIf="error && !isLoading" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
           <p class="font-medium">{{ error }}</p>
-          <button class="mt-2 text-sm underline" (click)="loadData()">{{ 'createRoute.retry' | customTranslate }}</button>
+          <button type="button" class="mt-2 text-sm underline" (click)="loadData()" [attr.aria-label]="'createRoute.retry' | customTranslate">{{ 'createRoute.retry' | customTranslate }}</button>
         </div>
         
         <!-- Empty State -->
@@ -74,7 +79,8 @@
                 <td class="text-center">
                   <label nz-checkbox 
                          [ngModel]="order.selected"
-                         (ngModelChange)="toggleOrderSelection(order.id)">
+                         (ngModelChange)="toggleOrderSelection(order.id)"
+                         [attr.aria-label]="('createRoute.selection' | customTranslate) + ': #' + order.id">
                   </label>
                 </td>
                 <td><strong>#{{ order.id }}</strong></td>
@@ -101,13 +107,16 @@
 
       <!-- Campo Vehículo/Conductor -->
       <div class="mb-6">
-        <label class="block text-sm font-medium text-dark dark:text-white mb-2">
+        <label for="vehicle-select" class="block text-sm font-medium text-dark dark:text-white mb-2">
           {{ 'createRoute.vehicleDriver' | customTranslate }}
         </label>
         <nz-select
+          id="vehicle-select"
           [(ngModel)]="selectedVehicle"
           class="w-full"
-          [nzPlaceHolder]="'createRoute.selectVehicle' | customTranslate">
+          [nzPlaceHolder]="'createRoute.selectVehicle' | customTranslate"
+          [nzShowSearch]="false"
+          [attr.aria-label]="'createRoute.vehicleDriver' | customTranslate">
           <nz-option [nzValue]="1" [nzLabel]="'createRoute.autoAssignment' | customTranslate"></nz-option>
           <nz-option [nzValue]="2" nzLabel="Vehículo 002"></nz-option>
           <nz-option [nzValue]="3" nzLabel="Vehículo 003"></nz-option>
@@ -119,8 +128,8 @@
 
       <!-- Botón de generar ruta -->
       <div class="flex justify-center">
-        <button class="btn-primary" (click)="generateRoute()">
-          <span nz-icon nzType="plus" nzTheme="outline"></span>
+        <button type="button" class="btn-primary" (click)="generateRoute()" [attr.aria-label]="'createRoute.generateRoute' | customTranslate">
+          <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
           {{ 'createRoute.generateRoute' | customTranslate }}
         </button>
       </div>

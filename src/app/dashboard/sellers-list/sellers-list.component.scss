@@ -1,13 +1,29 @@
 .sellers-list-container {
   padding: 20px;
-}
 
-.action-button {
-  color: #1890ff;
-  
-  &:hover {
-    color: #40a9ff;
-    background-color: #f0f8ff;
+  // Estilos para la tabla con scroll horizontal
+  .overflow-x-auto {
+    &::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+
+      &:hover {
+        background: #555;
+      }
+    }
+
+    table {
+      min-width: 600px; // Ancho mínimo para activar scroll en pantallas pequeñas
+    }
   }
 }
 
@@ -65,5 +81,18 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+// Clase para texto accesible pero oculto visualmente (screen reader only)
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 

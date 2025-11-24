@@ -1,0 +1,330 @@
+.route-detail-container {
+  padding: 24px;
+  min-height: calc(100vh - 120px);
+}
+
+// Clase para ocultar visualmente pero mantener accesible para lectores de pantalla
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.summary-card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 12px 30px rgba(93, 115, 150, 0.12);
+  overflow: hidden;
+}
+
+.summary-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.summary-overline {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--blue-violet-a11y);
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.summary-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gray-dark);
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+.status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-dark);
+
+  .anticon {
+    font-size: 18px;
+  }
+}
+
+.status-tag {
+  font-weight: 600;
+  font-size: 13px;
+  padding: 2px 12px;
+  border-radius: 999px;
+  min-width: inherit;
+  text-align: center;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.summary-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(95, 106, 176, 0.12);
+  box-shadow: 0 6px 18px rgba(93, 115, 150, 0.08);
+}
+
+.summary-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--blue-violet-a11y);
+
+  .anticon {
+    font-size: 18px;
+  }
+}
+
+.summary-icon.calendar {
+  color: var(--blue-violet-a11y);
+}
+
+.summary-icon.warehouse {
+  color: #7F53AC;
+}
+
+.summary-icon.truck {
+  color: var(--blue-violet-a11y);
+}
+
+.summary-icon.deliveries {
+  color: var(--warning);
+}
+
+.summary-icon.stops {
+  color: #d66d75;
+}
+
+.summary-icon.distance {
+  color: #4da0b0;
+}
+
+.summary-icon.duration {
+  color: #7f7fd5;
+}
+
+.summary-icon.cost {
+  color: #3a823d;
+}
+
+.summary-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+
+  .summary-item-value {
+    padding-left: 0;
+  }
+}
+
+.summary-item-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #5A6578;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.summary-item-value {
+  display: block;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gray-dark);
+}
+
+.map-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(93, 115, 150, 0.08);
+}
+
+.route-map {
+  width: 100%;
+  height: 520px;
+  border-radius: 12px;
+  background: #e6ebf2;
+  overflow: hidden;
+
+  > div {
+    border-radius: 12px !important;
+  }
+}
+
+.map-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #edf1f7;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  color: #5A6578;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-block;
+
+  &.pickup {
+    background: #5f6ab0;
+  }
+
+  &.delivery {
+    background: var(--success);
+  }
+}
+
+.stops-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(93, 115, 150, 0.08);
+}
+
+.subtitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--gray-dark);
+  margin-bottom: 16px;
+}
+
+.table-container {
+  max-height: 520px;
+  overflow-y: auto;
+}
+
+.stop-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.pickup-stop {
+  background-color: var(--blue-violet-a11y);
+  color: var(--white);
+}
+
+.delivery-stop {
+  background-color: var(--success);
+  color: var(--white);
+}
+
+.table-name {
+  margin: 0;
+  font-weight: 600;
+  color: var(--gray-dark);
+}
+
+.table-address {
+  margin: 0;
+  font-size: 13px;
+  color: #596579;
+}
+
+.pickup-tag {
+  background-color: var(--blue-violet-a11y) !important;
+  border-color: var(--blue-violet-a11y) !important;
+  color: var(--white) !important;
+}
+
+.delivery-tag {
+  background-color: var(--success) !important;
+  border-color: var(--success) !important;
+  color: var(--white) !important;
+}
+
+.table-order {
+  margin-top: 2px;
+}
+
+::host ::ng-deep {
+  .gm-style .gm-style-iw-c {
+    border-radius: 10px;
+    padding: 0;
+  }
+
+  .gm-style .gm-style-iw-t::after {
+    background: linear-gradient(45deg, white 50%, transparent 51%, transparent 100%);
+  }
+
+  .btn-primary {
+    color: #ffffff !important;
+
+    span,
+    nz-spin {
+      color: #ffffff !important;
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .map-card,
+  .stops-card {
+    padding: 20px;
+  }
+
+  .route-map {
+    height: 420px;
+  }
+}
+

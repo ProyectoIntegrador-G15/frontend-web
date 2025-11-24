@@ -1,0 +1,417 @@
+<!-- Modal de crear proveedor -->
+<nz-modal
+  [(nzVisible)]="isSupplierModalVisible"
+  [nzTitle]="supplierModalTitle"
+  [nzContent]="supplierModalContent"
+  [nzFooter]="supplierModalFooter"
+  (nzOnCancel)="handleSupplierModalCancel()"
+  nzWidth="75%"
+>
+  <ng-template #supplierModalTitle>{{ 'suppliers.newSupplier' | customTranslate }}</ng-template>
+
+  <ng-template #supplierModalContent>
+    <form nz-form nzLayout="vertical" [formGroup]="validateForm" (ngSubmit)="handleSupplierModalOk()">
+      <!-- Nombre del proveedor -->
+      <nz-form-item>
+        <nz-form-control [nzValidateStatus]="getFieldStatus('name')" [nzErrorTip]="getFieldError('name')">
+          <nz-form-label id="name-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+            {{ 'suppliers.supplierName' | customTranslate }}: <span class="text-red-500">*</span>
+          </nz-form-label>
+          <input
+            class="{{inputClass}}"
+            type="text"
+            nz-input
+            id="name-input"
+            [attr.aria-labelledby]="'name-label'"
+            [placeholder]="'suppliers.supplierNamePlaceholder' | customTranslate"
+            formControlName="name">
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- NIT y Dígito de verificación -->
+      <div nz-row nzGutter="16">
+        <div nz-col nzXs="24" nzSm="18">
+          <nz-form-item>
+            <nz-form-control [nzValidateStatus]="getFieldStatus('nit')" [nzErrorTip]="getFieldError('nit')">
+              <nz-form-label id="nit-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+                {{ 'suppliers.nit' | customTranslate }}: <span class="text-red-500">*</span>
+              </nz-form-label>
+              <input
+                class="{{inputClass}}"
+                type="text"
+                nz-input
+                id="nit-input"
+                [attr.aria-labelledby]="'nit-label'"
+                [placeholder]="'suppliers.nitPlaceholder' | customTranslate"
+                formControlName="nit"
+                maxlength="15">
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzXs="24" nzSm="6">
+          <nz-form-item>
+            <nz-form-control [nzValidateStatus]="getFieldStatus('nitVerificationDigit')" [nzErrorTip]="getFieldError('nitVerificationDigit')">
+              <nz-form-label id="nitVerificationDigit-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+                {{ 'suppliers.nitVerificationDigit' | customTranslate }}: <span class="text-red-500">*</span>
+              </nz-form-label>
+              <input
+                class="{{inputClass}}"
+                type="text"
+                nz-input
+                id="nitVerificationDigit-input"
+                [attr.aria-labelledby]="'nitVerificationDigit-label'"
+                [placeholder]="'suppliers.nitVerificationDigitPlaceholder' | customTranslate"
+                formControlName="nitVerificationDigit"
+                maxlength="1">
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <nz-form-item>
+        <nz-form-control [nzValidateStatus]="getFieldStatus('email')" [nzErrorTip]="getFieldError('email')">
+          <nz-form-label id="email-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+            {{ 'suppliers.email' | customTranslate }}: <span class="text-red-500">*</span>
+          </nz-form-label>
+          <input
+            class="{{inputClass}}"
+            type="email"
+            nz-input
+            id="email-input"
+            [attr.aria-labelledby]="'email-label'"
+            [placeholder]="'suppliers.emailPlaceholder' | customTranslate"
+            formControlName="email">
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- País y Ciudad -->
+      <div nz-row nzGutter="16">
+        <div nz-col nzXs="24" nzSm="12">
+          <nz-form-item>
+            <nz-form-control [nzValidateStatus]="getFieldStatus('country')" [nzErrorTip]="getFieldError('country')">
+              <nz-form-label id="country-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+                {{ 'suppliers.country' | customTranslate }}: <span class="text-red-500">*</span>
+              </nz-form-label>
+              <label for="country-select" class="sr-only">{{ 'suppliers.country' | customTranslate }}</label>
+              <nz-select
+                class="w-full"
+                nzId="country-select"
+                nzLabelId="country-label"
+                [nzPlaceHolder]="'suppliers.selectCountry' | customTranslate"
+                [attr.aria-label]="('suppliers.country' | customTranslate) + ' ' + ('common.required' | customTranslate)"
+                [attr.aria-labelledby]="'country-label'"
+                [attr.aria-describedby]="'country-label'"
+                nzAllowClear
+                formControlName="country">
+                <nz-option *ngFor="let country of countries" [nzValue]="country" [nzLabel]="country"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col nzXs="24" nzSm="12">
+          <nz-form-item>
+            <nz-form-control [nzValidateStatus]="getFieldStatus('city')" [nzErrorTip]="getFieldError('city')">
+              <nz-form-label id="city-label" class="text-[15px] font-semibold text-dark dark:text-white/[.87] capitalize mb-[10px]">
+                {{ 'suppliers.city' | customTranslate }}: <span class="text-red-500">*</span>
+              </nz-form-label>
+              <input
+                class="{{inputClass}}"
+                type="text"
+                nz-input
+                id="city-input"
+                [attr.aria-labelledby]="'city-label'"
+                [placeholder]="'suppliers.cityPlaceholder' | customTranslate"
+                formControlName="city">
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+    </form>
+  </ng-template>
+
+  <ng-template #supplierModalFooter>
+    <div class="flex justify-center gap-3 w-full">
+      <button class="btn-secondary-sm" (click)="handleSupplierModalCancel()">
+        {{ 'common.cancel' | customTranslate }}
+      </button>
+      <button class="btn-primary-sm" (click)="handleSupplierModalOk()" [nzLoading]="isSupplierModalLoading">
+        <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
+        {{ 'suppliers.createSupplier' | customTranslate }}
+      </button>
+    </div>
+  </ng-template>
+</nz-modal>
+
+<!-- Modal de carga masiva -->
+<nz-modal
+  [(nzVisible)]="isBulkUploadModalVisible"
+  [nzTitle]="bulkUploadModalTitle"
+  [nzContent]="bulkUploadModalContent"
+  [nzFooter]="bulkUploadModalFooter"
+  (nzOnCancel)="handleBulkUploadModalCancel()"
+  nzWidth="75%"
+>
+  <ng-template #bulkUploadModalTitle>{{ 'suppliers.bulkUpload' | customTranslate }}</ng-template>
+
+  <ng-template #bulkUploadModalContent>
+    <div class="space-y-6">
+
+      <!-- Descargar plantillas -->
+      <div class="bg-gray-50 dark:bg-white/5 p-4 rounded-lg border border-dashed border-gray-300 dark:border-white/10">
+        <div class="text-center mb-4">
+          <p class="font-medium text-dark dark:text-white/[.87] mb-1">{{ 'suppliers.downloadTemplate' | customTranslate }}</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- Plantilla Excel -->
+          <div class="flex items-center justify-between p-3 bg-white dark:bg-white/10 rounded-lg border border-gray-200 dark:border-white/20">
+            <div class="flex items-center gap-3">
+              <span nz-icon nzType="file-excel" nzTheme="outline" class="text-green-500 text-xl" aria-hidden="true"></span>
+              <div>
+                <p class="font-medium text-dark dark:text-white/[.87] text-sm">{{ 'suppliers.excelTemplate' | customTranslate }}</p>
+                <p class="text-xs text-gray-500 dark:text-white/50">{{ 'suppliers.excelFormat' | customTranslate }}</p>
+              </div>
+            </div>
+            <button
+              class="btn-secondary-sm text-xs px-3 py-1"
+              (click)="downloadExcelTemplate()">
+              <span nz-icon nzType="download" nzTheme="outline" class="text-xs" aria-hidden="true"></span>
+              {{ 'suppliers.downloadTemplate' | customTranslate }}
+            </button>
+          </div>
+
+          <!-- Plantilla CSV -->
+          <div class="flex items-center justify-between p-3 bg-white dark:bg-white/10 rounded-lg border border-gray-200 dark:border-white/20">
+            <div class="flex items-center gap-3">
+              <span nz-icon nzType="file-text" nzTheme="outline" class="text-blue-500 text-xl" aria-hidden="true"></span>
+              <div>
+                <p class="font-medium text-dark dark:text-white/[.87] text-sm">{{ 'suppliers.csvTemplate' | customTranslate }}</p>
+                <p class="text-xs text-gray-500 dark:text-white/50">{{ 'suppliers.csvFormat' | customTranslate }}</p>
+              </div>
+            </div>
+            <button
+              class="btn-secondary-sm text-xs px-3 py-1"
+              (click)="downloadCsvTemplate()">
+              <span nz-icon nzType="download" nzTheme="outline" class="text-xs" aria-hidden="true"></span>
+              {{ 'suppliers.downloadTemplate' | customTranslate }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Área de carga -->
+      <div class="upload-area">
+        <nz-upload
+          class="upload-list-inline"
+          nzListType="picture"
+          nzType="drag"
+          [nzMultiple]="false"
+          [nzFileList]="fileList"
+          nzAccept=".xlsx,.csv"
+          [nzCustomRequest]="customRequest"
+          [nzBeforeUpload]="beforeUpload"
+          [nzDownload]="onFileDownload"
+          (nzChange)="handleFileChange($event)"
+        >
+          <p class="text-center mb-[20px]">
+            <span nz-icon nzType="cloud-upload" nzTheme="outline" class="text-6xl text-blue-500" aria-hidden="true"></span>
+          </p>
+          <p class="text-[20px] font-medium text-dark dark:text-white/[.87]">
+            {{ 'suppliers.dragFileHere' | customTranslate }}
+          </p>
+          <p class="text-sm text-gray-500 dark:text-white/50 mt-2">
+            {{ 'suppliers.supportedFormats' | customTranslate }}
+          </p>
+        </nz-upload>
+      </div>
+
+      <!-- Sección de errores -->
+      <div *ngIf="bulkUploadErrors.length > 0" class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+        <div class="flex items-center gap-2 mb-3">
+          <span nz-icon nzType="exclamation-circle" nzTheme="outline" class="text-red-500 text-lg" aria-hidden="true"></span>
+          <h4 id="errors-heading" class="font-medium text-red-700 dark:text-red-400">{{ 'suppliers.errorsFound' | customTranslate }}</h4>
+        </div>
+        <ul 
+          class="space-y-2 max-h-60 overflow-y-auto"
+          role="list"
+          tabindex="0"
+          [attr.aria-labelledby]="'errors-heading'"
+          [attr.aria-label]="('suppliers.errorsFound' | customTranslate) + ': ' + bulkUploadErrors.length + ' ' + ('common.errors' | customTranslate)"
+          (keydown)="onErrorsListKeyDown($event)"
+          #errorsList>
+          <li *ngFor="let error of bulkUploadErrors; let i = index" 
+              class="text-sm text-red-600 dark:text-red-300 bg-red-100 dark:bg-red-900/30 px-3 py-2 rounded"
+              role="listitem">
+            {{ error }}
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </ng-template>
+
+  <ng-template #bulkUploadModalFooter>
+    <div class="flex justify-center gap-3 w-full">
+      <button class="btn-secondary-sm" (click)="handleBulkUploadModalCancel()">
+        {{ 'common.cancel' | customTranslate }}
+      </button>
+      <button
+        class="btn-primary-sm"
+        (click)="loadFile()"
+        [disabled]="isBulkUploadLoading"
+        [class.opacity-50]="isBulkUploadLoading"
+        [class.cursor-not-allowed]="isBulkUploadLoading">
+        <span nz-icon nzType="upload" nzTheme="outline" *ngIf="!isBulkUploadLoading" aria-hidden="true"></span>
+        <span nz-icon nzType="loading" nzTheme="outline" *ngIf="isBulkUploadLoading" aria-hidden="true"></span>
+        {{ isBulkUploadLoading ? ('common.loading' | customTranslate) : ('suppliers.uploadFile' | customTranslate) }}
+      </button>
+    </div>
+  </ng-template>
+</nz-modal>
+
+<h1 class="screen-title mb-6">{{ 'suppliers.title' | customTranslate }}</h1>
+
+<div class="mb-[25px] mt-[4px]">
+  <div class="flex flex-wrap items-center gap-3 justify-between">
+    <div class="flex flex-wrap items-center gap-3">
+      <!-- Búsqueda por nombre o NIT -->
+      <div class="w-full sm:w-auto sm:min-w-[300px] sm:max-w-[350px]">
+        <nz-input-group [nzSuffix]="suffixIconSearch" nzPrefixIcon="search" [nzSize]="'small'">
+          <input
+            type="text"
+            nz-input
+            [placeholder]="'suppliers.searchByNameOrNit' | customTranslate"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchChange($event)"
+            class="text-sm py-1.5"
+          />
+        </nz-input-group>
+        <ng-template #suffixIconSearch>
+          <span *ngIf="searchTerm" nz-icon nzType="close-circle" nzTheme="outline" (click)="clearSearch()" class="cursor-pointer hover:text-red-500 text-sm" role="button" tabindex="0" [attr.aria-label]="'common.clearSearch' | customTranslate" (keydown.enter)="clearSearch()" (keydown.space)="clearSearch()"></span>
+        </ng-template>
+      </div>
+
+      <!-- Filtro por país -->
+      <div class="w-full sm:w-auto sm:min-w-[200px] sm:max-w-[250px]">
+        <label for="country-filter-select" id="country-filter-label" class="sr-only">{{ 'suppliers.filterByCountry' | customTranslate }}</label>
+        <nz-select
+          class="w-full"
+          nzId="country-filter-select"
+          [nzPlaceHolder]="'suppliers.filterByCountry' | customTranslate"
+          [attr.aria-label]="'suppliers.filterByCountry' | customTranslate"
+          [attr.aria-labelledby]="'country-filter-label'"
+          nzAllowClear
+          nzSize="small"
+          [(ngModel)]="countryFilter"
+          (ngModelChange)="onCountrySearchChange($event)">
+          <nz-option *ngFor="let country of countries" [nzValue]="country" [nzLabel]="country"></nz-option>
+        </nz-select>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="w-full sm:w-auto flex flex-col sm:flex-row gap-3">
+      <button class="btn-primary-sm w-full sm:w-auto" (click)="showSupplierModal()">
+        <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
+        {{ 'suppliers.createSupplier' | customTranslate }}
+      </button>
+      <button class="btn-secondary-sm w-full sm:w-auto" (click)="loadBulkSuppliers()">
+        <span nz-icon nzType="upload" nzTheme="outline" aria-hidden="true"></span>
+        {{ 'suppliers.bulkUpload' | customTranslate }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<div
+  class="bg-white dark:bg-white/10 m-0 p-0 text-theme-gray dark:text-white/60 text-[15px] rounded-10 relative mb-[25px]">
+  <div class="p-[25px]">
+    <div 
+      class="w-full overflow-x-auto"
+      tabindex="0"
+      role="region"
+      [attr.aria-label]="'suppliers.tableScrollableRegion' | customTranslate"
+      (keydown)="onTableScrollKeyDown($event)"
+      #tableScrollContainer>
+      <nz-table
+        #suppliersTable
+        [nzData]="suppliers"
+        [nzFrontPagination]="false"
+        [nzShowPagination]="true"
+        [nzPageSize]="pageSize"
+        [nzTotal]="totalSuppliers"
+        [nzLoading]="isLoading"
+        (nzPageIndexChange)="onPageIndexChange($event)"
+        class="pagination-centered">
+        <thead>
+        <tr>
+          <th
+            class="bg-regularBG dark:bg-[#323440] px-[20px] py-[16px] text-start text-dark dark:text-white/[.87] text-15px font-medium border-none before:hidden rounded-s-[10px] capitalize">
+            {{ 'suppliers.supplierName' | customTranslate }}
+          </th>
+          <th
+            class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
+            {{ 'suppliers.nit' | customTranslate }}
+          </th>
+          <th
+            class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
+            {{ 'suppliers.email' | customTranslate }}
+          </th>
+          <th
+            class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
+            {{ 'suppliers.country' | customTranslate }}
+          </th>
+          <th
+            class="bg-regularBG dark:bg-[#323440] px-2 py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden capitalize">
+            {{ 'suppliers.city' | customTranslate }}
+          </th>
+          <th
+            class="bg-regularBG dark:bg-[#323440] px-[20px] py-[16px] text-start text-dark dark:text-white/[.87] text-[15px] font-medium border-none before:hidden rounded-e-[10px] capitalize">
+            {{ 'suppliers.status' | customTranslate }}
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="group" *ngFor="let data of suppliersTable.data">
+          <td
+            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
+            {{ data.name }}
+          </td>
+          <td
+            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
+            {{ data.nit }}
+          </td>
+          <td
+            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
+            {{ data.email }}
+          </td>
+          <td
+            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
+            {{ data.country }}
+          </td>
+          <td
+            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
+            {{ data.city }}
+          </td>
+          <td
+            class="ltr:pr-4 rtl:pl-4 text-dark dark:text-white/[.87] text-[15px] py-4 before:hidden border-none group-hover:bg-transparent">
+            <span *ngIf="data.status === 'active'"
+                  class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+              <span nz-icon nzType="check-circle" nzTheme="outline" class="mr-1 text-xs" aria-hidden="true"></span>
+              {{ 'common.active' | customTranslate }}
+            </span>
+            <span *ngIf="data.status !== 'active'"
+                  class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+              <span nz-icon nzType="close-circle" nzTheme="outline" class="mr-1 text-xs" aria-hidden="true"></span>
+              {{ 'common.inactive' | customTranslate }}
+            </span>
+          </td>
+        </tr>
+        </tbody>
+      </nz-table>
+    </div>
+  </div>
+</div>
+

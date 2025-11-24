@@ -64,3 +64,43 @@
   }
 }
 
+.actions-cell {
+  text-align: center;
+}
+
+.action-button {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  height: auto !important;
+  box-shadow: none !important;
+
+  .anticon {
+    font-size: 18px;
+  }
+
+  &:hover .action-icon {
+    background: rgba(95, 106, 176, 0.18);
+  }
+}
+
+.action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: rgba(95, 106, 176, 0.12);
+  color: var(--blue-violet-dark);
+  transition: background 0.3s ease, transform 0.3s ease;
+
+  .anticon {
+    font-size: 18px;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+

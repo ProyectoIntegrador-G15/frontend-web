@@ -102,7 +102,7 @@ describe('InventoryService', () => {
       tick(); // Procesar operaciones asíncronas después del flush
     }));
 
-    it('should handle empty warehouse list', fakeAsync(() => {
+    it('should handle empty warehouses-list list', fakeAsync(() => {
       const productId = 'MED-999';
       const emptyInventory: ProductInventory = {
         product_id: 'MED-999',

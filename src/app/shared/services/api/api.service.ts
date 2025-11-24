@@ -26,6 +26,15 @@ export class ApiService {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     });
+    
+    // Inicializar token si existe (buscar en localStorage y sessionStorage)
+    let token = localStorage.getItem('idToken');
+    if (!token) {
+      token = sessionStorage.getItem('idToken');
+    }
+    if (token) {
+      this.setAuthToken(token);
+    }
   }
 
   /**

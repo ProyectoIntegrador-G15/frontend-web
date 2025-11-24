@@ -3,7 +3,7 @@ import {Observable, BehaviorSubject} from 'rxjs';
 import {map, catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 
-import {Product} from '../interfaces/product.type';
+import {Product, SupplierInfo} from '../interfaces/product.type';
 import {ApiService, ApiResponse} from './api/api.service';
 import {EndpointsService} from './api/endpoints.service';
 
@@ -17,6 +17,7 @@ export interface ProductApiResponse {
   requires_cold_chain: boolean;
   status: boolean;
   supplier_id: number;
+  supplier?: SupplierInfo | null; // Información del proveedor cuando está disponible
   created_at: string;
   updated_at: string;
 }
@@ -53,7 +54,15 @@ export class ProductsService {
     }
 
     return this.apiService.getDirect<any>(`${this.endpointsService.getEndpointPath('products')}/paginated`, params)
-      .pipe(catchError(this.handleError),
+      .pipe(
+        map(response => {
+          // Transformar los productos para incluir la información del supplier
+          return {
+            ...response,
+            products: response.products.map((product: ProductApiResponse) => this.transformProductWithSupplier(product))
+          };
+        }),
+        catchError(this.handleError)
       );
   }
 
@@ -65,7 +74,25 @@ export class ProductsService {
       id: apiProduct.id.toString(),
       name: apiProduct.name,
       purchase_price: apiProduct.purchase_price,
-      supplier: `Proveedor ${apiProduct.supplier_id}`, // Convertir supplier_id a string descriptivo
+      supplier: apiProduct.supplier || null,
+      supplier_id: apiProduct.supplier_id,
+      requires_cold_chain: apiProduct.requires_cold_chain,
+      status: apiProduct.status,
+      description: apiProduct.description,
+      storageInstructions: apiProduct.storage_instructions
+    };
+  }
+
+  /**
+   * Transforma un producto con información de supplier del backend al formato del frontend
+   */
+  private transformProductWithSupplier(apiProduct: ProductApiResponse): Product {
+    return {
+      id: apiProduct.id.toString(),
+      name: apiProduct.name,
+      purchase_price: apiProduct.purchase_price,
+      supplier: apiProduct.supplier || null,
+      supplier_id: apiProduct.supplier_id,
       requires_cold_chain: apiProduct.requires_cold_chain,
       status: apiProduct.status,
       description: apiProduct.description,
@@ -125,7 +152,17 @@ export class ProductsService {
     if (error.error?.message) {
       errorMessage = error.error.message;
     } else if (error.message) {
-      errorMessage = error.message;
+      // Si el mensaje es solo el prefijo de ApiService sin contenido real, usar el mensaje por defecto
+      const message = error.message.trim();
+      if (message && message !== 'Network or Client Error:' && !message.match(/^Network or Client Error:\s*$/)) {
+        // Extraer el mensaje real si está después del prefijo
+        if (message.startsWith('Network or Client Error: ')) {
+          const actualMessage = message.substring('Network or Client Error: '.length).trim();
+          errorMessage = actualMessage || errorMessage;
+        } else {
+          errorMessage = message;
+        }
+      }
     }
 
     return throwError(() => new Error(errorMessage));

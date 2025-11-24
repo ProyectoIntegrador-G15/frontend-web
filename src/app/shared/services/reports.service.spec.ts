@@ -175,5 +175,81 @@ describe('ReportsService', () => {
     });
   });
 
+  describe('transformReport', () => {
+    it('should transform report with created_by_name', () => {
+      const reportWithName: ReportApiResponse = {
+        id: 1,
+        creation_date: '2025-10-30T00:00:00',
+        month: 10,
+        year: 2025,
+        created_by: 1,
+        created_by_name: 'John Doe',
+        status: 'completed',
+        created_at: '2025-10-30T10:00:00Z',
+        completed_at: '2025-10-30T10:05:00Z',
+        report_url: 'https://example.com/report.pdf'
+      };
+
+      // Access private method through any cast
+      const transformed = (service as any).transformReport(reportWithName);
+      expect(transformed.generatedBy).toBe('John Doe');
+      expect(transformed.downloadUrl).toBe('https://example.com/report.pdf');
+    });
+
+    it('should transform report without created_by_name', () => {
+      const reportWithoutName: ReportApiResponse = {
+        id: 1,
+        creation_date: '2025-10-30T00:00:00',
+        month: 10,
+        year: 2025,
+        created_by: 1,
+        status: 'completed',
+        created_at: '2025-10-30T10:00:00Z',
+        completed_at: '2025-10-30T10:05:00Z'
+      };
+
+      const transformed = (service as any).transformReport(reportWithoutName);
+      expect(transformed.generatedBy).toBe('User 1');
+    });
+
+    it('should transform report without report_url', () => {
+      const reportWithoutUrl: ReportApiResponse = {
+        id: 1,
+        creation_date: '2025-10-30T00:00:00',
+        month: 10,
+        year: 2025,
+        created_by: 1,
+        status: 'completed',
+        created_at: '2025-10-30T10:00:00Z',
+        completed_at: '2025-10-30T10:05:00Z'
+      };
+
+      const transformed = (service as any).transformReport(reportWithoutUrl);
+      expect(transformed.downloadUrl).toBeUndefined();
+    });
+  });
+
+  describe('mapStatus', () => {
+    it('should map pending status', () => {
+      const status = (service as any).mapStatus('pending');
+      expect(status).toBe('pending');
+    });
+
+    it('should map default status to pending', () => {
+      const status = (service as any).mapStatus('unknown');
+      expect(status).toBe('pending');
+    });
+
+    it('should map status case-insensitively', () => {
+      const status1 = (service as any).mapStatus('COMPLETED');
+      const status2 = (service as any).mapStatus('Processing');
+      const status3 = (service as any).mapStatus('FAILED');
+      expect(status1).toBe('completed');
+      expect(status2).toBe('processing');
+      expect(status3).toBe('failed');
+    });
+  });
+
+
 });
 
